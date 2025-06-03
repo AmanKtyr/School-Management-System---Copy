@@ -9,7 +9,8 @@
           <i class="fas fa-bus fa-2x mb-2" style="color:#007bff;"></i>
           <h5 class="card-title">Buses</h5>
           <p class="card-text">Manage all school buses.</p>
-          <a href="#" class="btn btn-outline-primary btn-sm disabled">View Buses</a>
+          <a href="#buses" class="btn btn-outline-primary btn-sm">View Buses</a>
+          <a href="{% url 'bus_add' %}" class="btn btn-primary btn-sm mt-2">Add Bus</a>
         </div>
       </div>
     </div>
@@ -19,7 +20,8 @@
           <i class="fas fa-route fa-2x mb-2" style="color:#28a745;"></i>
           <h5 class="card-title">Routes</h5>
           <p class="card-text">Define and assign bus routes.</p>
-          <a href="#" class="btn btn-outline-success btn-sm disabled">View Routes</a>
+          <a href="#routes" class="btn btn-outline-success btn-sm">View Routes</a>
+          <a href="{% url 'route_add' %}" class="btn btn-success btn-sm mt-2">Add Route</a>
         </div>
       </div>
     </div>
@@ -29,7 +31,8 @@
           <i class="fas fa-user-tie fa-2x mb-2" style="color:#ffc107;"></i>
           <h5 class="card-title">Drivers</h5>
           <p class="card-text">Manage driver details.</p>
-          <a href="#" class="btn btn-outline-warning btn-sm disabled">View Drivers</a>
+          <a href="#drivers" class="btn btn-outline-warning btn-sm">View Drivers</a>
+          <a href="{% url 'driver_add' %}" class="btn btn-warning btn-sm mt-2">Add Driver</a>
         </div>
       </div>
     </div>
@@ -39,36 +42,133 @@
           <i class="fas fa-users fa-2x mb-2" style="color:#dc3545;"></i>
           <h5 class="card-title">Assignments</h5>
           <p class="card-text">Assign students to buses/routes.</p>
-          <a href="#" class="btn btn-outline-danger btn-sm disabled">View Assignments</a>
+          <a href="#assignments" class="btn btn-outline-danger btn-sm">View Assignments</a>
+          <a href="{% url 'assignment_add' %}" class="btn btn-danger btn-sm mt-2">Add Assignment</a>
         </div>
       </div>
     </div>
   </div>
-  <div class="alert alert-info mb-4">Transport section is under development. Soon you will be able to add, edit, and view buses, routes, drivers, and assignments.</div>
-  <div class="d-flex justify-content-end mb-3">
-    <button class="btn btn-primary disabled"><i class="fas fa-plus me-1"></i> Add New Transport Entry</button>
+
+  <div id="buses" class="mb-5">
+    <h4>Buses</h4>
+    <table class="table table-bordered table-hover">
+      <thead class="table-secondary">
+        <tr>
+          <th>Number</th>
+          <th>Capacity</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for bus in buses %}
+        <tr>
+          <td>{{ bus.number }}</td>
+          <td>{{ bus.capacity }}</td>
+          <td>{{ bus.status }}</td>
+          <td>
+            <a href="{% url 'bus_edit' bus.pk %}" class="btn btn-sm btn-warning">Edit</a>
+            <a href="{% url 'bus_delete' bus.pk %}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this bus?');">Delete</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="text-center text-muted">No buses found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
-  <div class="card shadow-sm">
-    <div class="card-header bg-light">
-      <strong>Transport Overview</strong>
-    </div>
-    <div class="card-body">
-      <table class="table table-bordered table-hover mb-0">
-        <thead class="table-secondary">
-          <tr>
-            <th>Type</th>
-            <th>Name/Number</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td colspan="4" class="text-center text-muted">No transport data available yet.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+
+  <div id="routes" class="mb-5">
+    <h4>Routes</h4>
+    <table class="table table-bordered table-hover">
+      <thead class="table-secondary">
+        <tr>
+          <th>Name</th>
+          <th>Start Point</th>
+          <th>End Point</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for route in routes %}
+        <tr>
+          <td>{{ route.name }}</td>
+          <td>{{ route.start_point }}</td>
+          <td>{{ route.end_point }}</td>
+          <td>{{ route.status }}</td>
+          <td>
+            <a href="{% url 'route_edit' route.pk %}" class="btn btn-sm btn-warning">Edit</a>
+            <a href="{% url 'route_delete' route.pk %}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this route?');">Delete</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center text-muted">No routes found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div id="drivers" class="mb-5">
+    <h4>Drivers</h4>
+    <table class="table table-bordered table-hover">
+      <thead class="table-secondary">
+        <tr>
+          <th>Name</th>
+          <th>Phone</th>
+          <th>License Number</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for driver in drivers %}
+        <tr>
+          <td>{{ driver.name }}</td>
+          <td>{{ driver.phone }}</td>
+          <td>{{ driver.license_number }}</td>
+          <td>{{ driver.status }}</td>
+          <td>
+            <a href="{% url 'driver_edit' driver.pk %}" class="btn btn-sm btn-warning">Edit</a>
+            <a href="{% url 'driver_delete' driver.pk %}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this driver?');">Delete</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center text-muted">No drivers found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div id="assignments" class="mb-5">
+    <h4>Assignments</h4>
+    <table class="table table-bordered table-hover">
+      <thead class="table-secondary">
+        <tr>
+          <th>Student Name</th>
+          <th>Bus</th>
+          <th>Route</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for assignment in assignments %}
+        <tr>
+          <td>{{ assignment.student_name }}</td>
+          <td>{{ assignment.bus.number }}</td>
+          <td>{{ assignment.route.name }}</td>
+          <td>{{ assignment.status }}</td>
+          <td>
+            <a href="{% url 'assignment_edit' assignment.pk %}" class="btn btn-sm btn-warning">Edit</a>
+            <a href="{% url 'assignment_delete' assignment.pk %}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this assignment?');">Delete</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center text-muted">No assignments found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 </div>
 {% endblock %}
