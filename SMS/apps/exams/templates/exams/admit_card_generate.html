@@ -1,0 +1,370 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block breadcrumb-left %}
+<div class="breadcrumb-container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-chevron">
+      <li class="breadcrumb-item">
+        <a href="{% url 'home' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-home"></i> Home
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'exams:dashboard' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-graduation-cap"></i> Examination
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'exams:admit_card_list' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-id-card"></i> Admit Cards
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <i class="fas fa-plus"></i> Generate Admit Cards
+      </li>
+    </ol>
+  </nav>
+</div>
+{% endblock breadcrumb-left %}
+
+{% block title-icon %}fas fa-plus{% endblock title-icon %}
+
+{% block title %}Generate Admit Cards{% endblock title %}
+
+{% block subtitle %}Create admit cards for students{% endblock subtitle %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-lg-10 mx-auto">
+      <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-plus me-2"></i>
+            Generate Admit Cards
+          </h5>
+        </div>
+        <div class="card-body">
+          <form method="post" id="generateForm">
+            {% csrf_token %}
+            
+            <div class="row mb-4">
+              <div class="col-md-12">
+                <div class="alert alert-info d-flex align-items-center">
+                  <i class="fas fa-info-circle fa-2x me-3"></i>
+                  <div>
+                    <h5 class="alert-heading mb-1">Important Information</h5>
+                    <p class="mb-0">Generate admit cards for students based on exam, class, and section. You can generate for all students in a class or select specific students.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="exam" class="form-label">Exam <span class="text-danger">*</span></label>
+                <select name="exam" id="exam" class="form-select" required>
+                  <option value="">-- Select Exam --</option>
+                  {% for exam in exams %}
+                  <option value="{{ exam.id }}">{{ exam.name }} ({{ exam.session.name }} {{ exam.term.name }})</option>
+                  {% endfor %}
+                </select>
+                <div class="form-text">
+                  <a href="{% url 'exams:exam_create' %}" target="_blank">
+                    <i class="fas fa-plus-circle"></i> Create New Exam
+                  </a>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label for="roll_number_prefix" class="form-label">Roll Number Prefix</label>
+                <input type="text" name="roll_number_prefix" id="roll_number_prefix" class="form-control" placeholder="E.g., EX2023-">
+                <div class="form-text">Optional prefix for roll numbers. Leave blank to use student registration numbers.</div>
+              </div>
+            </div>
+            
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="student_class" class="form-label">Class</label>
+                <select name="student_class" id="student_class" class="form-select">
+                  <option value="">-- All Classes --</option>
+                  {% for class in classes %}
+                  <option value="{{ class.id }}">{{ class.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="section" class="form-label">Section</label>
+                <input type="text" name="section" id="section" class="form-control" placeholder="Enter section">
+                <div class="form-text">Leave blank for all sections</div>
+              </div>
+            </div>
+            
+            <div class="row mb-4">
+              <div class="col-md-12">
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="select_specific" name="select_specific">
+                  <label class="form-check-label" for="select_specific">Select specific students</label>
+                </div>
+              </div>
+            </div>
+            
+            <div id="studentSelectionSection" class="d-none">
+              <div class="row mb-3">
+                <div class="col-md-12">
+                  <div class="card border">
+                    <div class="card-header bg-light">
+                      <h6 class="mb-0">Select Students</h6>
+                    </div>
+                    <div class="card-body">
+                      <div class="table-responsive">
+                        <table class="table table-hover table-striped" id="studentTable">
+                          <thead class="table-light">
+                            <tr>
+                              <th>
+                                <div class="form-check">
+                                  <input class="form-check-input" type="checkbox" id="selectAllStudents">
+                                  <label class="form-check-label" for="selectAllStudents"></label>
+                                </div>
+                              </th>
+                              <th>S/N</th>
+                              <th>Reg. Number</th>
+                              <th>Name</th>
+                              <th>Class</th>
+                              <th>Section</th>
+                            </tr>
+                          </thead>
+                          <tbody id="studentTableBody">
+                            <tr>
+                              <td colspan="6" class="text-center">Select a class to view students</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <hr class="my-4">
+            
+            <div class="d-flex justify-content-between">
+              <a href="{% url 'exams:admit_card_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Back to List
+              </a>
+              <div>
+                <button type="button" id="previewBtn" class="btn btn-info me-2">
+                  <i class="fas fa-eye me-1"></i> Preview
+                </button>
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-save me-1"></i> Generate
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Preview Modal -->
+  <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title" id="previewModalLabel">Admit Card Preview</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="text-center py-5" id="previewLoading">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-3">Generating preview...</p>
+          </div>
+          <div id="previewContent" class="d-none">
+            <!-- Preview content will be loaded here -->
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="generateFromPreview">
+            <i class="fas fa-save me-1"></i> Generate
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block morejs %}
+<script>
+  $(document).ready(function() {
+    // Toggle student selection section
+    $('#select_specific').on('change', function() {
+      if ($(this).is(':checked')) {
+        $('#studentSelectionSection').removeClass('d-none');
+        loadStudents();
+      } else {
+        $('#studentSelectionSection').addClass('d-none');
+      }
+    });
+    
+    // Load students when class or section changes
+    $('#student_class, #section').on('change', function() {
+      if ($('#select_specific').is(':checked')) {
+        loadStudents();
+      }
+    });
+    
+    // Select all students checkbox
+    $('#selectAllStudents').on('change', function() {
+      $('.student-checkbox').prop('checked', $(this).prop('checked'));
+    });
+    
+    // Preview button click
+    $('#previewBtn').on('click', function() {
+      var examId = $('#exam').val();
+      if (!examId) {
+        alert('Please select an exam first.');
+        return;
+      }
+      
+      $('#previewModal').modal('show');
+      $('#previewLoading').removeClass('d-none');
+      $('#previewContent').addClass('d-none');
+      
+      // Simulate loading preview (would be AJAX in real implementation)
+      setTimeout(function() {
+        $('#previewLoading').addClass('d-none');
+        $('#previewContent').removeClass('d-none');
+        
+        // Sample preview content
+        var previewHtml = `
+          <div class="card border mb-3">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+              <h6 class="mb-0">Sample Admit Card</h6>
+              <div class="text-muted small">Preview Only</div>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-8">
+                  <h4 class="text-center mb-3">School Name</h4>
+                  <h5 class="text-center mb-4">Examination Admit Card</h5>
+                  
+                  <div class="row mb-2">
+                    <div class="col-md-4 fw-bold">Name:</div>
+                    <div class="col-md-8">John Doe</div>
+                  </div>
+                  <div class="row mb-2">
+                    <div class="col-md-4 fw-bold">Roll Number:</div>
+                    <div class="col-md-8">${$('#roll_number_prefix').val() || 'REG'}001</div>
+                  </div>
+                  <div class="row mb-2">
+                    <div class="col-md-4 fw-bold">Class:</div>
+                    <div class="col-md-8">Class X</div>
+                  </div>
+                  <div class="row mb-2">
+                    <div class="col-md-4 fw-bold">Exam:</div>
+                    <div class="col-md-8">${$('#exam option:selected').text()}</div>
+                  </div>
+                  
+                  <h6 class="mt-4 mb-3">Exam Schedule:</h6>
+                  <table class="table table-bordered table-sm">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Date</th>
+                        <th>Subject</th>
+                        <th>Time</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>01 Jun, 2023</td>
+                        <td>Mathematics</td>
+                        <td>09:00 AM - 12:00 PM</td>
+                      </tr>
+                      <tr>
+                        <td>02 Jun, 2023</td>
+                        <td>Science</td>
+                        <td>09:00 AM - 12:00 PM</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="col-md-4 text-center">
+                  <div class="border p-2 mb-3" style="height: 150px; display: flex; align-items: center; justify-content: center;">
+                    <div class="text-muted">Student Photo</div>
+                  </div>
+                  <div class="border-bottom my-3 pt-3">
+                    <div class="text-muted small">Student Signature</div>
+                  </div>
+                  <div class="border-bottom my-3 pt-3">
+                    <div class="text-muted small">Principal Signature</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            This is a preview. The actual admit cards will be generated for all selected students.
+          </div>
+        `;
+        
+        $('#previewContent').html(previewHtml);
+      }, 1500);
+    });
+    
+    // Generate from preview button
+    $('#generateFromPreview').on('click', function() {
+      $('#previewModal').modal('hide');
+      $('#generateForm').submit();
+    });
+    
+    // Function to load students (would be AJAX in real implementation)
+    function loadStudents() {
+      var classId = $('#student_class').val();
+      var section = $('#section').val();
+      
+      if (!classId) {
+        $('#studentTableBody').html('<tr><td colspan="6" class="text-center">Select a class to view students</td></tr>');
+        return;
+      }
+      
+      // Show loading
+      $('#studentTableBody').html('<tr><td colspan="6" class="text-center"><div class="spinner-border spinner-border-sm text-primary me-2" role="status"><span class="visually-hidden">Loading...</span></div> Loading students...</td></tr>');
+      
+      // Simulate loading students (would be AJAX in real implementation)
+      setTimeout(function() {
+        var html = '';
+        
+        // Sample data
+        for (var i = 1; i <= 5; i++) {
+          html += `
+            <tr>
+              <td>
+                <div class="form-check">
+                  <input class="form-check-input student-checkbox" type="checkbox" name="students[]" value="${i}" id="student${i}">
+                  <label class="form-check-label" for="student${i}"></label>
+                </div>
+              </td>
+              <td>${i}</td>
+              <td>REG00${i}</td>
+              <td>Student ${i}</td>
+              <td>Class X</td>
+              <td>${section || 'A'}</td>
+            </tr>
+          `;
+        }
+        
+        $('#studentTableBody').html(html);
+      }, 1000);
+    }
+  });
+</script>
+{% endblock morejs %}

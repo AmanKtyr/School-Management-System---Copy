@@ -1,0 +1,3686 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block title %}
+  {% if object %}
+    Update Student - UDISE+ Format
+  {% else %}
+    Add New Student - UDISE+ Format
+  {% endif %}
+{% endblock title %}
+
+{% block extrastyle %}
+<!-- Make sure Bootstrap CSS is loaded -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<style>
+  /* UDISE+ Form Styling */
+  body {
+    background-color: #f5f7fa;
+  }
+
+  .content-wrapper {
+    background-color: #f5f7fa;
+  }
+
+  .card {
+    border: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .card-header {
+    background-color: #ffffff;
+    border-bottom: 1px solid #eaedf2;
+    padding: 1.25rem 1.5rem;
+  }
+
+  .card-body {
+    padding: 1.5rem;
+  }
+
+  /* Floating Help Button */
+  .floating-help {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1a5ca6, #0e4686);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: 0 6px 16px rgba(14, 70, 134, 0.3);
+    cursor: pointer;
+    z-index: 1000;
+    transition: all 0.3s ease;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+  }
+
+  .floating-help:hover {
+    background: linear-gradient(135deg, #1e66b5, #0d3f77);
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 10px 20px rgba(14, 70, 134, 0.4);
+  }
+
+  .floating-help:active {
+    transform: translateY(0) scale(0.95);
+  }
+
+  .help-tooltip {
+    position: absolute;
+    bottom: 70px;
+    right: 0;
+    width: 320px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    padding: 20px;
+    display: none;
+    z-index: 1001;
+    border: 1px solid rgba(14, 70, 134, 0.1);
+  }
+
+  .help-tooltip.active {
+    display: block;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .help-tooltip h5 {
+    color: #0e4686;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #eaedf2;
+    padding-bottom: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  .help-tooltip p {
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+    line-height: 1.5;
+    color: #4a5568;
+  }
+
+  .help-tooltip ul {
+    padding-left: 20px;
+    margin-bottom: 12px;
+  }
+
+  .help-tooltip li {
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    color: #4a5568;
+    line-height: 1.4;
+  }
+
+  .help-tooltip li strong {
+    color: #2d3748;
+  }
+
+  .help-tooltip .close-help {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    cursor: pointer;
+    color: #a0aec0;
+    font-size: 16px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #f7fafc;
+    transition: all 0.2s ease;
+  }
+
+  .help-tooltip .close-help:hover {
+    background-color: #edf2f7;
+    color: #4a5568;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-10px); }
+  }
+  .udise-header {
+    background: linear-gradient(135deg, #0e4686, #1a5ca6);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px 8px 0 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .udise-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+    z-index: 1;
+  }
+
+  .udise-logo {
+    height: 55px;
+    margin-right: 20px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    z-index: 2;
+    position: relative;
+  }
+
+  .udise-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 2px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    z-index: 2;
+    position: relative;
+  }
+
+  .udise-subtitle {
+    font-size: 0.95rem;
+    opacity: 0.95;
+    margin-bottom: 0;
+    z-index: 2;
+    position: relative;
+  }
+
+  .session-info {
+    font-size: 0.85rem;
+    padding: 6px 12px;
+    background-color: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    z-index: 2;
+    position: relative;
+  }
+
+  .udise-info-bar {
+    background-color: #f0f6fc;
+    border-bottom: 1px solid #d0e0f2;
+    padding: 10px 20px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+  }
+
+  .udise-info-item {
+    font-size: 0.85rem;
+    color: #0e4686;
+    margin-right: 24px;
+    display: flex;
+    align-items: center;
+  }
+
+  .udise-info-item:before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background-color: #0e4686;
+    border-radius: 50%;
+    margin-right: 8px;
+    opacity: 0.5;
+  }
+
+  .udise-info-item strong {
+    font-weight: 600;
+    margin-right: 4px;
+  }
+
+  .udise-section-tabs-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding: 10px 15px;
+    background-color: #ffffff;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    border-bottom: 2px solid #0d6efd;
+  }
+
+  .udise-section-tab {
+    text-align: center;
+    padding: 10px 15px;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    color: #495057;
+    font-weight: normal;
+    font-size: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 5px;
+    text-decoration: none;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  .udise-section-tab .tab-number {
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 2px;
+  }
+
+  .udise-section-tab .tab-text {
+    font-size: 0.9rem;
+  }
+
+  .udise-section-tab:hover {
+    background-color: #e9ecef;
+    color: #0d6efd;
+    transform: translateY(-2px);
+    text-decoration: none;
+  }
+
+  .udise-section-tab.active {
+    color: #ffffff;
+    font-weight: 500;
+    background-color: #0d6efd;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
+
+  .udise-section-tab.active .tab-number,
+  .udise-section-tab.active .tab-text {
+    color: #ffffff;
+  }
+
+  .udise-section-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid #0d6efd;
+  }
+
+  .mt-3 h5.text-primary {
+    color: #0d6efd !important;
+    font-size: 1rem;
+    margin-bottom: 15px;
+  }
+
+  .udise-section {
+    display: none;
+    padding: 30px;
+    background-color: white;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    position: absolute;
+    left: 0;
+    right: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+
+  /* Section fade-in animation */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .udise-section.active {
+    display: block;
+    position: relative;
+    opacity: 1;
+    visibility: visible;
+    animation: fadeIn 0.3s ease;
+    z-index: 1;
+  }
+
+  .udise-section h5 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #0e4686;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  .udise-field-group {
+    margin-bottom: 24px;
+    border-bottom: 1px solid #f0f2f5;
+    padding-bottom: 20px;
+    transition: all 0.2s ease;
+  }
+
+  .udise-field-group:hover {
+    background-color: #f9fafb;
+    border-radius: 8px;
+    padding: 15px;
+    margin-left: -15px;
+    margin-right: -15px;
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  .udise-field-label {
+    font-weight: 600;
+    color: #0e4686;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .udise-field-sublabel {
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin-bottom: 5px;
+  }
+
+  .field-validation-indicator {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    font-size: 0.7rem;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+
+  .field-required {
+    background-color: #fff5f5;
+    color: #e53e3e;
+    border: 1px solid #fed7d7;
+  }
+
+  .field-optional {
+    background-color: #f7fafc;
+    color: #718096;
+    border: 1px solid #e2e8f0;
+  }
+
+  .udise-field-group {
+    position: relative;
+  }
+
+  .udise-field-number {
+    font-weight: 600;
+    color: #0e4686;
+    margin-right: 5px;
+  }
+
+  .udise-rule-reference {
+    font-size: 0.75rem;
+    color: #6c757d;
+    font-style: italic;
+  }
+
+  .udise-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eaedf2;
+  }
+
+  .udise-btn {
+    padding: 10px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+
+  .udise-btn-primary {
+    background: linear-gradient(to bottom, #1a5ca6, #0e4686);
+    color: white;
+    border: none;
+  }
+
+  .udise-btn-secondary {
+    background-color: #f0f6fc;
+    color: #0e4686;
+    border: 1px solid #d0e0f2;
+  }
+
+  .udise-btn-primary:hover {
+    background: linear-gradient(to bottom, #1e66b5, #0d3f77);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(14, 70, 134, 0.2);
+  }
+
+  .udise-btn-secondary:hover {
+    background-color: #e1edf8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  }
+
+  .udise-btn i {
+    margin-right: 8px;
+    font-size: 0.9rem;
+  }
+
+  .udise-btn-primary i {
+    color: rgba(255,255,255,0.9);
+  }
+
+  /* Button pulse animation */
+  @keyframes btnPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+
+  .btn-pulse {
+    animation: btnPulse 0.2s ease;
+  }
+
+  .udise-verified-badge {
+    display: inline-flex;
+    align-items: center;
+    background-color: #e6f7e6;
+    color: #28a745;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+
+  .udise-verified-badge i {
+    margin-right: 5px;
+  }
+
+  .student-info-item {
+    padding: 8px 12px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    height: 100%;
+    border-left: 3px solid #0e4686;
+  }
+
+  .student-info-item .text-muted {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .student-info-item .fw-medium {
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: #212529;
+  }
+
+  /* Form field styling */
+  .form-control, .form-select {
+    border-radius: 6px;
+    border: 1px solid #dde2e6;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    background-color: #f9fafb;
+    transition: all 0.2s ease;
+  }
+
+  .form-control:focus, .form-select:focus {
+    border-color: #0e4686;
+    box-shadow: 0 0 0 3px rgba(14, 70, 134, 0.15);
+    background-color: #ffffff;
+  }
+
+  .form-control::placeholder {
+    color: #adb5bd;
+    font-size: 0.85rem;
+  }
+
+  .form-label {
+    font-weight: 500;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    color: #495057;
+  }
+
+  .form-text {
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+  }
+
+  .invalid-feedback {
+    font-size: 0.75rem;
+    color: #dc3545;
+    margin-top: 0.25rem;
+  }
+
+  /* Radio and checkbox styling */
+  .udise-radio-group {
+    display: flex;
+    gap: 15px;
+  }
+
+  .udise-radio-item {
+    display: flex;
+    align-items: center;
+  }
+
+  .udise-radio-item input[type="radio"] {
+    margin-right: 5px;
+  }
+
+  /* Date picker styling */
+  .date-input-group {
+    position: relative;
+  }
+
+  .date-input-group .form-control {
+    padding-right: 30px;
+  }
+
+  .date-input-group i {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+  }
+</style>
+{% endblock extrastyle %}
+
+{% block content %}
+<!-- Bootstrap check message -->
+<div id="bootstrap-check-message" class="alert alert-warning alert-dismissible fade show mb-3" role="alert" style="display: none;">
+  <strong>Warning!</strong> Bootstrap may not be loaded correctly. Some features might not work properly.
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
+<!-- UDISE+ Header -->
+
+<!-- Edit Student Details Card -->
+<div class="card mb-4 border-0 shadow-sm">
+  <div class="card-header bg-white d-flex align-items-center justify-content-between">
+    <h5 class="mb-0 fw-bold">
+      {% if object %}
+        <i class="fas fa-user-edit text-primary me-2"></i> Edit Student Details
+      {% else %}
+        <i class="fas fa-user-plus text-primary me-2"></i> Add New Student
+      {% endif %}
+    </h5>
+    <div>
+      <a href="{% url 'student-list' %}" class="btn btn-sm btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i> Back to List
+      </a>
+    </div>
+  </div>
+  <div class="card-body p-0">
+
+
+    <!-- Form starts here -->
+    <form method="POST" enctype="multipart/form-data" id="udiseStudentForm" class="needs-validation" novalidate>
+      {% csrf_token %}
+
+      <!-- Progress Indicator -->
+      <div class="progress mb-4" style="height: 4px; background-color: #e9ecef; border-radius: 0; max-width: 1200px; margin-left: auto; margin-right: auto;">
+        <div class="progress-bar" role="progressbar" style="width: 20%; background-color: #0e4686;" id="form-progress-bar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+      </div>
+
+      <!-- UDISE+ Header -->
+      <div class="udise-header d-flex align-items-center mb-4">
+        <div class="d-flex flex-column">
+          <h2 class="udise-title mb-0">{{ profile.college_name | default:"MySchool" }}</h2>
+          <p class="udise-subtitle">{{ profile.college_address | default:"College Address" }}</p>
+        </div>
+
+        <div class="ms-auto session-info">
+          <span id="current-time">12:00 PM</span> | Academic Year: 2023-24
+        </div>
+      </div>
+
+
+
+      <!-- Section Tabs -->
+      <div class="container-fluid px-4 py-3">
+        <div class="row">
+          <div class="col-12">
+            <div class="udise-section-tabs-row d-flex flex-row justify-content-between">
+              <div class="udise-section-tab active" data-section="general-profile" data-progress="20">
+                <span class="tab-number">1</span> <span class="tab-text">General Profile</span>
+              </div>
+              <div class="udise-section-tab" data-section="enrolment-profile" data-progress="40">
+                <span class="tab-number">2</span> <span class="tab-text">Enrolment Profile</span>
+              </div>
+              <div class="udise-section-tab" data-section="facility-profile" data-progress="60">
+                <span class="tab-number">3</span> <span class="tab-text">Facility Profile</span>
+              </div>
+              <div class="udise-section-tab" data-section="document-upload" data-progress="80">
+                <span class="tab-number">4</span> <span class="tab-text">Documents</span>
+              </div>
+              <div class="udise-section-tab" data-section="profile-preview" data-progress="100">
+                <span class="tab-number">5</span> <span class="tab-text">Profile Preview</span>
+              </div>
+            </div>
+            <div class="mt-3">
+              <h5 class="text-primary">General Profile Information</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sections Container -->
+      <div class="udise-sections-container position-relative" style="min-height: 500px;">
+        <!-- Section 1: General Profile -->
+        <div id="general-profile" class="udise-section active">
+          <div class="row">
+          <!-- Student's Name -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <span class="field-validation-indicator field-required">Required</span>
+              <label class="udise-field-label">
+                <span class="udise-field-number">1</span> Student's Name
+                <span class="udise-rule-reference">(as Per School record/School Admission Register)</span>
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="text-danger">*</span> <span class="udise-rule-reference"></span>
+              </div>
+              {{ form.fullname|add_class:"form-control"|default_if_none:""|attr:"required"|attr:"placeholder:Enter student's full name" }}
+              <div class="invalid-feedback">Student name is required</div>
+            </div>
+          </div>
+
+          <!-- Gender -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <span class="field-validation-indicator field-required">Required</span>
+              <label class="udise-field-label">
+                <span class="udise-field-number">2</span> Gender
+                <span class="udise-rule-reference">(as Per School record/School Admission Register)</span>
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="text-danger">*</span> <span class="udise-rule-reference"></span>
+              </div>
+              <select name="gender" class="form-select" required placeholder="Select gender">
+                <option value="">Select gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+              <div class="invalid-feedback">Please select a gender</div>
+            </div>
+          </div>
+
+          <!-- Date of Birth -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <span class="field-validation-indicator field-required">Required</span>
+              <label class="udise-field-label">
+                <span class="udise-field-number">3</span> Date of Birth
+                <span class="udise-rule-reference">(as Per School record/School Admission Register)</span>
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="text-danger">*</span> <span class="udise-rule-reference"></span>
+                <a href="#" class="text-primary" data-bs-toggle="tooltip" title="Click to view age matrix for different classes">Age Matrix</a>
+              </div>
+              <div class="date-input-group">
+                <input type="date" name="date_of_birth" class="form-control" required placeholder="Select date of birth">
+                <i class="fas fa-calendar"></i>
+              </div>
+              <div class="invalid-feedback">Date of birth is required</div>
+            </div>
+          </div>
+
+          <!-- Mother's Name -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <span class="field-validation-indicator field-optional">Optional</span>
+              <label class="udise-field-label">
+                <span class="udise-field-number">4</span> Mother's Name
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <input type="text" name="Mother_name" class="form-control" placeholder="Enter mother's name">
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Father's Name -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">5</span> Father's Name
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <input type="text" name="Father_name" class="form-control" placeholder="Enter father's name">
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Guardian's Name -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">6</span> Guardian's Name
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <input type="text" class="form-control" name="guardian_name" placeholder="Enter guardian's name">
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Permanent Education Number -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">7</span> Permanent Education Number
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <input type="text" name="permanent_education_number" class="form-control" placeholder="Enter permanent education number">
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- AADHAAR Number -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">8</span> AADHAAR Number of Student
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <div class="d-flex align-items-center mb-2">
+                <div class="form-check me-3">
+
+
+                </div>
+              </div>
+              <input type="text" name="aadhar" class="form-control" placeholder="Enter 12-digit Aadhaar number" maxlength="12" pattern="[0-9]{12}">
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Name as per AADHAAR -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">9</span> Name of Student as per AADHAAR Card
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <input type="text" class="form-control" name="name_as_per_aadhaar" placeholder="Enter name as per Aadhaar card">
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Address -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <span class="field-validation-indicator field-required">Required</span>
+              <label class="udise-field-label">
+                <span class="udise-field-number">10</span> Address
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="text-danger">*</span> <span class="udise-rule-reference"></span>
+              </div>
+              <textarea name="address" class="form-control" required placeholder="Enter complete address"></textarea>
+              <div class="invalid-feedback">Address is required</div>
+            </div>
+          </div>
+
+          <!-- Pin Code -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">11</span> Pin Code
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <input type="text" class="form-control" name="pin_code" maxlength="6" pattern="[0-9]{6}" placeholder="Enter 6-digit PIN code" required>
+              <div class="invalid-feedback">Pin code must be 6 digits</div>
+            </div>
+          </div>
+
+          <!-- Mobile Number -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <span class="field-validation-indicator field-required">Required</span>
+              <label class="udise-field-label">
+                <span class="udise-field-number">12</span> Mobile Number
+                <span class="udise-rule-reference">(of Student/Parent/Guardian)</span>
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="text-danger">*</span> <span class="udise-rule-reference"></span>
+              </div>
+              <input type="text" name="mobile_number" class="form-control" placeholder="Enter 10-digit mobile number" pattern="[0-9]{10,15}" required>
+              <div class="invalid-feedback">Valid mobile number is required (10-15 digits)</div>
+            </div>
+          </div>
+
+          <!-- Alternate Mobile Number -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">13</span> Alternate Mobile Number
+                <span class="udise-rule-reference">(of Student/Parent/Guardian)</span>
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <input type="text" class="form-control" name="alternate_mobile" pattern="[0-9]{10,15}" placeholder="Enter alternate mobile number (optional)">
+              <div class="invalid-feedback">Mobile number must be 10-15 digits</div>
+            </div>
+          </div>
+
+          <!-- Contact Email -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">14</span> Contact email id
+                <span class="udise-rule-reference">(of Student/Parent/Guardian)</span>
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <input type="email" name="email_id" class="form-control" placeholder="Enter email address">
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Mother Tongue -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">15</span> Mother Tongue of the Student
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <select class="form-select" name="mother_tongue">
+                <option value="">Select mother tongue</option>
+                <option value="58-HINDI-Bhojpuri">58-HINDI-Bhojpuri</option>
+                <option value="1-HINDI">1-HINDI</option>
+                <option value="2-ENGLISH">2-ENGLISH</option>
+                <option value="3-BENGALI">3-BENGALI</option>
+                <option value="4-MARATHI">4-MARATHI</option>
+                <option value="5-TELUGU">5-TELUGU</option>
+                <option value="6-TAMIL">6-TAMIL</option>
+                <option value="7-GUJARATI">7-GUJARATI</option>
+                <option value="8-URDU">8-URDU</option>
+                <option value="9-KANNADA">9-KANNADA</option>
+                <option value="10-MALAYALAM">10-MALAYALAM</option>
+                <option value="11-ODIA">11-ODIA</option>
+                <option value="12-PUNJABI">12-PUNJABI</option>
+                <option value="13-ASSAMESE">13-ASSAMESE</option>
+                <option value="14-MAITHILI">14-MAITHILI</option>
+                <option value="15-SANSKRIT">15-SANSKRIT</option>
+                <option value="16-KASHMIRI">16-KASHMIRI</option>
+              </select>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Social Category -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">16</span> Social Category
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <select name="social_category" class="form-select">
+                <option value="">Select social category</option>
+                <option value="Gen">General</option>
+                <option value="OBC">OBC</option>
+                <option value="SC">SC</option>
+                <option value="ST">ST</option>
+                <option value="2-SC">2-SC</option>
+                <option value="Other">Other</option>
+              </select>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Minority Group -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">17</span> Minority Group
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <select class="form-select" name="minority_group">
+                <option value="">Select minority group (if applicable)</option>
+                <option value="1-MUSLIM">1-MUSLIM</option>
+                <option value="2-CHRISTIAN">2-CHRISTIAN</option>
+                <option value="3-SIKH">3-SIKH</option>
+                <option value="4-BUDDHIST">4-BUDDHIST</option>
+                <option value="5-PARSI">5-PARSI</option>
+                <option value="6-JAIN">6-JAIN</option>
+                <option value="7-OTHER">7-OTHER</option>
+                <option value="8-LINGUISTIC MINORITY">8-LINGUISTIC MINORITY</option>
+              </select>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- BPL Beneficiary -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">18</span> Whether BPL beneficiary?
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <div class="udise-radio-group">
+                <div class="udise-radio-item">
+                  <input type="radio" id="bpl_yes" name="bpl_beneficiary" value="Yes">
+                  <label for="bpl_yes">Yes</label>
+                </div>
+                <div class="udise-radio-item">
+                  <input type="radio" id="bpl_no" name="bpl_beneficiary" value="No" checked>
+                  <label for="bpl_no">No</label>
+                </div>
+              </div>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- AAY Beneficiary -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">19</span> Whether Antyodaya Anna Yojana (AAY) beneficiary?
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <div class="udise-radio-group">
+                <div class="udise-radio-item">
+                  <input type="radio" id="aay_yes" name="aay_beneficiary" value="Yes">
+                  <label for="aay_yes">Yes</label>
+                </div>
+                <div class="udise-radio-item">
+                  <input type="radio" id="aay_no" name="aay_beneficiary" value="No" checked>
+                  <label for="aay_no">No</label>
+                </div>
+              </div>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- EWS -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">20</span> Whether belongs to EWS (Disadvantaged Group)?
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <div class="udise-radio-group">
+                <div class="udise-radio-item">
+                  <input type="radio" id="ews_yes" name="ews" value="Yes">
+                  <label for="ews_yes">Yes</label>
+                </div>
+                <div class="udise-radio-item">
+                  <input type="radio" id="ews_no" name="ews" value="No" checked>
+                  <label for="ews_no">No</label>
+                </div>
+              </div>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- CWSN -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">21</span> Whether CWSN?
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <div class="udise-radio-group">
+                <div class="udise-radio-item">
+                  <input type="radio" id="cwsn_yes" name="cwsn" value="Yes">
+                  <label for="cwsn_yes">Yes</label>
+                </div>
+                <div class="udise-radio-item">
+                  <input type="radio" id="cwsn_no" name="cwsn" value="No" checked>
+                  <label for="cwsn_no">No</label>
+                </div>
+              </div>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Type of Impairment -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">22</span> If Yes, Type of impairment (code)
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <select class="form-select" name="impairment_type">
+                <option value="">Select</option>
+                <option value="1">1-Blindness</option>
+                <option value="2">2-Low-vision</option>
+                <option value="3">3-Hearing impairment</option>
+                <option value="4">4-Speech and Language disability</option>
+                <option value="5">5-Locomotor disability</option>
+                <option value="6">6-Mental illness</option>
+                <option value="7">7-Specific learning disabilities</option>
+                <option value="8">8-Cerebral palsy</option>
+                <option value="9">9-Autism spectrum disorder</option>
+                <option value="10">10-Multiple disabilities</option>
+                <option value="11">11-Leprosy cured persons</option>
+                <option value="12">12-Dwarfism</option>
+                <option value="13">13-Intellectual disability</option>
+                <option value="14">14-Muscular dystrophy</option>
+                <option value="15">15-Chronic neurological conditions</option>
+                <option value="16">16-Multiple sclerosis</option>
+                <option value="17">17-Thalassemia</option>
+                <option value="18">18-Hemophilia</option>
+                <option value="19">19-Sickle cell disease</option>
+                <option value="20">20-Acid attack victim</option>
+                <option value="21">21-Parkinson's disease</option>
+              </select>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Disability Certificate -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">23</span> Whether having Disability Certificate?
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <div class="udise-radio-group">
+                <div class="udise-radio-item">
+                  <input type="radio" id="disability_cert_yes" name="disability_certificate" value="Yes">
+                  <label for="disability_cert_yes">Yes</label>
+                </div>
+                <div class="udise-radio-item">
+                  <input type="radio" id="disability_cert_no" name="disability_certificate" value="No" checked>
+                  <label for="disability_cert_no">No</label>
+                </div>
+              </div>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Disability Percentage -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">24</span> Disability Percentage (in %)
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <input type="number" class="form-control" name="disability_percentage" min="0" max="100">
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Indian National -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">25</span> Whether the Student is Indian National?
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <div class="udise-radio-group">
+                <div class="udise-radio-item">
+                  <input type="radio" id="indian_yes" name="is_indian" value="Yes" checked>
+                  <label for="indian_yes">Yes</label>
+                </div>
+                <div class="udise-radio-item">
+                  <input type="radio" id="indian_no" name="is_indian" value="No">
+                  <label for="indian_no">No</label>
+                </div>
+              </div>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Out-of-School Child -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">26</span> Is this Student identified as Out-of-School Child in current or previous years?
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <div class="udise-radio-group">
+                <div class="udise-radio-item">
+                  <input type="radio" id="out_of_school_yes" name="out_of_school" value="Yes">
+                  <label for="out_of_school_yes">Yes</label>
+                </div>
+                <div class="udise-radio-item">
+                  <input type="radio" id="out_of_school_no" name="out_of_school" value="No" checked>
+                  <label for="out_of_school_no">No</label>
+                </div>
+              </div>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Blood Group -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">27</span> Blood Group
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <select class="form-select" name="blood_group">
+                <option value="">Select</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+                <option value="Under Investigation">Under Investigation - Result will be updated soon</option>
+              </select>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- When the Child is mainstreamed -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">28</span> When the Child is mainstreamed
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <select class="form-select" name="mainstreamed">
+                <option value="">Select</option>
+                <option value="NA" selected>NA</option>
+                <option value="2023">2023</option>
+                <option value="2022">2022</option>
+                <option value="2021">2021</option>
+                <option value="2020">2020</option>
+                <option value="2019">2019</option>
+              </select>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Mainstreamed -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">4.1.19 (a)</span> When the student is mainstreamed?
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <select class="form-select" name="mainstreamed" disabled>
+                <option value="">Select</option>
+                <option value="1">1-Current Academic Year</option>
+                <option value="2">2-Previous Academic Year</option>
+                <option value="3">3-Before Previous Academic Year</option>
+              </select>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Blood Group -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">4.1.20</span> Blood Group
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <select class="form-select" name="blood_group">
+                <option value="">Under Investigation - Result will be updated soon</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+              </select>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation buttons -->
+        <div class="udise-navigation">
+          <button type="button" class="udise-btn udise-btn-secondary" id="back-btn" disabled>
+            <i class="fas fa-arrow-left me-2"></i> Back
+          </button>
+          <button type="button" class="udise-btn udise-btn-primary" id="next-btn" data-next="enrolment-profile">
+            Next <i class="fas fa-arrow-right ms-2"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Section 2: Enrolment Profile -->
+      <div id="enrolment-profile" class="udise-section">
+        <!-- Section heading will be dynamically updated by JavaScript -->
+
+        <div class="row">
+          <!-- Registration/Admission Number -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <span class="field-validation-indicator field-required">Required</span>
+              <label class="udise-field-label">
+                <span class="udise-field-number">1</span> Registration/Admission Number
+                <span class="udise-rule-reference">(Auto-generated)</span>
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="text-danger">*</span> <span class="udise-rule-reference"></span>
+              </div>
+              <div class="input-group">
+                <input type="text" class="form-control" name="registration_number" value="{{ form.registration_number.value|default:'Will be auto-generated' }}" readonly>
+                <span class="input-group-text bg-light text-muted"><i class="fas fa-lock"></i></span>
+              </div>
+              <small class="form-text text-muted">Format: YYClassSection### (e.g., 2511A002)</small>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Admission Date -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">2</span> Admission Date (DD/ MM/ YYYY) in Present School
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <div class="date-input-group">
+                <input type="date" name="date_of_admission" class="form-control" required placeholder="Select admission date">
+                <i class="fas fa-calendar"></i>
+              </div>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Current Class -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <span class="field-validation-indicator field-required">Required</span>
+              <label class="udise-field-label">
+                <span class="udise-field-number">3</span> Current Class
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="text-danger">*</span> <span class="udise-rule-reference"></span>
+              </div>
+              {{ form.current_class|add_class:"form-select"|attr:"required"|attr:"onchange:loadSections(this.value)" }}
+              <div class="invalid-feedback">Please select a class</div>
+              <div class="form-text text-muted small">When you select a class, its sections will automatically load.</div>
+            </div>
+          </div>
+
+          <!-- Section -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">4</span> Section
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              {{ form.section|add_class:"form-select" }}
+              <div class="invalid-feedback">Please select a section</div>
+            </div>
+          </div>
+
+          <!-- Class/Section Roll Number -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">5</span> Class/Section Roll No
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <input type="text" class="form-control" name="roll_number" placeholder="Enter roll number">
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Medium of Instruction -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">6</span> Medium of Instruction
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <select class="form-select" name="medium_of_instruction">
+                <option value="">Select medium of instruction</option>
+                <option value="19-English">19-English</option>
+                <option value="1-Assamese">1-Assamese</option>
+                <option value="2-Bengali">2-Bengali</option>
+                <option value="3-Gujarati">3-Gujarati</option>
+                <option value="4-Hindi">4-Hindi</option>
+                <option value="5-Kannada">5-Kannada</option>
+                <option value="6-Kashmiri">6-Kashmiri</option>
+                <option value="7-Konkani">7-Konkani</option>
+                <option value="8-Malayalam">8-Malayalam</option>
+                <option value="9-Manipuri">9-Manipuri</option>
+                <option value="10-Marathi">10-Marathi</option>
+                <option value="11-Nepali">11-Nepali</option>
+                <option value="12-Oriya">12-Oriya</option>
+                <option value="13-Punjabi">13-Punjabi</option>
+                <option value="14-Sanskrit">14-Sanskrit</option>
+                <option value="15-Sindhi">15-Sindhi</option>
+                <option value="16-Tamil">16-Tamil</option>
+                <option value="17-Telugu">17-Telugu</option>
+                <option value="18-Urdu">18-Urdu</option>
+                <option value="20-Bodo">20-Bodo</option>
+                <option value="21-Mising">21-Mising</option>
+                <option value="22-Dogri">22-Dogri</option>
+                <option value="23-Khasi">23-Khasi</option>
+                <option value="24-Garo">24-Garo</option>
+                <option value="25-Mizo">25-Mizo</option>
+                <option value="26-Bhutia">26-Bhutia</option>
+                <option value="27-Lepcha">27-Lepcha</option>
+                <option value="28-Limboo">28-Limboo</option>
+                <option value="29-French">29-French</option>
+                <option value="99-Other">99-Other</option>
+              </select>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Languages Group Studied -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">7</span> Languages Group Studied by the Student
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <select class="form-select" name="languages_studied">
+                <option value="">Select languages studied</option>
+                <option value="Hindi, English">Hindi, English</option>
+                <option value="Hindi_English">Hindi_English</option>
+                <option value="English, Hindi, Sanskrit">English, Hindi, Sanskrit</option>
+                <option value="English, Hindi, French">English, Hindi, French</option>
+                <option value="English, Hindi, Urdu">English, Hindi, Urdu</option>
+                <option value="English, Bengali">English, Bengali</option>
+                <option value="English, Tamil">English, Tamil</option>
+                <option value="English, Telugu">English, Telugu</option>
+                <option value="English, Kannada">English, Kannada</option>
+                <option value="English, Malayalam">English, Malayalam</option>
+                <option value="English, Marathi">English, Marathi</option>
+                <option value="English, Gujarati">English, Gujarati</option>
+                <option value="English, Punjabi">English, Punjabi</option>
+              </select>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Academic Stream -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">8</span> Academic Stream opted by student
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+                <span class="text-muted">(For Higher Secondary Classes only)</span>
+              </div>
+              <select class="form-select" name="academic_stream">
+                <option value="">Select</option>
+                <option value="1">1-Arts</option>
+                <option value="2">2-Science</option>
+                <option value="3">3-Commerce</option>
+                <option value="4">4-Vocational</option>
+                <option value="5">5-Other Streams</option>
+                <option value="6">6-Not Applicable</option>
+              </select>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Subjects Group Studied -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">9</span> Subjects Group Studied by the Student
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+                <span class="text-muted">(For Higher Secondary Classes only. As per selection of 4.2.4 (a))</span>
+              </div>
+              <select class="form-select" name="subjects_group">
+                <option value="">Select</option>
+                <option value="1">Physics, Chemistry, Mathematics</option>
+                <option value="2">Physics, Chemistry, Biology</option>
+                <option value="3">History, Geography, Political Science</option>
+                <option value="4">Accountancy, Business Studies, Economics</option>
+                <option value="5">Not Applicable</option>
+              </select>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Status in Previous Year -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">10</span> Status of student in Previous Academic Year of Schooling
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <select class="form-select" name="previous_status">
+                <option value="">Select</option>
+                <option value="1" selected>1-Studied at Current/Same School</option>
+                <option value="2">2-Studied at Other School</option>
+                <option value="3">3-NIOS</option>
+                <option value="4">4-Anganwadi/ECCE</option>
+                <option value="5">5-Not Studied (Status of student in previous academic year)</option>
+              </select>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Previous Grade/Class -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">11</span> Grade/Class Studied in the Previous/Last Academic Year
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <select class="form-select" name="previous_class">
+                <option value="">Select</option>
+                <option value="PP-1" selected>PP-1</option>
+                <option value="PP-2">PP-2</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+              </select>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Admitted/Enrolled Under -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">12</span> Admitted / Enrolled Under (Only for Pvt. Unaided)
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <select class="form-select" name="admitted_under">
+                <option value="">Select</option>
+                <option value="1">1-RTE 12(1)(c)</option>
+                <option value="2">2-RTE 12(1)(c) Disadvantaged Group</option>
+                <option value="3">3-RTE 12(1)(c) Weaker Section</option>
+                <option value="4">4-RTE 12(1)(c) Orphan</option>
+                <option value="5">5-RTE 12(1)(c) Transgender</option>
+                <option value="6">6-RTE 12(1)(c) HIV Affected/Infected</option>
+                <option value="7">7-RTE 12(1)(c) CwSN</option>
+                <option value="8">8-Non-RTE</option>
+                <option value="9" selected>9-Not Applicable</option>
+              </select>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Previous Class Result -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">13</span> In the previous class studied – Result of the examination
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <select class="form-select" name="previous_result">
+                <option value="">Select</option>
+                <option value="1" selected>1-Promoted/Passed</option>
+                <option value="2">2-Promoted/Passed with Grace</option>
+                <option value="3">3-Detained/Repeating</option>
+                <option value="4">4-Appeared for Improvement</option>
+                <option value="5">5-Compartment/Supplementary</option>
+                <option value="6">6-Not Appeared in Exam</option>
+                <option value="7">7-Not Applicable</option>
+              </select>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Previous Class Marks -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">14</span> In the previous class studied – Marks obtained (in Percentage)
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <input type="number" class="form-control" name="previous_marks" min="0" max="100" value="77">
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Attendance Previous Year -->
+          <div class="col-md-4 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">15</span> No. of days Student attended school (in the previous academic year)
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <input type="number" class="form-control" name="previous_attendance" min="0" max="365" value="200">
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation buttons -->
+        <div class="udise-navigation">
+          <button type="button" class="udise-btn udise-btn-secondary" id="back-btn" data-prev="general-profile">
+            <i class="fas fa-arrow-left me-2"></i> Back
+          </button>
+          <button type="button" class="udise-btn udise-btn-primary" id="next-btn" data-next="facility-profile">
+            Next <i class="fas fa-arrow-right ms-2"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Section 3: Facility Profile -->
+      <div id="facility-profile" class="udise-section">
+        <!-- Section heading will be dynamically updated by JavaScript -->
+
+        <div class="row">
+          <!-- SLD Screening -->
+          <div class="col-md-12 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">1</span> Whether Student has been screened for Specific Learning Disability (SLD)?
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <div class="udise-radio-group">
+                <div class="udise-radio-item">
+                  <input type="radio" id="sld_yes" name="sld_screened" value="Yes">
+                  <label for="sld_yes">Yes</label>
+                </div>
+                <div class="udise-radio-item">
+                  <input type="radio" id="sld_no" name="sld_screened" value="No" checked>
+                  <label for="sld_no">No</label>
+                </div>
+              </div>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- SLD Type -->
+          <div class="col-md-12 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">2</span> If Yes-1, specify the type of SLD
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <div class="d-flex flex-wrap gap-4">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="sld_type" id="dysgraphia" value="Dysgraphia" disabled>
+                  <label class="form-check-label" for="dysgraphia">Dysgraphia</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="sld_type" id="dyscalculia" value="Dyscalculia" disabled>
+                  <label class="form-check-label" for="dyscalculia">Dyscalculia</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="sld_type" id="dyslexia" value="Dyslexia" disabled>
+                  <label class="form-check-label" for="dyslexia">Dyslexia</label>
+                </div>
+              </div>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- ASD Screening -->
+          <div class="col-md-12 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">3</span> Whether Student has been screened for Autism Spectrum Disorder (ASD)?
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <div class="udise-radio-group">
+                <div class="udise-radio-item">
+                  <input type="radio" id="asd_yes" name="asd_screened" value="Yes">
+                  <label for="asd_yes">Yes</label>
+                </div>
+                <div class="udise-radio-item">
+                  <input type="radio" id="asd_no" name="asd_screened" value="No" checked>
+                  <label for="asd_no">No</label>
+                </div>
+              </div>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- ADHD Screening -->
+          <div class="col-md-12 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">4</span> Whether Student has been screened for Attention Deficit Hyperactive Disorder (ADHD)?
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <div class="udise-radio-group">
+                <div class="udise-radio-item">
+                  <input type="radio" id="adhd_yes" name="adhd_screened" value="Yes">
+                  <label for="adhd_yes">Yes</label>
+                </div>
+                <div class="udise-radio-item">
+                  <input type="radio" id="adhd_no" name="adhd_screened" value="No" checked>
+                  <label for="adhd_no">No</label>
+                </div>
+              </div>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Gifted/Talented -->
+          <div class="col-md-12 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">5</span> Has the Student been identified as a Gifted / Talented?
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <div class="udise-radio-group">
+                <div class="udise-radio-item">
+                  <input type="radio" id="gifted_yes" name="is_gifted" value="Yes">
+                  <label for="gifted_yes">Yes</label>
+                </div>
+                <div class="udise-radio-item">
+                  <input type="radio" id="gifted_no" name="is_gifted" value="No" checked>
+                  <label for="gifted_no">No</label>
+                </div>
+              </div>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- State/National Competitions -->
+          <div class="col-md-12 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">6</span> Does the student appeared in any State Level Competitions/ National level Competitions/ Olympiads?
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <div class="udise-radio-group">
+                <div class="udise-radio-item">
+                  <input type="radio" id="competitions_yes" name="competitions" value="Yes">
+                  <label for="competitions_yes">Yes</label>
+                </div>
+                <div class="udise-radio-item">
+                  <input type="radio" id="competitions_no" name="competitions" value="No" checked>
+                  <label for="competitions_no">No</label>
+                </div>
+              </div>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- NCC/NSS/Scouts -->
+          <div class="col-md-12 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">7</span> Does the Student participate in NCC/ NSS/ Scouts and Guides?
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <div class="udise-radio-group">
+                <div class="udise-radio-item">
+                  <input type="radio" id="ncc_yes" name="ncc_nss" value="Yes">
+                  <label for="ncc_yes">Yes</label>
+                </div>
+                <div class="udise-radio-item">
+                  <input type="radio" id="ncc_no" name="ncc_nss" value="No" checked>
+                  <label for="ncc_no">No</label>
+                </div>
+              </div>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Digital Devices -->
+          <div class="col-md-12 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">8</span> Whether student is capable of handling digital devices including the internet?
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="text-muted">(Mobile, Laptops, Smart Boards, Desktops, Projectors, the use of computers to retrieve, assess, store, produce, present and exchange information, and to communicate and participate in collaborative networks via the Internet, Interacting through digital technologies, Protecting personal data and privacy)</span>
+              </div>
+              <div class="udise-radio-group">
+                <div class="udise-radio-item">
+                  <input type="radio" id="digital_yes" name="digital_capable" value="Yes" checked>
+                  <label for="digital_yes">Yes</label>
+                </div>
+                <div class="udise-radio-item">
+                  <input type="radio" id="digital_no" name="digital_capable" value="No">
+                  <label for="digital_no">No</label>
+                </div>
+              </div>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Height and Weight -->
+          <div class="col-md-6 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">9</span> Student's Height (in CMs)
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <input type="number" class="form-control" name="height" min="50" max="250" placeholder="Enter height in cm" required>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">10</span> Student's Weight (in KGs)
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <input type="number" class="form-control" name="weight" min="5" max="150" placeholder="Enter weight in kg" required>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Distance to School -->
+          <div class="col-md-6 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">11</span> Approximate Distance of student's residence to school
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <select class="form-select" name="distance_to_school">
+                <option value="">Select distance to school</option>
+                <option value="1">1 - Less than 1 km</option>
+                <option value="2">2 - 1 to 3 km</option>
+                <option value="3">3 - 3 to 5 km</option>
+                <option value="4">4 - More than 5 km</option>
+              </select>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Guardian Education -->
+          <div class="col-md-6 mb-4">
+            <div class="udise-field-group">
+              <label class="udise-field-label">
+                <span class="udise-field-number">12</span> Completed Highest Education Level of Mother/Father/Legal Guardian
+              </label>
+              <div class="udise-field-sublabel">
+                <span class="udise-rule-reference"></span>
+              </div>
+              <select class="form-select" name="guardian_education">
+                <option value="">Select guardian's education level</option>
+                <option value="1">1 - Primary</option>
+                <option value="2">2 - Upper Primary</option>
+                <option value="3">3 - Secondary</option>
+                <option value="4">4 - Higher Secondary</option>
+                <option value="5">5 - Graduation</option>
+                <option value="6">6 - Post Graduation</option>
+                <option value="7">7 - Ph.D.</option>
+                <option value="8">8 - Not Applicable</option>
+              </select>
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation buttons -->
+        <div class="udise-navigation">
+          <button type="button" class="udise-btn udise-btn-secondary" id="back-btn" data-prev="enrolment-profile">
+            <i class="fas fa-arrow-left me-2"></i> Back
+          </button>
+          <button type="button" class="udise-btn udise-btn-primary" id="next-btn" data-next="document-upload">
+            Next <i class="fas fa-arrow-right ms-2"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Section 4: Document Upload -->
+      <div id="document-upload" class="udise-section">
+        <!-- Section heading will be dynamically updated by JavaScript -->
+
+        <div class="alert alert-info d-flex align-items-center border-0 shadow-sm" style="background-color: #e6f7ff; border-left: 4px solid #1890ff;">
+          <i class="fas fa-info-circle me-3 fs-4" style="color: #1890ff;"></i>
+          <div>
+            <strong class="d-block mb-1">Upload optional documents for verification</strong>
+            <span>You can upload clear scanned copies or photos of the following documents if available. All documents are optional. Supported formats: JPG, PNG, PDF (max 2MB each).</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <!-- Photo Upload -->
+          <div class="col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-header bg-light d-flex align-items-center">
+                <i class="fas fa-image me-2 text-primary"></i>
+                <h6 class="mb-0">Student Photo</h6>
+                <span class="ms-auto badge bg-info">Optional</span>
+              </div>
+              <div class="card-body">
+                <div class="mb-3">
+                  <label class="udise-field-label">
+                    <span class="udise-field-number">1</span> Recent Passport Size Photo
+                    <span class="udise-rule-reference">(with white background)</span>
+                  </label>
+                  <div class="input-group">
+                    {{ form.passport|add_class:"form-control"|attr:"accept:image/*" }}
+                    <button class="btn btn-outline-primary" type="button" id="photoGuideBtn" data-bs-toggle="tooltip" title="View photo guidelines">
+                      <i class="fas fa-question-circle"></i>
+                    </button>
+                  </div>
+                  <div class="form-text">JPG/PNG format, max 1MB, white background</div>
+                </div>
+
+                <div class="text-center mt-3 mb-3">
+                  <div class="photo-preview-container" style="width: 120px; height: 150px; border: 1px dashed #ccc; margin: 0 auto; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa; border-radius: 4px;">
+                    <img id="photoPreview" src="{% if form.passport.value %}{{ form.passport.value.url }}{% else %}{% static 'dist/img/avatar.png' %}{% endif %}" alt="Student Photo" style="max-width: 100%; max-height: 100%;">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Document Uploads -->
+          <div class="col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-header bg-light d-flex align-items-center">
+                <i class="fas fa-file-alt me-2 text-primary"></i>
+                <h6 class="mb-0">Optional Documents</h6>
+              </div>
+              <div class="card-body">
+                <div class="mb-3">
+                  <label class="udise-field-label">
+                    <span class="udise-field-number">2</span> Birth Certificate
+                  </label>
+                  <div class="input-group">
+                    <input type="file" class="form-control" name="birth_certificate" accept=".jpg,.jpeg,.png,.pdf" placeholder="Upload birth certificate">
+                    <input type="text" class="form-control" name="birth_certificate_number" placeholder="Enter document number" style="max-width: 150px;">
+                  </div>
+                  <div class="form-text">Proof of date of birth</div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="udise-field-label">
+                    <span class="udise-field-number">3</span> Address Proof
+                  </label>
+                  <div class="input-group">
+                    <input type="file" class="form-control" name="address_proof" accept=".jpg,.jpeg,.png,.pdf" placeholder="Upload address proof">
+                    <input type="text" class="form-control" name="address_proof_number" placeholder="Enter document number" style="max-width: 150px;">
+                  </div>
+                  <div class="form-text">Aadhaar card, utility bill, etc.</div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="udise-field-label">
+                    <span class="udise-field-number">4</span> Previous School Transfer Certificate
+                  </label>
+                  <div class="input-group">
+                    <input type="file" class="form-control" name="transfer_certificate" accept=".jpg,.jpeg,.png,.pdf" placeholder="Upload transfer certificate (if applicable)">
+                    <input type="text" class="form-control" name="transfer_certificate_number" placeholder="Enter TC number" style="max-width: 150px;">
+                  </div>
+                  <div class="form-text">If applicable</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Additional Documents -->
+          <div class="col-md-12 mb-4">
+            <div class="card border-0 shadow-sm">
+              <div class="card-header bg-light d-flex align-items-center">
+                <i class="fas fa-file-medical me-2 text-primary"></i>
+                <h6 class="mb-0">Additional Documents (if applicable)</h6>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-4 mb-3">
+                    <label class="udise-field-label">
+                      <span class="udise-field-number">5</span> Category Certificate (SC/ST/OBC)
+                    </label>
+                    <div class="input-group">
+                      <input type="file" class="form-control" name="category_certificate" accept=".jpg,.jpeg,.png,.pdf" placeholder="Upload category certificate (if applicable)">
+                      <input type="text" class="form-control" name="category_certificate_number" placeholder="Enter certificate number" style="max-width: 150px;">
+                    </div>
+                  </div>
+
+                  <div class="col-md-4 mb-3">
+                    <label class="udise-field-label">
+                      <span class="udise-field-number">6</span> Disability Certificate
+                    </label>
+                    <div class="input-group">
+                      <input type="file" class="form-control" name="disability_certificate" accept=".jpg,.jpeg,.png,.pdf" placeholder="Upload disability certificate (if applicable)">
+                      <input type="text" class="form-control" name="disability_certificate_number" placeholder="Enter certificate number" style="max-width: 150px;">
+                    </div>
+                  </div>
+
+                  <div class="col-md-4 mb-3">
+                    <label class="udise-field-label">
+                      <span class="udise-field-number">7</span> Income Certificate (for EWS)
+                    </label>
+                    <div class="input-group">
+                      <input type="file" class="form-control" name="income_certificate" accept=".jpg,.jpeg,.png,.pdf" placeholder="Upload income certificate (if applicable)">
+                      <input type="text" class="form-control" name="income_certificate_number" placeholder="Enter certificate number" style="max-width: 150px;">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation buttons -->
+        <div class="udise-navigation">
+          <button type="button" class="udise-btn udise-btn-secondary" id="back-btn" data-prev="facility-profile">
+            <i class="fas fa-arrow-left me-2"></i> Back
+          </button>
+          <button type="button" class="udise-btn udise-btn-primary" id="next-btn" data-next="profile-preview">
+            Next <i class="fas fa-arrow-right ms-2"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Section 5: Profile Preview -->
+      <div id="profile-preview" class="udise-section">
+        <!-- Section heading will be dynamically updated by JavaScript -->
+
+        <div class="alert alert-info d-flex align-items-center border-0 shadow-sm" style="background-color: #ebf8ff; border-left: 4px solid #4299e1; border-radius: 8px;">
+          <i class="fas fa-info-circle me-3 fs-4" style="color: #3182ce;"></i>
+          <div>
+            <strong class="d-block mb-1" style="color: #2b6cb0;">Please review all the information before submitting</strong>
+            <span style="color: #4a5568;">You can go back to any section to make changes. All fields marked with <span class="text-danger fw-bold">*</span> are mandatory.</span>
+          </div>
+        </div>
+
+        <!-- Student Information Report Format -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-header bg-primary text-white text-center py-3">
+            <h5 class="mb-0">Student Information Report</h5>
+            <p class="mb-0 small">Student Database Management System (SDMS)</p>
+          </div>
+          <div class="card-body p-0">
+            <table class="table table-bordered mb-0">
+              <tr>
+                <td colspan="3" class="fw-bold">Student Name: <span id="preview-fullname">{{ form.fullname.value|default:"Not provided" }}</span></td>
+                <td>Class: <span id="preview-class">{{ form.current_class.value|default:"Not assigned" }}</span></td>
+<!-- Add this near the top of your form, likely after the opening container div -->
+<div class="college-header mb-4">
+  <h2 class="text-primary">{{ profile.college_name|default:"School Management System" }}</h2>
+  {% if profile.college_logo %}
+  <img src="{{ profile.college_logo.url }}" alt="College Logo" class="img-fluid me-3" style="max-height: 60px;">
+  {% endif %}
+</div>
+
+                <td>Section: <span id="preview-section">{{ form.section.value|default:"Not assigned" }}</span></td>
+              </tr>
+            </table>
+
+            <table class="table table-bordered mb-0">
+              <tr class="bg-light">
+                <td colspan="6" class="fw-bold">General Information of Student</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">1</td>
+                <td>Gender (as Per School record/School Admission Register)</td>
+                <td id="preview-gender">{{ form.gender.value|default:"Not provided" }}</td>
+                <td style="width: 30px;" class="text-center">2</td>
+                <td>Mother Tongue of the Student</td>
+                <td id="preview-mother-tongue">58-HINDI-Bhojpuri</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">3</td>
+                <td>Date of Birth (as Per School record/School Admission Register) (DD/MM/YYYY)</td>
+                <td id="preview-dob">{{ form.date_of_birth.value|default:"Not provided" }}</td>
+                <td style="width: 30px;" class="text-center">4</td>
+                <td>Permanent Education Number</td>
+                <td id="preview-pen">2018010737</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">5</td>
+                <td>Social Category</td>
+                <td id="preview-social-category">2-SC</td>
+                <td style="width: 30px;" class="text-center">6</td>
+                <td>Mother's Name</td>
+                <td id="preview-mother">{{ form.Mother_name.value|default:"Not provided" }}</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">7</td>
+                <td>Minority Group</td>
+                <td id="preview-minority-group">7-NA</td>
+                <td style="width: 30px;" class="text-center">8</td>
+                <td>Father's Name</td>
+                <td id="preview-father">{{ form.Father_name.value|default:"Not provided" }}</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">9</td>
+                <td>Whether BPL beneficiary</td>
+                <td id="preview-bpl">No</td>
+                <td style="width: 30px;" class="text-center">10</td>
+                <td>Guardian's Name</td>
+                <td id="preview-guardian">{{ form.guardian_name.value|default:"Not provided" }}</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">11</td>
+                <td>Whether Antyodaya Anna Yojana (AAY) beneficiary</td>
+                <td id="preview-aay">NA</td>
+                <td style="width: 30px;" class="text-center">12</td>
+                <td>AADHAAR Number of Student</td>
+                <td id="preview-aadhar">{{ form.aadhar.value|default:"Not provided" }}</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">13</td>
+                <td>Whether belongs to EWS / Disadvantaged Group</td>
+                <td id="preview-ews">No</td>
+                <td style="width: 30px;" class="text-center">14</td>
+                <td>Name of Student as per in AADHAAR Card</td>
+                <td id="preview-name-as-per-aadhaar">{{ form.name_as_per_aadhaar.value|default:"Not provided" }}</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">15</td>
+                <td>Whether CWSN</td>
+                <td id="preview-cwsn">No</td>
+                <td style="width: 30px;" class="text-center">16</td>
+                <td>Address</td>
+                <td id="preview-address">{{ form.address.value|default:"Not provided" }}</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">17</td>
+                <td>Type of Impairments</td>
+                <td id="preview-impairments">NA</td>
+                <td style="width: 30px;" class="text-center">18</td>
+                <td>Pincode</td>
+                <td id="preview-pincode">{{ form.pin_code.value|default:"Not provided" }}</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">19</td>
+                <td>Indian Nationality</td>
+                <td id="preview-nationality">Yes</td>
+                <td style="width: 30px;" class="text-center">20</td>
+                <td>Mobile Number (of Student/Parent/Guardian)</td>
+                <td id="preview-mobile">{{ form.mobile_number.value|default:"Not provided" }}</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">21</td>
+                <td>Is Child Identified as Out of School-Child</td>
+                <td id="preview-out-of-school">No</td>
+                <td style="width: 30px;" class="text-center">22</td>
+                <td>Alternate Mobile Number (of Student/Parent/Guardian)</td>
+                <td id="preview-alt-mobile">{{ form.alternate_mobile.value|default:"Not provided" }}</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">23</td>
+                <td>When the Child is mainstreamed</td>
+                <td id="preview-mainstreamed">NA</td>
+                <td style="width: 30px;" class="text-center">24</td>
+                <td>Contact email-id (of Student/Parent/Guardian)</td>
+                <td id="preview-email">{{ form.email_id.value|default:"Not provided" }}</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">25</td>
+                <td>Whether having Disability Certificate</td>
+                <td id="preview-disability-cert">NA</td>
+                <td style="width: 30px;" class="text-center">26</td>
+                <td>Disability Percentage (in %)</td>
+                <td id="preview-disability-percentage">0</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">27</td>
+                <td>Blood Group</td>
+                <td colspan="4" id="preview-blood-group">Under Investigation - Result will be updated soon</td>
+              </tr>
+            </table>
+
+            <table class="table table-bordered mb-0">
+              <tr class="bg-light">
+                <td colspan="6" class="fw-bold">Enrollment Detail of the Student</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">1</td>
+                <td>Admission Number in Present School</td>
+                <td id="preview-admission-number">{{ form.registration_number.value|default:"Will be generated" }}</td>
+                <td style="width: 30px;" class="text-center">2</td>
+                <td>Admitted / Enrolled Under (Only for Pvt. Unaided)</td>
+                <td id="preview-admitted-under">NA</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">3</td>
+                <td>Admission Date (DD/ MM/ YYYY) in Present School</td>
+                <td id="preview-admission-date">{{ form.date_of_admission.value|default:"Not provided" }}</td>
+                <td style="width: 30px;" class="text-center">4</td>
+                <td>Class/Section Roll No</td>
+                <td id="preview-roll-number">1</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">5</td>
+                <td>Medium of Instruction</td>
+                <td id="preview-medium">4-Hindi</td>
+                <td style="width: 30px;" class="text-center">6</td>
+                <td>Languages Group Studied by the Student</td>
+                <td id="preview-languages">Hindi_English</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">7</td>
+                <td>Is the previous class studied - result of the examinations</td>
+                <td id="preview-result">1-Promoted/Passed</td>
+                <td style="width: 30px;" class="text-center">8</td>
+                <td>Academic Stream opted by student</td>
+                <td id="preview-academic-stream">NA</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">9</td>
+                <td>Status of Student in Previous Academic Year of Schooling</td>
+                <td id="preview-previous-status">1-Studied at Current/Same School</td>
+                <td style="width: 30px;" class="text-center">10</td>
+                <td>No. of days child attended school (in the previous academic year)</td>
+                <td id="preview-attendance">206</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">11</td>
+                <td>Grade/Class Studied in the Previous/Last Academic Year</td>
+                <td colspan="4" id="preview-previous-class">Class UKG/KG2/Pre-Primary</td>
+              </tr>
+            </table>
+
+            <table class="table table-bordered mb-0">
+              <tr class="bg-light">
+                <td colspan="6" class="fw-bold">Facility Profile</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">1</td>
+                <td>Whether Facilities provided to the Student (for the year of filling data)</td>
+                <td id="preview-facilities">NA</td>
+                <td style="width: 30px;" class="text-center">2</td>
+                <td>Has the student appeared in State Level Competitions/ Olympics/National level Competitions?</td>
+                <td id="preview-competitions">No</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">3</td>
+                <td>Facilities provided to Student in case of CWSN (for the year of filling data)</td>
+                <td id="preview-cwsn-facilities">NA</td>
+                <td style="width: 30px;" class="text-center">4</td>
+                <td>Does the Student participate in NCC/ NSS/ Scouts and Guides?</td>
+                <td id="preview-ncc-nss">No</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">5</td>
+                <td>Whether Student has been screened for Specific Learning Disability (SLD)</td>
+                <td id="preview-sld-screened">No</td>
+                <td style="width: 30px;" class="text-center">6</td>
+                <td>Whether student is capable of handling digital devices including the internet?</td>
+                <td id="preview-digital">Yes</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">7</td>
+                <td>SLD Type</td>
+                <td id="preview-sld-type">NA</td>
+                <td style="width: 30px;" class="text-center">8</td>
+                <td>Student's Height (in CMs)</td>
+                <td id="preview-height">98 CMs</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">9</td>
+                <td>Whether Student has been screened for Autism Spectrum Disorder (ASD)?</td>
+                <td id="preview-asd-screened">No</td>
+                <td style="width: 30px;" class="text-center">10</td>
+                <td>Student's Weight (in KGs)</td>
+                <td id="preview-weight">30 KGs</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">11</td>
+                <td>Whether Student has been screened for Attention Deficit Hyperactive Disorder (ADHD)?</td>
+                <td id="preview-adhd-screened">No</td>
+                <td style="width: 30px;" class="text-center">12</td>
+                <td>Approximate Distance of student's residence to school</td>
+                <td id="preview-distance">2 - Between 1-3 Kms</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">13</td>
+                <td>Has the Student been identified as a gifted / talented?</td>
+                <td id="preview-gifted">No</td>
+                <td style="width: 30px;" class="text-center">14</td>
+                <td>Completed Highest Education Level of Mother/Father/Legal Guardian</td>
+                <td id="preview-guardian-education">2 - Upper Primary</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="alert border-0 shadow-sm" style="background-color: #fffaf0; border-left: 4px solid #ed8936; border-radius: 8px; padding: 16px;">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="confirmInformation" required style="width: 18px; height: 18px;">
+            <label class="form-check-label fw-bold" for="confirmInformation" style="color: #c05621; padding-left: 8px;">
+              I hereby declare that all the information provided above is correct and complete to the best of my knowledge and belief.
+            </label>
+          </div>
+          <div class="mt-3 small" style="color: #4a5568; margin-left: 26px;">
+            <i class="fas fa-exclamation-triangle me-2" style="color: #dd6b20;"></i>
+            <strong>Note:</strong> Providing false information may result in rejection of admission or cancellation at a later stage.
+          </div>
+        </div>
+
+        <!-- Download Button -->
+        <div class="text-center mb-4">
+          <button type="button" class="btn btn-primary" id="downloadReport">
+            <i class="fas fa-download me-2"></i> Download Student Information Report
+          </button>
+        </div>
+
+        <!-- Navigation buttons -->
+        <div class="udise-navigation">
+          <button type="button" class="udise-btn udise-btn-secondary" id="back-btn" data-prev="facility-profile">
+            <i class="fas fa-arrow-left me-2"></i> Back
+          </button>
+          <div class="d-flex">
+            <button type="button" class="udise-btn udise-btn-secondary me-3" id="draft-btn">
+              <i class="fas fa-file-alt me-2"></i> Save as Draft
+            </button>
+            <button type="submit" class="udise-btn udise-btn-primary" id="submit-btn" disabled>
+              <i class="fas fa-save me-2"></i> Submit & Save
+            </button>
+            <div class="ms-3 d-flex align-items-center text-muted small">
+              <i class="fas fa-lock me-2"></i> Your data is secure and encrypted
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+
+
+{% endblock content %}
+
+{% block morejs %}
+<script>
+  // Make sure Bootstrap is properly initialized
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Bootstrap tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Initialize Bootstrap popovers
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+      return new bootstrap.Popover(popoverTriggerEl);
+    });
+  });
+
+  // Update current time
+  function updateTime() {
+    const now = new Date();
+    let hours = now.getHours();
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    const timeString = hours + ':' + minutes + ' ' + ampm;
+    document.getElementById('current-time').textContent = timeString;
+  }
+
+  // Update time every minute
+  updateTime();
+  setInterval(updateTime, 60000);
+
+  // Function to download Student Information Report as PDF
+  document.getElementById('downloadReport').addEventListener('click', function() {
+    // Create a new window for printing
+    const printWindow = window.open('', '_blank');
+
+    // Get student information
+    const studentName = document.getElementById('preview-fullname').textContent;
+    const studentClass = document.getElementById('preview-class').textContent;
+    const studentSection = document.getElementById('preview-section').textContent;
+
+    // Create the content for the print window
+    let content = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Student Information Report - ${studentName}</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+          table { width: 100%; border-collapse: collapse; margin-bottom: 0; }
+          th, td { border: 1px solid #000; padding: 5px 8px; font-size: 12px; }
+          th { background-color: #f2f2f2; }
+          .header { text-align: center; margin-bottom: 20px; }
+          .section-header { background-color: #f2f2f2; font-weight: bold; }
+          @media print {
+            body { padding: 0; }
+            button { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h2 style="margin-bottom: 5px;">Student Information Report</h2>
+          <p style="margin-top: 0;">Student Database Management System (SDMS)</p>
+        </div>
+
+        <table>
+          <tr>
+            <td colspan="3"><strong>Student Name:</strong> ${studentName}</td>
+            <td><strong>Class:</strong> ${studentClass}</td>
+            <td><strong>Section:</strong> ${studentSection}</td>
+          </tr>
+        </table>
+
+        <table>
+          <tr class="section-header">
+            <td colspan="6">General Information of Student</td>
+          </tr>
+          <tr>
+            <td style="width: 30px; text-align: center;">1</td>
+            <td>Gender (as Per School record/School Admission Register)</td>
+            <td>${document.getElementById('preview-gender').textContent}</td>
+            <td style="width: 30px; text-align: center;">2</td>
+            <td>Mother Tongue of the Student</td>
+            <td>${document.getElementById('preview-mother-tongue').textContent}</td>
+          </tr>
+          <tr>
+            <td style="width: 30px; text-align: center;">3</td>
+            <td>Date of Birth (as Per School record/School Admission Register) (DD/MM/YYYY)</td>
+            <td>${document.getElementById('preview-dob').textContent}</td>
+            <td style="width: 30px; text-align: center;">4</td>
+            <td>Permanent Education Number</td>
+            <td>${document.getElementById('preview-pen').textContent}</td>
+          </tr>
+          <tr>
+            <td style="width: 30px; text-align: center;">5</td>
+            <td>Social Category</td>
+            <td>${document.getElementById('preview-social-category').textContent}</td>
+            <td style="width: 30px; text-align: center;">6</td>
+            <td>Mother's Name</td>
+            <td>${document.getElementById('preview-mother').textContent}</td>
+          </tr>
+          <tr>
+            <td style="width: 30px; text-align: center;">7</td>
+            <td>Minority Group</td>
+            <td>${document.getElementById('preview-minority-group').textContent}</td>
+            <td style="width: 30px; text-align: center;">8</td>
+            <td>Father's Name</td>
+            <td>${document.getElementById('preview-father').textContent}</td>
+          </tr>
+          <tr>
+            <td style="width: 30px; text-align: center;">9</td>
+            <td>Whether BPL beneficiary</td>
+            <td>${document.getElementById('preview-bpl').textContent}</td>
+            <td style="width: 30px; text-align: center;">10</td>
+            <td>Guardian's Name</td>
+            <td>${document.getElementById('preview-guardian').textContent}</td>
+          </tr>
+          <tr>
+            <td style="width: 30px; text-align: center;">11</td>
+            <td>Whether Antyodaya Anna Yojana (AAY) beneficiary</td>
+            <td>${document.getElementById('preview-aay').textContent}</td>
+            <td style="width: 30px; text-align: center;">12</td>
+            <td>AADHAAR Number of Student</td>
+            <td>${document.getElementById('preview-aadhar').textContent}</td>
+          </tr>
+          <tr>
+            <td style="width: 30px; text-align: center;">13</td>
+            <td>Whether belongs to EWS / Disadvantaged Group</td>
+            <td>${document.getElementById('preview-ews').textContent}</td>
+            <td style="width: 30px; text-align: center;">14</td>
+            <td>Name of Student as per in AADHAAR Card</td>
+            <td>${document.getElementById('preview-name-as-per-aadhaar').textContent}</td>
+          </tr>
+          <tr>
+            <td style="width: 30px; text-align: center;">15</td>
+            <td>Whether CWSN</td>
+            <td>${document.getElementById('preview-cwsn').textContent}</td>
+            <td style="width: 30px; text-align: center;">16</td>
+            <td>Address</td>
+            <td>${document.getElementById('preview-address').textContent}</td>
+          </tr>
+          <tr>
+            <td style="width: 30px; text-align: center;">17</td>
+            <td>Type of Impairments</td>
+            <td>${document.getElementById('preview-impairments').textContent}</td>
+            <td style="width: 30px; text-align: center;">18</td>
+            <td>Pincode</td>
+            <td>${document.getElementById('preview-pincode').textContent}</td>
+          </tr>
+          <tr>
+            <td style="width: 30px; text-align: center;">19</td>
+            <td>Indian Nationality</td>
+            <td>${document.getElementById('preview-nationality').textContent}</td>
+            <td style="width: 30px; text-align: center;">20</td>
+            <td>Mobile Number (of Student/Parent/Guardian)</td>
+            <td>${document.getElementById('preview-mobile').textContent}</td>
+          </tr>
+          <tr>
+            <td style="width: 30px; text-align: center;">21</td>
+            <td>Is Child Identified as Out of School-Child</td>
+            <td>${document.getElementById('preview-out-of-school').textContent}</td>
+            <td style="width: 30px; text-align: center;">22</td>
+            <td>Alternate Mobile Number (of Student/Parent/Guardian)</td>
+            <td>${document.getElementById('preview-alt-mobile').textContent}</td>
+          </tr>
+          <tr>
+            <td style="width: 30px; text-align: center;">23</td>
+            <td>When the Child is mainstreamed</td>
+            <td>${document.getElementById('preview-mainstreamed').textContent}</td>
+            <td style="width: 30px; text-align: center;">24</td>
+            <td>Contact email-id (of Student/Parent/Guardian)</td>
+            <td>${document.getElementById('preview-email').textContent}</td>
+          </tr>
+          <tr>
+            <td style="width: 30px; text-align: center;">25</td>
+            <td>Whether having Disability Certificate</td>
+            <td>${document.getElementById('preview-disability-cert').textContent}</td>
+            <td style="width: 30px; text-align: center;">26</td>
+            <td>Disability Percentage (in %)</td>
+            <td>${document.getElementById('preview-disability-percentage').textContent}</td>
+          </tr>
+          <tr>
+            <td style="width: 30px; text-align: center;">27</td>
+            <td>Blood Group</td>
+            <td colspan="4">${document.getElementById('preview-blood-group').textContent}</td>
+          </tr>
+        </table>
+
+        <table>
+          <tr class="section-header">
+            <td colspan="6">Enrollment Detail of the Student</td>
+          </tr>
+          <tr>
+            <td style="width: 30px; text-align: center;">1</td>
+            <td>Admission Number in Present School</td>
+            <td>${document.getElementById('preview-admission-number').textContent}</td>
+            <td style="width: 30px; text-align: center;">2</td>
+            <td>Admitted / Enrolled Under (Only for Pvt. Unaided)</td>
+            <td>${document.getElementById('preview-admitted-under').textContent}</td>
+          </tr>
+          <tr>
+            <td style="width: 30px; text-align: center;">3</td>
+            <td>Admission Date (DD/ MM/ YYYY) in Present School</td>
+            <td>${document.getElementById('preview-admission-date').textContent}</td>
+            <td style="width: 30px; text-align: center;">4</td>
+            <td>Class/Section Roll No</td>
+            <td>${document.getElementById('preview-roll-number').textContent}</td>
+          </tr>
+          <tr>
+            <td style="width: 30px; text-align: center;">5</td>
+            <td>Medium of Instruction</td>
+            <td>${document.getElementById('preview-medium').textContent}</td>
+            <td style="width: 30px; text-align: center;">6</td>
+            <td>Languages Group Studied by the Student</td>
+            <td>${document.getElementById('preview-languages').textContent}</td>
+          </tr>
+          <tr>
+            <td style="width: 30px; text-align: center;">7</td>
+            <td>Is the previous class studied - result of the examinations</td>
+            <td>${document.getElementById('preview-result').textContent}</td>
+            <td style="width: 30px; text-align: center;">8</td>
+            <td>Academic Stream opted by student</td>
+            <td>${document.getElementById('preview-academic-stream').textContent}</td>
+          </tr>
+          <tr>
+            <td style="width: 30px; text-align: center;">9</td>
+            <td>Status of Student in Previous Academic Year of Schooling</td>
+            <td>${document.getElementById('preview-previous-status').textContent}</td>
+            <td style="width: 30px; text-align: center;">10</td>
+            <td>No. of days child attended school (in the previous academic year)</td>
+            <td>${document.getElementById('preview-attendance').textContent}</td>
+          </tr>
+          <tr>
+            <td style="width: 30px; text-align: center;">11</td>
+            <td>Grade/Class Studied in the Previous/Last Academic Year</td>
+            <td colspan="4">${document.getElementById('preview-previous-class').textContent}</td>
+          </tr>
+        </table>
+
+        <table>
+          <tr class="section-header">
+            <td colspan="6">Facility Profile</td>
+          </tr>
+          <tr>
+            <td style="width: 30px; text-align: center;">1</td>
+            <td>Whether Facilities provided to the Student (for the year of filling data)</td>
+            <td>${document.getElementById('preview-facilities').textContent}</td>
+            <td style="width: 30px; text-align: center;">2</td>
+            <td>Has the student appeared in State Level Competitions/ Olympics/National level Competitions?</td>
+            <td>${document.getElementById('preview-competitions').textContent}</td>
+          </tr>
+          <tr>
+            <td style="width: 30px; text-align: center;">3</td>
+            <td>Facilities provided to Student in case of CWSN (for the year of filling data)</td>
+            <td>${document.getElementById('preview-cwsn-facilities').textContent}</td>
+            <td style="width: 30px; text-align: center;">4</td>
+            <td>Does the Student participate in NCC/ NSS/ Scouts and Guides?</td>
+            <td>${document.getElementById('preview-ncc-nss').textContent}</td>
+          </tr>
+          <tr>
+            <td style="width: 30px; text-align: center;">5</td>
+            <td>Whether Student has been screened for Specific Learning Disability (SLD)</td>
+            <td>${document.getElementById('preview-sld-screened').textContent}</td>
+            <td style="width: 30px; text-align: center;">6</td>
+            <td>Whether student is capable of handling digital devices including the internet?</td>
+            <td>${document.getElementById('preview-digital').textContent}</td>
+          </tr>
+          <tr>
+            <td style="width: 30px; text-align: center;">7</td>
+            <td>SLD Type</td>
+            <td>${document.getElementById('preview-sld-type').textContent}</td>
+            <td style="width: 30px; text-align: center;">8</td>
+            <td>Student's Height (in CMs)</td>
+            <td>${document.getElementById('preview-height').textContent}</td>
+          </tr>
+          <tr>
+            <td style="width: 30px; text-align: center;">9</td>
+            <td>Whether Student has been screened for Autism Spectrum Disorder (ASD)?</td>
+            <td>${document.getElementById('preview-asd-screened').textContent}</td>
+            <td style="width: 30px; text-align: center;">10</td>
+            <td>Student's Weight (in KGs)</td>
+            <td>${document.getElementById('preview-weight').textContent}</td>
+          </tr>
+          <tr>
+            <td style="width: 30px; text-align: center;">11</td>
+            <td>Whether Student has been screened for Attention Deficit Hyperactive Disorder (ADHD)?</td>
+            <td>${document.getElementById('preview-adhd-screened').textContent}</td>
+            <td style="width: 30px; text-align: center;">12</td>
+            <td>Approximate Distance of student's residence to school</td>
+            <td>${document.getElementById('preview-distance').textContent}</td>
+          </tr>
+          <tr>
+            <td style="width: 30px; text-align: center;">13</td>
+            <td>Has the Student been identified as a gifted / talented?</td>
+            <td>${document.getElementById('preview-gifted').textContent}</td>
+            <td style="width: 30px; text-align: center;">14</td>
+            <td>Completed Highest Education Level of Mother/Father/Legal Guardian</td>
+            <td>${document.getElementById('preview-guardian-education').textContent}</td>
+          </tr>
+        </table>
+
+        <div style="margin-top: 20px; text-align: center;">
+          <button onclick="window.print();" style="padding: 10px 20px; background-color: #0e4686; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            Print Report
+          </button>
+        </div>
+      </body>
+      </html>
+    `;
+
+    // Write the content to the new window
+    printWindow.document.open();
+    printWindow.document.write(content);
+    printWindow.document.close();
+
+    // Set the filename for the downloaded PDF
+    const filename = `Student_Information_Report_${studentName.replace(/\s+/g, '_')}.pdf`;
+
+    // Auto-trigger print after the content is loaded
+    printWindow.onload = function() {
+      // For browsers that support it, set the filename
+      if (typeof printWindow.document.title !== 'undefined') {
+        printWindow.document.title = filename;
+      }
+    };
+  });
+
+  // Function to load sections based on selected class
+  function loadSections(classId) {
+    if (!classId) return;
+
+    // Clear current options
+    const sectionField = document.querySelector('[name="section"]');
+    sectionField.innerHTML = '<option value="">Loading sections...</option>';
+
+    // Show loading indicator
+    const loadingIndicator = document.createElement('div');
+    loadingIndicator.id = 'section-loading-indicator';
+    loadingIndicator.className = 'text-primary small mt-1';
+    loadingIndicator.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Loading sections...';
+
+    // Add loading indicator after the section field
+    const fieldGroup = sectionField.closest('.udise-field-group');
+    if (fieldGroup && !document.getElementById('section-loading-indicator')) {
+      fieldGroup.appendChild(loadingIndicator);
+    }
+
+    // Fetch sections for the selected class
+    fetch(`/students/api/class/${classId}/sections/`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        // Remove loading indicator
+        const indicator = document.getElementById('section-loading-indicator');
+        if (indicator) indicator.remove();
+
+        // Check if we have sections data
+        if (data && data.sections && Array.isArray(data.sections)) {
+          if (data.sections.length > 0) {
+            sectionField.innerHTML = '<option value="">Select Section</option>';
+
+            // Add new options
+            data.sections.forEach(section => {
+              const option = document.createElement('option');
+              option.value = section.id;
+              option.textContent = section.name;
+              sectionField.appendChild(option);
+            });
+
+            // If there's only one section, select it automatically
+            if (data.sections.length === 1) {
+              sectionField.selectedIndex = 1; // Select the first section (index 1 because index 0 is "Select Section")
+
+              // Trigger change event to update any dependent fields
+              const event = new Event('change');
+              sectionField.dispatchEvent(event);
+            } else {
+              // If there's a previously selected section, try to restore it
+              const currentSection = '{{ form.section.value|default:"" }}';
+              if (currentSection) {
+                for (let i = 0; i < sectionField.options.length; i++) {
+                  if (sectionField.options[i].value === currentSection) {
+                    sectionField.selectedIndex = i;
+                    break;
+                  }
+                }
+              }
+            }
+
+            // Show success message
+            showToast('Sections loaded successfully!', 'success');
+          } else {
+            // No sections found for this class
+            sectionField.innerHTML = '<option value="">No sections available for this class</option>';
+
+            // Add default sections A and B
+            const sectionA = document.createElement('option');
+            sectionA.value = "A";
+            sectionA.textContent = "A";
+            sectionField.appendChild(sectionA);
+
+            const sectionB = document.createElement('option');
+            sectionB.value = "B";
+            sectionB.textContent = "B";
+            sectionField.appendChild(sectionB);
+
+            // Select section A by default
+            sectionField.selectedIndex = 1;
+
+            // Trigger change event
+            const event = new Event('change');
+            sectionField.dispatchEvent(event);
+
+            // Add a message
+            showToast('Using default sections A and B', 'info');
+          }
+        } else {
+          // Invalid data format
+          throw new Error('Invalid data format received from server');
+        }
+      })
+      .catch(error => {
+        console.error('Error loading sections:', error);
+
+        // Remove loading indicator
+        const indicator = document.getElementById('section-loading-indicator');
+        if (indicator) indicator.remove();
+
+        // Show error message
+        sectionField.innerHTML = '<option value="">Select Section</option>';
+
+        // Add default sections A and B
+        const sectionA = document.createElement('option');
+        sectionA.value = "A";
+        sectionA.textContent = "A";
+        sectionField.appendChild(sectionA);
+
+        const sectionB = document.createElement('option');
+        sectionB.value = "B";
+        sectionB.textContent = "B";
+        sectionField.appendChild(sectionB);
+
+        // Select section A by default
+        sectionField.selectedIndex = 1;
+
+        // Trigger change event
+        const event = new Event('change');
+        sectionField.dispatchEvent(event);
+
+        // Show error message
+        showToast('Could not load sections. Using default sections A and B.', 'warning');
+      });
+  }
+
+  // Initialize sections on page load if class is already selected
+  document.addEventListener('DOMContentLoaded', function() {
+    const classField = document.querySelector('[name="current_class"]');
+    const sectionField = document.querySelector('[name="section"]');
+
+    // Add a manual event listener to the class field to ensure it works
+    classField.addEventListener('change', function() {
+      console.log('Class changed to:', this.value);
+      loadSections(this.value);
+    });
+
+    // If class is already selected on page load, load its sections
+    if (classField && classField.value) {
+      console.log('Class already selected, loading sections for class ID:', classField.value);
+      setTimeout(() => {
+        loadSections(classField.value);
+      }, 300); // Small delay to ensure the DOM is fully loaded
+    } else {
+      console.log('No class selected on page load');
+    }
+
+    // Make sure only the first section is visible on page load
+    const allSections = document.querySelectorAll('.udise-section');
+    allSections.forEach((section, index) => {
+      if (index === 0) {
+        section.classList.add('active');
+        section.style.display = 'block';
+        section.style.opacity = '1';
+        section.style.visibility = 'visible';
+      } else {
+        section.classList.remove('active');
+        section.style.display = 'none';
+        section.style.opacity = '0';
+        section.style.visibility = 'hidden';
+      }
+    });
+  });
+
+  // Tab navigation
+  document.addEventListener('DOMContentLoaded', function() {
+    const sectionTabs = document.querySelectorAll('.udise-section-tab');
+    const sections = document.querySelectorAll('.udise-section');
+    const nextButtons = document.querySelectorAll('#next-btn');
+    const backButtons = document.querySelectorAll('#back-btn');
+    const confirmCheckbox = document.getElementById('confirmInformation');
+    const submitButton = document.getElementById('submit-btn');
+
+    // Function to update preview section
+    function updatePreview() {
+      // Update photo preview
+      const photoPreviewElement = document.getElementById('preview-photo');
+      const photoInput = document.querySelector('input[name="passport"]');
+      if (photoInput && photoInput.files && photoInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          photoPreviewElement.src = e.target.result;
+        };
+        reader.readAsDataURL(photoInput.files[0]);
+      }
+
+      // General Profile
+      document.getElementById('preview-fullname').textContent = document.querySelector('[name="fullname"]').value || 'Not provided';
+      document.getElementById('preview-gender').textContent = document.querySelector('[name="gender"]').value || 'Not provided';
+      document.getElementById('preview-dob').textContent = document.querySelector('[name="date_of_birth"]').value || 'Not provided';
+      document.getElementById('preview-father').textContent = document.querySelector('[name="Father_name"]').value || 'Not provided';
+      document.getElementById('preview-mother').textContent = document.querySelector('[name="Mother_name"]').value || 'Not provided';
+      document.getElementById('preview-aadhar').textContent = document.querySelector('[name="aadhar"]').value || 'Not provided';
+      document.getElementById('preview-address').textContent = document.querySelector('[name="address"]').value || 'Not provided';
+      document.getElementById('preview-mobile').textContent = document.querySelector('[name="mobile_number"]').value || 'Not provided';
+      document.getElementById('preview-email').textContent = document.querySelector('[name="email_id"]').value || 'Not provided';
+
+      // Additional fields for Student Information Report
+      // Mother Tongue
+      const motherTongueSelect = document.querySelector('[name="mother_tongue"]');
+      if (motherTongueSelect && motherTongueSelect.selectedIndex > 0) {
+        document.getElementById('preview-mother-tongue').textContent = motherTongueSelect.options[motherTongueSelect.selectedIndex].text;
+      }
+
+      // Permanent Education Number
+      document.getElementById('preview-pen').textContent = document.querySelector('[name="permanent_education_number"]').value || '2018010737';
+
+      // Social Category
+      const socialCategorySelect = document.querySelector('[name="social_category"]');
+      if (socialCategorySelect && socialCategorySelect.selectedIndex > 0) {
+        document.getElementById('preview-social-category').textContent = socialCategorySelect.options[socialCategorySelect.selectedIndex].value;
+      }
+
+      // Guardian's Name
+      document.getElementById('preview-guardian').textContent = document.querySelector('[name="guardian_name"]').value || 'Not provided';
+
+      // Name as per AADHAAR
+      document.getElementById('preview-name-as-per-aadhaar').textContent = document.querySelector('[name="name_as_per_aadhaar"]').value || document.querySelector('[name="fullname"]').value || 'Not provided';
+
+      // Pincode
+      document.getElementById('preview-pincode').textContent = document.querySelector('[name="pin_code"]').value || 'Not provided';
+
+      // Alternate Mobile
+      document.getElementById('preview-alt-mobile').textContent = document.querySelector('[name="alternate_mobile"]').value || 'Not provided';
+
+      // Blood Group
+      const bloodGroupSelect = document.querySelector('[name="blood_group"]');
+      if (bloodGroupSelect && bloodGroupSelect.selectedIndex > 0) {
+        document.getElementById('preview-blood-group').textContent = bloodGroupSelect.options[bloodGroupSelect.selectedIndex].text;
+      }
+
+      // Mainstreamed
+      const mainstreamedSelect = document.querySelector('[name="mainstreamed"]');
+      if (mainstreamedSelect && mainstreamedSelect.selectedIndex > 0) {
+        document.getElementById('preview-mainstreamed').textContent = mainstreamedSelect.options[mainstreamedSelect.selectedIndex].text;
+      }
+
+      // Enrolment Profile
+      document.getElementById('preview-admission-number').textContent = document.querySelector('[name="admission_number"]').value || 'Will be generated';
+      document.getElementById('preview-admission-date').textContent = document.querySelector('[name="date_of_admission"]').value || 'Not provided';
+      document.getElementById('preview-class').textContent = document.querySelector('[name="current_class"]').value || 'Not assigned';
+      document.getElementById('preview-section').textContent = document.querySelector('[name="section"]').value || 'Not assigned';
+
+      // Roll Number
+      document.getElementById('preview-roll-number').textContent = document.querySelector('[name="roll_number"]').value || '1';
+
+      // Medium of instruction
+      const mediumSelect = document.querySelector('[name="medium_of_instruction"]');
+      if (mediumSelect && mediumSelect.selectedIndex > 0) {
+        document.getElementById('preview-medium').textContent = mediumSelect.options[mediumSelect.selectedIndex].text;
+      }
+
+      // Languages Group Studied
+      const languagesSelect = document.querySelector('[name="languages_studied"]');
+      if (languagesSelect && languagesSelect.selectedIndex > 0) {
+        document.getElementById('preview-languages').textContent = languagesSelect.options[languagesSelect.selectedIndex].value;
+      }
+
+      // Previous class result
+      const resultSelect = document.querySelector('[name="previous_result"]');
+      if (resultSelect && resultSelect.selectedIndex > 0) {
+        document.getElementById('preview-result').textContent = resultSelect.options[resultSelect.selectedIndex].text;
+      }
+
+      // Previous class
+      const previousClassSelect = document.querySelector('[name="previous_class"]');
+      if (previousClassSelect && previousClassSelect.selectedIndex > 0) {
+        document.getElementById('preview-previous-class').textContent = previousClassSelect.options[previousClassSelect.selectedIndex].text;
+      }
+
+      // Previous status
+      const previousStatusSelect = document.querySelector('[name="previous_status"]');
+      if (previousStatusSelect && previousStatusSelect.selectedIndex > 0) {
+        document.getElementById('preview-previous-status').textContent = previousStatusSelect.options[previousStatusSelect.selectedIndex].text;
+      }
+
+      // Attendance
+      document.getElementById('preview-attendance').textContent = document.querySelector('[name="previous_attendance"]').value || '206';
+
+      // Facility Profile
+      document.getElementById('preview-height').textContent = document.querySelector('[name="height"]').value + ' CMs' || '98 CMs';
+      document.getElementById('preview-weight').textContent = document.querySelector('[name="weight"]').value + ' KGs' || '30 KGs';
+
+      // Distance to school
+      const distanceSelect = document.querySelector('[name="distance_to_school"]');
+      if (distanceSelect && distanceSelect.selectedIndex > 0) {
+        document.getElementById('preview-distance').textContent = distanceSelect.options[distanceSelect.selectedIndex].text;
+      }
+
+      // Digital capability
+      const digitalYes = document.getElementById('digital_yes');
+      document.getElementById('preview-digital').textContent = digitalYes.checked ? 'Yes' : 'No';
+
+      // Guardian education
+      const educationSelect = document.querySelector('[name="guardian_education"]');
+      if (educationSelect && educationSelect.selectedIndex > 0) {
+        document.getElementById('preview-guardian-education').textContent = educationSelect.options[educationSelect.selectedIndex].text;
+      }
+
+      // Special needs
+      let specialNeeds = 'None';
+      if (document.getElementById('cwsn_yes').checked) {
+        specialNeeds = 'CWSN';
+      } else if (document.getElementById('sld_yes').checked) {
+        specialNeeds = 'Specific Learning Disability';
+      } else if (document.getElementById('asd_yes').checked) {
+        specialNeeds = 'Autism Spectrum Disorder';
+      } else if (document.getElementById('adhd_yes').checked) {
+        specialNeeds = 'ADHD';
+      }
+      document.getElementById('preview-special-needs').textContent = specialNeeds;
+
+      // Update document status badges
+      const photoStatus = document.querySelector('.col-md-3:nth-child(1) .badge');
+      const birthCertStatus = document.querySelector('.col-md-3:nth-child(2) .badge');
+      const addressProofStatus = document.querySelector('.col-md-3:nth-child(3) .badge');
+      const tcStatus = document.querySelector('.col-md-3:nth-child(4) .badge');
+
+      // Check if photo is uploaded
+      if (document.querySelector('input[name="passport"]').files.length > 0) {
+        photoStatus.className = 'badge bg-success';
+        photoStatus.textContent = 'Uploaded';
+      } else {
+        photoStatus.className = 'badge bg-info';
+        photoStatus.textContent = 'Optional';
+      }
+
+      // Check if birth certificate is uploaded
+      if (document.querySelector('input[name="birth_certificate"]').files.length > 0) {
+        birthCertStatus.className = 'badge bg-success';
+        birthCertStatus.textContent = 'Uploaded';
+      } else {
+        birthCertStatus.className = 'badge bg-info';
+        birthCertStatus.textContent = 'Optional';
+      }
+
+      // Check if address proof is uploaded
+      if (document.querySelector('input[name="address_proof"]').files.length > 0) {
+        addressProofStatus.className = 'badge bg-success';
+        addressProofStatus.textContent = 'Uploaded';
+      } else {
+        addressProofStatus.className = 'badge bg-info';
+        addressProofStatus.textContent = 'Optional';
+      }
+
+      // Check if transfer certificate is uploaded
+      if (document.querySelector('input[name="transfer_certificate"]').files.length > 0) {
+        tcStatus.className = 'badge bg-success';
+        tcStatus.textContent = 'Uploaded';
+      } else {
+        tcStatus.className = 'badge bg-secondary';
+        tcStatus.textContent = 'Not Required';
+      }
+    }
+
+    // Tab click handler
+    sectionTabs.forEach(tab => {
+      tab.addEventListener('click', function() {
+        const targetSection = this.getAttribute('data-section');
+        const progress = this.getAttribute('data-progress');
+        const tabText = this.querySelector('.tab-text').textContent.trim();
+
+        // Use the tab-text directly as the section name
+        const sectionName = tabText;
+
+        // Update active tab
+        sectionTabs.forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+
+        // Update progress bar
+        const progressBar = document.getElementById('form-progress-bar');
+        progressBar.style.width = progress + '%';
+        progressBar.setAttribute('aria-valuenow', progress);
+
+        // Update the section heading
+        const sectionHeading = document.querySelector('.mt-3 h5.text-primary');
+        if (sectionHeading) {
+          sectionHeading.textContent = sectionName + ' Information';
+          console.log('Updated section heading to: ' + sectionName + ' Information');
+        }
+
+        // Hide all sections first
+        sections.forEach(section => {
+          section.classList.remove('active');
+          section.style.display = 'none';
+          section.style.opacity = '0';
+          section.style.visibility = 'hidden';
+        });
+
+        // Show only the target section with animation
+        const targetSectionElement = document.getElementById(targetSection);
+        if (targetSectionElement) {
+          targetSectionElement.style.display = 'block';
+
+          // Use setTimeout to ensure the display change has taken effect before changing opacity
+          setTimeout(() => {
+            targetSectionElement.classList.add('active');
+            targetSectionElement.style.opacity = '1';
+            targetSectionElement.style.visibility = 'visible';
+
+            // Update preview if navigating to preview section
+            if (targetSection === 'profile-preview') {
+              updatePreview();
+            }
+
+            // Scroll to the top of the section
+            targetSectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 50);
+        }
+      });
+    });
+
+    // Next button handler
+    nextButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const nextSection = this.getAttribute('data-next');
+        if (nextSection) {
+          // Find and click the corresponding tab
+          const targetTab = document.querySelector(`.udise-section-tab[data-section="${nextSection}"]`);
+          if (targetTab) {
+            // Add a subtle animation effect
+            button.classList.add('btn-pulse');
+            setTimeout(() => {
+              button.classList.remove('btn-pulse');
+              targetTab.click();
+            }, 200);
+          }
+        }
+      });
+    });
+
+    // Back button handler
+    backButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const prevSection = this.getAttribute('data-prev');
+        if (prevSection) {
+          // Find and click the corresponding tab
+          const targetTab = document.querySelector(`.udise-section-tab[data-section="${prevSection}"]`);
+          if (targetTab) {
+            // Add a subtle animation effect
+            button.classList.add('btn-pulse');
+            setTimeout(() => {
+              button.classList.remove('btn-pulse');
+              targetTab.click();
+            }, 200);
+          }
+        }
+      });
+    });
+
+    // Enable/disable submit button based on checkbox
+    if (confirmCheckbox && submitButton) {
+      confirmCheckbox.addEventListener('change', function() {
+        submitButton.disabled = !this.checked;
+      });
+    }
+
+    // Save as Draft functionality
+    const draftButton = document.getElementById('draft-btn');
+    if (draftButton) {
+      draftButton.addEventListener('click', function() {
+        // Add a hidden input to indicate this is a draft submission
+        const draftInput = document.createElement('input');
+        draftInput.type = 'hidden';
+        draftInput.name = 'save_as_draft';
+        draftInput.value = 'true';
+        document.getElementById('udiseStudentForm').appendChild(draftInput);
+
+        // Show confirmation message
+        if (confirm('Do you want to save this form as a draft? You can complete it later.')) {
+          // Submit the form without validation
+          const form = document.getElementById('udiseStudentForm');
+          form.classList.remove('needs-validation');
+          form.noValidate = true;
+          form.submit();
+        } else {
+          // Remove the draft input if user cancels
+          document.querySelector('input[name="save_as_draft"]').remove();
+        }
+      });
+    }
+
+    // Add event listeners to update preview when form fields change
+    const formInputs = document.querySelectorAll('input:not([type="file"]), select, textarea');
+    formInputs.forEach(input => {
+      input.addEventListener('change', function() {
+        if (document.getElementById('profile-preview').classList.contains('active')) {
+          updatePreview();
+        }
+      });
+    });
+
+    // Photo preview functionality
+    const photoInput = document.querySelector('input[name="passport"]');
+    const photoPreview = document.getElementById('photoPreview');
+
+    if (photoInput && photoPreview) {
+      photoInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+          const reader = new FileReader();
+          const fileSize = this.files[0].size / 1024 / 1024; // in MB
+
+          if (fileSize > 1) {
+            showToast('Photo size exceeds 1MB limit. Please choose a smaller file.', 'error');
+            this.value = ''; // Clear the input
+            return;
+          }
+
+          const fileType = this.files[0].type;
+          if (!fileType.match('image.*')) {
+            showToast('Please select an image file (JPG, PNG).', 'error');
+            this.value = ''; // Clear the input
+            return;
+          }
+
+          reader.onload = function(e) {
+            photoPreview.src = e.target.result;
+
+            // Create an image element to check dimensions
+            const img = new Image();
+            img.onload = function() {
+              const width = this.width;
+              const height = this.height;
+
+              // Check if dimensions are appropriate for passport photo
+              if (width < 200 || height < 250) {
+                showToast('Image resolution is too low. Please use a higher quality photo.', 'warning');
+              } else if (width/height < 0.7 || width/height > 0.85) {
+                showToast('Photo dimensions should be in passport size ratio (3:4).', 'warning');
+              } else {
+                showToast('Photo uploaded successfully!', 'success');
+              }
+            };
+            img.src = e.target.result;
+          };
+
+          reader.readAsDataURL(this.files[0]);
+        }
+      });
+    }
+
+    // Photo guidelines button
+    const photoGuideBtn = document.getElementById('photoGuideBtn');
+    if (photoGuideBtn) {
+      photoGuideBtn.addEventListener('click', function() {
+        const guideContent = `
+          <h5>Photo Guidelines</h5>
+          <ul>
+            <li>Recent passport size color photograph (not older than 3 months)</li>
+            <li>White background</li>
+            <li>Face should cover 70-80% of the photo</li>
+            <li>No caps, hats, or sunglasses</li>
+            <li>JPG or PNG format</li>
+            <li>File size should not exceed 1MB</li>
+          </ul>
+        `;
+
+        // Create modal for guidelines
+        const modal = document.createElement('div');
+        modal.className = 'modal fade';
+        modal.id = 'photoGuideModal';
+        modal.innerHTML = `
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header bg-light">
+                <h5 class="modal-title" id="photoGuideModalLabel">Photo Guidelines</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                ${guideContent}
+                <div class="text-center mt-3">
+                  <img src="{% static 'dist/img/photo-guide.png' %}" alt="Photo Guide" style="max-width: 100%; height: auto; border: 1px solid #ddd; padding: 5px;">
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        `;
+
+        // Ensure the modal has the proper Bootstrap 5 attributes
+        modal.setAttribute('tabindex', '-1');
+        modal.setAttribute('aria-labelledby', 'photoGuideModalLabel');
+        modal.setAttribute('aria-hidden', 'true');
+
+        document.body.appendChild(modal);
+
+        // Show the modal - make sure Bootstrap is loaded
+        if (typeof bootstrap !== 'undefined') {
+          const bsModal = new bootstrap.Modal(modal);
+          bsModal.show();
+        } else {
+          console.error('Bootstrap is not loaded. Cannot show modal.');
+          // Fallback to alert if Bootstrap is not available
+          alert('Photo Guidelines:\n- Recent passport size color photograph\n- White background\n- Face should cover 70-80% of the photo\n- No caps, hats, or sunglasses\n- JPG or PNG format\n- File size should not exceed 1MB');
+        }
+
+        // Remove modal from DOM when hidden
+        modal.addEventListener('hidden.bs.modal', function() {
+          document.body.removeChild(modal);
+        });
+      });
+    }
+
+    // Enable/disable SLD type fields based on SLD screening
+    const sldYes = document.getElementById('sld_yes');
+    const sldNo = document.getElementById('sld_no');
+    const sldTypeInputs = document.querySelectorAll('[name="sld_type"]');
+
+    function toggleSldTypeFields() {
+      const isEnabled = sldYes.checked;
+      sldTypeInputs.forEach(input => {
+        input.disabled = !isEnabled;
+      });
+    }
+
+    sldYes.addEventListener('change', toggleSldTypeFields);
+    sldNo.addEventListener('change', toggleSldTypeFields);
+
+    // Enable/disable disability fields based on CWSN selection
+    const cwsnYes = document.getElementById('cwsn_yes');
+    const cwsnNo = document.getElementById('cwsn_no');
+    const impairmentTypeSelect = document.querySelector('[name="impairment_type"]');
+    const disabilityCertYes = document.getElementById('disability_cert_yes');
+    const disabilityCertNo = document.getElementById('disability_cert_no');
+    const disabilityPercentage = document.querySelector('[name="disability_percentage"]');
+
+    function toggleDisabilityFields() {
+      const isEnabled = cwsnYes.checked;
+      impairmentTypeSelect.disabled = !isEnabled;
+      disabilityCertYes.disabled = !isEnabled;
+      disabilityCertNo.disabled = !isEnabled;
+      disabilityPercentage.disabled = !isEnabled;
+
+      // If CWSN is set to No, reset the fields
+      if (!isEnabled) {
+        impairmentTypeSelect.selectedIndex = 0;
+        disabilityCertNo.checked = true;
+        disabilityPercentage.value = '';
+      }
+    }
+
+    // Initialize on page load
+    toggleDisabilityFields();
+
+    // Add event listeners
+    cwsnYes.addEventListener('change', toggleDisabilityFields);
+    cwsnNo.addEventListener('change', toggleDisabilityFields);
+
+    // Form validation
+    const form = document.getElementById('udiseStudentForm');
+    form.addEventListener('submit', function(event) {
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        // Find the first invalid field
+        const invalidField = form.querySelector(':invalid');
+        if (invalidField) {
+          // Find the section containing the invalid field
+          const section = invalidField.closest('.udise-section');
+          if (section) {
+            // Navigate to that section
+            const sectionId = section.id;
+            const tab = document.querySelector(`.udise-section-tab[data-section="${sectionId}"]`);
+            if (tab) {
+              tab.click();
+            }
+
+            // Focus the invalid field
+            invalidField.focus();
+
+            // Show error message
+            const fieldName = invalidField.name || 'This field';
+            const errorMessage = invalidField.validationMessage || `${fieldName} is required`;
+            showToast(`Please check: ${errorMessage}`, 'error');
+          }
+        }
+      } else {
+        // Show loading state on submit button
+        const submitBtn = document.getElementById('submit-btn');
+        if (submitBtn) {
+          submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Saving...';
+          submitBtn.disabled = true;
+        }
+
+        // Make sure Father's mobile number is set from mobile number if not provided
+        const fatherMobileField = document.querySelector('[name="Father_mobile_number"]');
+        if (!fatherMobileField || !fatherMobileField.value) {
+          const mobileNumber = document.querySelector('[name="mobile_number"]').value;
+          // Create a hidden input for Father's mobile number
+          const hiddenInput = document.createElement('input');
+          hiddenInput.type = 'hidden';
+          hiddenInput.name = 'Father_mobile_number';
+          hiddenInput.value = mobileNumber;
+          form.appendChild(hiddenInput);
+        }
+
+        // Show success message
+        showToast('Form submitted successfully! Redirecting to student profile...', 'success');
+      }
+
+      form.classList.add('was-validated');
+    });
+
+    // Floating Help Button Functionality
+    const helpButton = document.getElementById('helpButton');
+    const helpTooltip = document.getElementById('helpTooltip');
+    const closeHelp = document.getElementById('closeHelp');
+    const helpTitle = document.getElementById('helpTitle');
+    const helpContent = document.getElementById('helpContent');
+
+    // Toggle help tooltip
+    if (helpButton && helpTooltip && closeHelp) {
+      helpButton.addEventListener('click', function() {
+        helpTooltip.classList.toggle('active');
+
+        // Show contextual help based on active section
+        const activeSection = document.querySelector('.udise-section.active');
+        if (activeSection) {
+          const sectionId = activeSection.id;
+          const helpInfo = helpContents[sectionId] || {
+            title: 'UDISE+ Form Help',
+            content: 'Select a section to see specific help information.'
+          };
+
+          helpTitle.textContent = helpInfo.title;
+          helpContent.innerHTML = helpInfo.content;
+        }
+      });
+
+      // Close help tooltip
+      closeHelp.addEventListener('click', function(e) {
+        e.stopPropagation();
+        helpTooltip.classList.remove('active');
+      });
+    }
+
+    // Section-specific help content
+    const helpContents = {
+      'general-profile': {
+        title: 'General Profile Help',
+        content: `
+          <p>This section collects basic information about the student:</p>
+          <ul>
+            <li><strong>Student's Name:</strong> Enter the full name as per school records</li>
+            <li><strong>Gender:</strong> Select the appropriate gender</li>
+            <li><strong>Date of Birth:</strong> Enter in DD/MM/YYYY format</li>
+            <li><strong>Parent Information:</strong> Provide accurate parent/guardian details</li>
+            <li><strong>AADHAAR:</strong> 12-digit AADHAAR number if available</li>
+            <li><strong>Contact Details:</strong> Current address and contact information</li>
+          </ul>
+          <p>Fields marked with <span class="text-danger">*</span> are mandatory.</p>
+        `
+      },
+      'enrolment-profile': {
+        title: 'Enrolment Profile Help',
+        content: `
+          <p>This section collects academic information about the student:</p>
+          <ul>
+            <li><strong>Admission Number:</strong> School-assigned admission number</li>
+            <li><strong>Admission Date:</strong> Date of admission to the school</li>
+            <li><strong>Medium of Instruction:</strong> Language used for teaching</li>
+            <li><strong>Previous Academic Details:</strong> Information about previous schooling</li>
+            <li><strong>Academic Stream:</strong> For higher secondary students only</li>
+          </ul>
+          <p>Ensure all academic information is accurate as per school records.</p>
+        `
+      },
+      'facility-profile': {
+        title: 'Facility Profile Help',
+        content: `
+          <p>This section collects information about student's special needs and facilities:</p>
+          <ul>
+            <li><strong>Special Learning Needs:</strong> Information about SLD, ASD, ADHD</li>
+            <li><strong>Physical Attributes:</strong> Height, weight, etc.</li>
+            <li><strong>Distance to School:</strong> How far the student travels</li>
+            <li><strong>Digital Capability:</strong> Student's ability to use digital devices</li>
+            <li><strong>Special Talents:</strong> Information about gifted/talented students</li>
+          </ul>
+          <p>This information helps in providing appropriate facilities to students.</p>
+        `
+      },
+      'document-upload': {
+        title: 'Document Upload Help',
+        content: `
+          <p>This section allows you to upload optional documents:</p>
+          <ul>
+            <li><strong>Student Photo:</strong> Recent passport size photograph with white background</li>
+            <li><strong>Birth Certificate:</strong> Document proving date of birth</li>
+            <li><strong>Address Proof:</strong> Aadhaar card, utility bill, etc.</li>
+            <li><strong>Transfer Certificate:</strong> If coming from another school</li>
+            <li><strong>Category Certificate:</strong> For SC/ST/OBC students</li>
+            <li><strong>Disability Certificate:</strong> For students with special needs</li>
+          </ul>
+          <p><strong>Note:</strong> All documents are optional. You can proceed without uploading any documents.</p>
+          <p>If you choose to upload, documents should be clear, legible, and in JPG, PNG, or PDF format (max 2MB each).</p>
+          <p>Click on the question mark icon next to the photo upload for detailed photo guidelines.</p>
+        `
+      },
+      'profile-preview': {
+        title: 'Profile Preview Help',
+        content: `
+          <p>This section shows a summary of all information entered:</p>
+          <ul>
+            <li>Review all information carefully before submission</li>
+            <li>You can go back to any section to make changes</li>
+            <li>Check for any errors or missing information</li>
+            <li>Confirm the declaration by checking the checkbox</li>
+            <li>Click "Submit & Save" to complete the form</li>
+            <li>Use "Save as Draft" if you need to complete it later</li>
+          </ul>
+          <p>Once submitted, you'll be redirected to the student detail page.</p>
+        `
+      }
+    };
+
+    // Toggle help tooltip
+    helpButton.addEventListener('click', function() {
+      helpTooltip.classList.toggle('active');
+
+      // Show contextual help based on active section
+      const activeSection = document.querySelector('.udise-section.active');
+      if (activeSection) {
+        const sectionId = activeSection.id;
+        const helpInfo = helpContents[sectionId] || {
+          title: 'UDISE+ Form Help',
+          content: 'Select a section to see specific help information.'
+        };
+
+        helpTitle.textContent = helpInfo.title;
+        helpContent.innerHTML = helpInfo.content;
+      }
+    });
+
+    // Close help tooltip
+    closeHelp.addEventListener('click', function(e) {
+      e.stopPropagation();
+      helpTooltip.classList.remove('active');
+    });
+
+    // Update help content when changing sections
+    sectionTabs.forEach(tab => {
+      tab.addEventListener('click', function() {
+        if (helpTooltip.classList.contains('active')) {
+          const sectionId = this.getAttribute('data-section');
+          const helpInfo = helpContents[sectionId] || {
+            title: 'UDISE+ Form Help',
+            content: 'Select a section to see specific help information.'
+          };
+
+          helpTitle.textContent = helpInfo.title;
+          helpContent.innerHTML = helpInfo.content;
+        }
+      });
+    });
+
+    // Toast notification system
+    function showToast(message, type = 'info') {
+      // Create toast container if it doesn't exist
+      let toastContainer = document.getElementById('toast-container');
+      if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.id = 'toast-container';
+        toastContainer.style.position = 'fixed';
+        toastContainer.style.top = '20px';
+        toastContainer.style.right = '20px';
+        toastContainer.style.zIndex = '9999';
+        document.body.appendChild(toastContainer);
+      }
+
+      // Create toast element
+      const toast = document.createElement('div');
+      toast.style.minWidth = '250px';
+      toast.style.margin = '0 0 10px 0';
+      toast.style.padding = '15px';
+      toast.style.borderRadius = '4px';
+      toast.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+      toast.style.animation = 'fadeIn 0.3s ease, fadeOut 0.5s ease 2.5s forwards';
+
+      // Set background color based on type
+      if (type === 'error') {
+        toast.style.backgroundColor = '#f8d7da';
+        toast.style.color = '#721c24';
+        toast.style.borderLeft = '5px solid #dc3545';
+      } else if (type === 'success') {
+        toast.style.backgroundColor = '#d4edda';
+        toast.style.color = '#155724';
+        toast.style.borderLeft = '5px solid #28a745';
+      } else if (type === 'warning') {
+        toast.style.backgroundColor = '#fff3cd';
+        toast.style.color = '#856404';
+        toast.style.borderLeft = '5px solid #ffc107';
+      } else {
+        toast.style.backgroundColor = '#d1ecf1';
+        toast.style.color = '#0c5460';
+        toast.style.borderLeft = '5px solid #17a2b8';
+      }
+
+      // Add message
+      toast.innerHTML = message;
+
+      // Add close button
+      const closeBtn = document.createElement('span');
+      closeBtn.innerHTML = '&times;';
+      closeBtn.style.float = 'right';
+      closeBtn.style.fontWeight = 'bold';
+      closeBtn.style.fontSize = '20px';
+      closeBtn.style.lineHeight = '1';
+      closeBtn.style.cursor = 'pointer';
+      closeBtn.onclick = function() {
+        toast.remove();
+      };
+      toast.prepend(closeBtn);
+
+      // Add to container
+      toastContainer.appendChild(toast);
+
+      // Remove after 3 seconds
+      setTimeout(() => {
+        toast.remove();
+      }, 3000);
+    }
+  });
+</script>
+
+<!-- Make sure Bootstrap JS is loaded -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Check if Bootstrap is loaded and log to console -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    if (typeof bootstrap !== 'undefined') {
+      console.log('Bootstrap is loaded successfully');
+    } else {
+      console.error('Bootstrap is not loaded properly');
+      // Show warning message
+      document.getElementById('bootstrap-check-message').style.display = 'block';
+    }
+
+    // Try to initialize Bootstrap components again
+    try {
+      // Initialize tooltips
+      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+      });
+
+      // Initialize popovers
+      var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+      popoverTriggerList.map(function (popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl);
+      });
+
+      // Initialize any modals
+      var modalTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="modal"]'));
+      modalTriggerList.map(function (modalTriggerEl) {
+        return new bootstrap.Modal(modalTriggerEl);
+      });
+    } catch (e) {
+      console.error('Error initializing Bootstrap components:', e);
+    }
+  });
+</script>
+{% endblock morejs %}

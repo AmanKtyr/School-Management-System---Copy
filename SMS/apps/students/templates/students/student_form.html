@@ -1,0 +1,1271 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block extrastyle %}
+<style>
+  /* Professional form styling */
+  .card-header.bg-gradient-primary {
+    background: linear-gradient(135deg, #1a237e, #283593, #3949ab);
+  }
+
+  .form-label {
+    font-weight: 500;
+    color: #495057;
+  }
+
+  .form-control:focus, .form-select:focus {
+    border-color: #3949ab;
+    box-shadow: 0 0 0 0.2rem rgba(57, 73, 171, 0.25);
+  }
+
+  .card {
+    transition: all 0.3s ease;
+  }
+
+  .card:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  .card-header {
+    border-bottom: none;
+    padding: 0.75rem 1.25rem;
+  }
+
+  .card-header h6 {
+    font-weight: 600;
+  }
+
+  .text-danger {
+    font-size: 0.8rem;
+  }
+
+  .form-text {
+    font-size: 0.75rem;
+    color: #6c757d;
+  }
+
+  .btn-primary {
+    background-color: #3949ab;
+    border-color: #3949ab;
+    box-shadow: 0 2px 6px rgba(57, 73, 171, 0.4);
+    transition: all 0.2s;
+  }
+
+  .btn-primary:hover {
+    background-color: #303f9f;
+    border-color: #303f9f;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(57, 73, 171, 0.5);
+  }
+
+  .btn-outline-secondary {
+    box-shadow: 0 2px 6px rgba(108, 117, 125, 0.2);
+    transition: all 0.2s;
+  }
+
+  .btn-outline-secondary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+  }
+
+  .progress {
+    border-radius: 10px;
+    background-color: #e9ecef;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+
+  .progress-bar {
+    transition: width 0.6s ease;
+  }
+
+  .photo-preview {
+    border: 2px dashed #dee2e6;
+    border-radius: 5px;
+    transition: all 0.3s;
+  }
+
+  .photo-preview:hover {
+    border-color: #3949ab;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .col-md-3 {
+      margin-top: 1rem;
+    }
+  }
+
+  /* Custom animations */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .invalid-feedback {
+    display: block;
+  }
+
+  /* Navigation styles */
+  .form-navigation-container {
+    margin-bottom: 1.5rem;
+    border-left: 4px solid #3949ab;
+    position: sticky;
+    top: 10px;
+    z-index: 100;
+  }
+
+  .form-navigation-wrapper {
+    background: linear-gradient(to right, rgba(57, 73, 171, 0.05), rgba(57, 73, 171, 0.1));
+    border: 1px solid rgba(57, 73, 171, 0.1);
+  }
+
+  #formNavigation .btn {
+    position: relative;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border-width: 2px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  #formNavigation .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(57, 73, 171, 0.2);
+    z-index: 1;
+  }
+
+  #formNavigation .btn.active {
+    background-color: #3949ab;
+    color: white;
+    border-color: #3949ab;
+    box-shadow: 0 4px 8px rgba(57, 73, 171, 0.3);
+    z-index: 2;
+  }
+
+  #formNavigation .btn::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 3px;
+    bottom: 0;
+    left: 0;
+    background-color: #3949ab;
+    transform: scaleX(0);
+    transform-origin: bottom right;
+    transition: transform 0.3s ease-out;
+  }
+
+  #formNavigation .btn:hover::after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+  }
+
+  #formNavigation .btn.active::after {
+    transform: scaleX(1);
+  }
+
+  /* Pulse animation for active button */
+  @keyframes pulse-border {
+    0% {
+      box-shadow: 0 0 0 0 rgba(57, 73, 171, 0.4);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba(57, 73, 171, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(57, 73, 171, 0);
+    }
+  }
+
+  #formNavigation .btn.active {
+    animation: pulse-border 2s infinite;
+  }
+
+  /* Highlight effect for section navigation */
+  @keyframes highlight-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(57, 73, 171, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(57, 73, 171, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(57, 73, 171, 0); }
+  }
+
+  .highlight-section {
+    animation: highlight-pulse 1s ease-out;
+  }
+
+  /* Section card styling */
+  .section-card {
+    transition: all 0.3s ease;
+    border-left: 0px solid #3949ab !important;
+  }
+
+  .section-card.active-section {
+    border-left: 5px solid #3949ab !important;
+    box-shadow: 0 5px 15px rgba(57, 73, 171, 0.1) !important;
+  }
+
+  .section-card .card-header {
+    transition: all 0.3s ease;
+  }
+
+  .section-card.active-section .card-header {
+    background: linear-gradient(to right, rgba(57, 73, 171, 0.1), rgba(57, 73, 171, 0.05)) !important;
+  }
+
+  .section-card.active-section .card-header h6 {
+    color: #3949ab;
+    font-weight: 600;
+  }
+</style>
+{% endblock extrastyle %}
+
+{% block breadcrumb-left %}
+<div class="breadcrumb-container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-chevron">
+      <li class="breadcrumb-item">
+        <a href="{% url 'home' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-home"></i> Home
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'student-list' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-user-graduate"></i> Students
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'student-list' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-list"></i> List
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <i class="fas fa-plus-circle"></i> Form
+      </li>
+    </ol>
+  </nav>
+</div>
+{% endblock breadcrumb-left %}
+
+{% block title %}
+  {% if object %}
+    Update {{ object }}
+  {% else %}
+    Add New Student
+  {% endif %}
+{% endblock title %}
+
+{% block content %}
+<div class="container-fluid px-0">
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-gradient-primary text-white">
+      <h5 class="mb-0">
+        <i class="fas {% if object %}fa-edit{% else %}fa-user-plus{% endif %} me-2"></i>
+        {% if object %}
+          Update Student Information
+        {% else %}
+          New Student Registration
+        {% endif %}
+      </h5>
+    </div>
+    <div class="card-body">
+      <form action="" method="POST" enctype="multipart/form-data" id="studentForm" class="needs-validation" novalidate>
+        {% csrf_token %}
+
+        <!-- Form Sections -->
+        <div class="row mb-4">
+          <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div>
+                <span class="text-muted small">Fill in the form fields below. Fields marked with <span class="text-danger">*</span> are required.</span>
+              </div>
+              <div>
+                <span class="text-muted small me-2">Form completion:</span>
+                <span class="badge bg-primary" id="progressPercentage">0%</span>
+              </div>
+            </div>
+            <div class="progress" style="height: 5px;">
+              <div class="progress-bar bg-success" role="progressbar" style="width: 0%;"
+                   aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="formProgress"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Navigation -->
+        <div class="row mb-4">
+          <div class="col-md-12">
+            <div class="form-navigation-container p-3 bg-white rounded shadow-sm border">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="mb-0 text-primary fw-bold"><i class="fas fa-map-signs me-2"></i>Form Sections</h6>
+                <div class="badge bg-primary p-2"><i class="fas fa-info-circle me-1"></i> Navigate between sections</div>
+              </div>
+              <div class="form-navigation-wrapper p-2 bg-light rounded">
+                <div class="d-flex flex-wrap justify-content-between" id="formNavigation">
+                  <button type="button" class="btn btn-outline-primary active mb-2 mb-md-0 flex-grow-1 mx-1 py-2" data-section="personal">
+                    <i class="fas fa-user me-1"></i> Personal
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">1</span>
+                  </button>
+                  <button type="button" class="btn btn-outline-primary mb-2 mb-md-0 flex-grow-1 mx-1 py-2" data-section="academic">
+                    <i class="fas fa-graduation-cap me-1"></i> Academic
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">2</span>
+                  </button>
+                  <button type="button" class="btn btn-outline-primary mb-2 mb-md-0 flex-grow-1 mx-1 py-2" data-section="contact">
+                    <i class="fas fa-address-book me-1"></i> Contact
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">3</span>
+                  </button>
+                  <button type="button" class="btn btn-outline-primary mb-2 mb-md-0 flex-grow-1 mx-1 py-2" data-section="family">
+                    <i class="fas fa-users me-1"></i> Family
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">4</span>
+                  </button>
+                  <button type="button" class="btn btn-outline-primary mb-2 mb-md-0 flex-grow-1 mx-1 py-2" data-section="additional">
+                    <i class="fas fa-info-circle me-1"></i> Additional
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">5</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Personal Information Section -->
+        <div id="personal" class="card mb-4 border-0 shadow-sm section-card">
+          <div class="card-header bg-light">
+            <h6 class="mb-0"><i class="fas fa-user me-2"></i>Personal Information</h6>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-9">
+                <div class="row">
+                  <!-- Fullname Field -->
+                  <div class="col-md-6 mb-3">
+                    <label for="{{ form.fullname.id_for_label }}" class="form-label">
+                      <i class="fas fa-user-tag me-1"></i> {{ form.fullname.label }} <span class="text-danger">*</span>
+                    </label>
+                    {{ form.fullname|add_class:"form-control" }}
+                    <div class="invalid-feedback" id="fullname-error"></div>
+                    {% if form.fullname.errors %}
+                      <div class="text-danger small">{{ form.fullname.errors }}</div>
+                    {% endif %}
+                  </div>
+
+                  <!-- Gender Field -->
+                  <div class="col-md-6 mb-3">
+                    <label for="{{ form.gender.id_for_label }}" class="form-label">
+                      <i class="fas fa-venus-mars me-1"></i> {{ form.gender.label }}
+                    </label>
+                    {{ form.gender|add_class:"form-select" }}
+                    {% if form.gender.errors %}
+                      <div class="text-danger small">{{ form.gender.errors }}</div>
+                    {% endif %}
+                  </div>
+
+                  <!-- Date of Birth Field -->
+                  <div class="col-md-6 mb-3">
+                    <label for="{{ form.date_of_birth.id_for_label }}" class="form-label">
+                      <i class="fas fa-birthday-cake me-1"></i> {{ form.date_of_birth.label }}
+                    </label>
+                    {{ form.date_of_birth|add_class:"form-control" }}
+                    <div class="invalid-feedback" id="date_of_birth-error"></div>
+                    {% if form.date_of_birth.errors %}
+                      <div class="text-danger small">{{ form.date_of_birth.errors }}</div>
+                    {% endif %}
+                  </div>
+
+                  <!-- Category Field -->
+                  <div class="col-md-6 mb-3">
+                    <label for="{{ form.category.id_for_label }}" class="form-label">
+                      <i class="fas fa-tag me-1"></i> {{ form.category.label }}
+                    </label>
+                    {{ form.category|add_class:"form-select" }}
+                    {% if form.category.errors %}
+                      <div class="text-danger small">{{ form.category.errors }}</div>
+                    {% endif %}
+                  </div>
+
+                  <!-- Aadhar Field -->
+                  <div class="col-md-6 mb-3">
+                    <label for="{{ form.aadhar.id_for_label }}" class="form-label">
+                      <i class="fas fa-id-card me-1"></i> {{ form.aadhar.label }}
+                    </label>
+                    {{ form.aadhar|add_class:"form-control" }}
+                    <div class="form-text">12-digit Aadhar number without spaces</div>
+                    <div class="invalid-feedback" id="aadhar-error"></div>
+                    {% if form.aadhar.errors %}
+                      <div class="text-danger small">{{ form.aadhar.errors }}</div>
+                    {% endif %}
+                  </div>
+
+                  <!-- Current Status Field -->
+                  <div class="col-md-6 mb-3">
+                    <label for="{{ form.current_status.id_for_label }}" class="form-label">
+                      <i class="fas fa-toggle-on me-1"></i> {{ form.current_status.label }}
+                    </label>
+                    {{ form.current_status|add_class:"form-select" }}
+                    {% if form.current_status.errors %}
+                      <div class="text-danger small">{{ form.current_status.errors }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Photo Upload -->
+              <div class="col-md-3">
+                <div class="text-center mb-3">
+                  <div class="mb-3">
+                    <label for="{{ form.passport.id_for_label }}" class="form-label d-block">
+                      <i class="fas fa-camera me-1"></i> Student Photo
+                    </label>
+                    <div class="photo-preview mb-2">
+                      {% if object and object.passport %}
+                        <img src="{{ object.passport.url }}" alt="Student Photo" class="img-thumbnail" style="height: 150px; width: 150px; object-fit: cover;">
+                      {% else %}
+                        <div class="placeholder-image d-flex align-items-center justify-content-center bg-light" style="height: 150px; width: 150px; border-radius: 5px;">
+                          <i class="fas fa-user fa-4x text-secondary"></i>
+                        </div>
+                      {% endif %}
+                    </div>
+                    {{ form.passport|add_class:"form-control" }}
+                    <div class="form-text">Upload passport size photo</div>
+                    {% if form.passport.errors %}
+                      <div class="text-danger small">{{ form.passport.errors }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Academic Information Section -->
+        <div id="academic" class="card mb-4 border-0 shadow-sm section-card">
+          <div class="card-header bg-light">
+            <h6 class="mb-0"><i class="fas fa-graduation-cap me-2"></i>Academic Information</h6>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <!-- Class Field -->
+              <div class="col-md-4 mb-3">
+                <label for="{{ form.current_class.id_for_label }}" class="form-label">
+                  <i class="fas fa-chalkboard me-1"></i> CLASS <span class="text-danger">*</span>
+                </label>
+                {{ form.current_class|add_class:"form-select" }}
+                <div class="invalid-feedback" id="current_class-error"></div>
+                {% if form.current_class.errors %}
+                  <div class="text-danger small">{{ form.current_class.errors }}</div>
+                {% endif %}
+              </div>
+
+              <!-- Section Field -->
+              <div class="col-md-4 mb-3">
+                <label for="{{ form.section.id_for_label }}" class="form-label">
+                  <i class="fas fa-puzzle-piece me-1"></i> {{ form.section.label }}
+                </label>
+                {{ form.section|add_class:"form-select" }}
+                <div class="invalid-feedback" id="section-error"></div>
+                {% if form.section.errors %}
+                  <div class="text-danger small">{{ form.section.errors }}</div>
+                {% endif %}
+              </div>
+
+              <!-- Date of Admission Field -->
+              <div class="col-md-4 mb-3">
+                <label for="{{ form.date_of_admission.id_for_label }}" class="form-label">
+                  <i class="fas fa-calendar-check me-1"></i> {{ form.date_of_admission.label }}
+                </label>
+                {{ form.date_of_admission|add_class:"form-control" }}
+                {% if form.date_of_admission.errors %}
+                  <div class="text-danger small">{{ form.date_of_admission.errors }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Information Section -->
+        <div id="contact" class="card mb-4 border-0 shadow-sm section-card">
+          <div class="card-header bg-light">
+            <h6 class="mb-0"><i class="fas fa-address-book me-2"></i>Contact Information</h6>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <!-- Mobile Number Field -->
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.mobile_number.id_for_label }}" class="form-label">
+                  <i class="fas fa-mobile-alt me-1"></i> {{ form.mobile_number.label }}
+                </label>
+                {{ form.mobile_number|add_class:"form-control" }}
+                <div class="invalid-feedback" id="mobile_number-error"></div>
+                {% if form.mobile_number.errors %}
+                  <div class="text-danger small">{{ form.mobile_number.errors }}</div>
+                {% endif %}
+              </div>
+
+              <!-- Email Field -->
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.email_id.id_for_label }}" class="form-label">
+                  <i class="fas fa-envelope me-1"></i> {{ form.email_id.label }}
+                </label>
+                {{ form.email_id|add_class:"form-control" }}
+                <div class="invalid-feedback" id="email_id-error"></div>
+                {% if form.email_id.errors %}
+                  <div class="text-danger small">{{ form.email_id.errors }}</div>
+                {% endif %}
+              </div>
+
+              <!-- Address Field -->
+              <div class="col-md-12 mb-3">
+                <label for="{{ form.address.id_for_label }}" class="form-label">
+                  <i class="fas fa-map-marker-alt me-1"></i> {{ form.address.label }} <span class="text-danger">*</span>
+                </label>
+                {{ form.address|add_class:"form-control" }}
+                <div class="invalid-feedback" id="address-error"></div>
+                {% if form.address.errors %}
+                  <div class="text-danger small">{{ form.address.errors }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Family Information Section -->
+        <div id="family" class="card mb-4 border-0 shadow-sm section-card">
+          <div class="card-header bg-light">
+            <h6 class="mb-0"><i class="fas fa-users me-2"></i>Family Information</h6>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <!-- Father's Name Field -->
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.Father_name.id_for_label }}" class="form-label">
+                  <i class="fas fa-user me-1"></i> {{ form.Father_name.label }} <span class="text-danger">*</span>
+                </label>
+                {{ form.Father_name|add_class:"form-control" }}
+                <div class="invalid-feedback" id="Father_name-error"></div>
+                {% if form.Father_name.errors %}
+                  <div class="text-danger small">{{ form.Father_name.errors }}</div>
+                {% endif %}
+              </div>
+
+              <!-- Father's Mobile Number Field -->
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.Father_mobile_number.id_for_label }}" class="form-label">
+                  <i class="fas fa-phone me-1"></i> {{ form.Father_mobile_number.label }} <span class="text-danger">*</span>
+                </label>
+                {{ form.Father_mobile_number|add_class:"form-control" }}
+                <div class="invalid-feedback" id="Father_mobile_number-error"></div>
+                {% if form.Father_mobile_number.errors %}
+                  <div class="text-danger small">{{ form.Father_mobile_number.errors }}</div>
+                {% endif %}
+              </div>
+
+              <!-- Father's Aadhar Field -->
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.Father_aadhar.id_for_label }}" class="form-label">
+                  <i class="fas fa-id-card me-1"></i> {{ form.Father_aadhar.label }}
+                </label>
+                {{ form.Father_aadhar|add_class:"form-control" }}
+                <div class="form-text">12-digit Aadhar number without spaces</div>
+                <div class="invalid-feedback" id="Father_aadhar-error"></div>
+                {% if form.Father_aadhar.errors %}
+                  <div class="text-danger small">{{ form.Father_aadhar.errors }}</div>
+                {% endif %}
+              </div>
+
+              <!-- Mother's Name Field -->
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.Mother_name.id_for_label }}" class="form-label">
+                  <i class="fas fa-user me-1"></i> {{ form.Mother_name.label }}
+                </label>
+                {{ form.Mother_name|add_class:"form-control" }}
+                {% if form.Mother_name.errors %}
+                  <div class="text-danger small">{{ form.Mother_name.errors }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Information Section -->
+        <div id="additional" class="card mb-4 border-0 shadow-sm section-card">
+          <div class="card-header bg-light">
+            <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Additional Information</h6>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <!-- Others Field -->
+              <div class="col-md-12 mb-3">
+                <label for="{{ form.others.id_for_label }}" class="form-label">
+                  <i class="fas fa-sticky-note me-1"></i> {{ form.others.label }}
+                </label>
+                {{ form.others|add_class:"form-control" }}
+                <div class="form-text">Any additional information about the student</div>
+                {% if form.others.errors %}
+                  <div class="text-danger small">{{ form.others.errors }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="d-flex justify-content-between mt-4">
+          <a href="{% url 'student-list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Cancel
+          </a>
+          <button type="submit" class="btn btn-primary px-4">
+            <i class="fas {% if object %}fa-save{% else %}fa-user-plus{% endif %} me-2"></i>
+            {% if object %}
+              Update Student
+            {% else %}
+              Register Student
+            {% endif %}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block morejs %}
+<script>
+  // Function to update progress bar based on filled fields
+  function updateProgressBar() {
+    const form = document.getElementById('studentForm');
+    const inputs = form.querySelectorAll('input, select, textarea');
+    let filledCount = 0;
+    let totalFields = 0;
+
+    inputs.forEach(input => {
+      if (input.name !== 'csrfmiddlewaretoken') {
+        totalFields++;
+        if (input.value && input.value.trim() !== '') {
+          filledCount++;
+        }
+      }
+    });
+
+    const progressPercent = Math.min(Math.round((filledCount / totalFields) * 100), 100);
+    const progressBar = document.getElementById('formProgress');
+    const progressPercentage = document.getElementById('progressPercentage');
+
+    progressBar.style.width = progressPercent + '%';
+    progressBar.setAttribute('aria-valuenow', progressPercent);
+    progressPercentage.textContent = progressPercent + '%';
+
+    // Update progress bar color based on completion percentage
+    if (progressPercent < 30) {
+      progressBar.className = 'progress-bar bg-danger';
+    } else if (progressPercent < 70) {
+      progressBar.className = 'progress-bar bg-warning';
+    } else {
+      progressBar.className = 'progress-bar bg-success';
+    }
+  }
+
+  // Function to load sections for a class with improved UI feedback
+  function loadSections(classId) {
+    const sectionField = document.querySelector('select[name="section"]');
+    const sectionContainer = sectionField.closest('.mb-3');
+
+    // Clear the section dropdown
+    sectionField.innerHTML = '<option value="">-- Select Section --</option>';
+
+    if (!classId) {
+      return;
+    }
+
+    // Add loading indicator
+    const loadingSpinner = document.createElement('div');
+    loadingSpinner.className = 'spinner-border spinner-border-sm text-primary ms-2';
+    loadingSpinner.setAttribute('role', 'status');
+    loadingSpinner.innerHTML = '<span class="visually-hidden">Loading...</span>';
+
+    const label = sectionContainer.querySelector('label');
+    label.appendChild(loadingSpinner);
+
+    // Make AJAX call to get sections for this class
+    $.ajax({
+      url: '/student/api/class/' + classId + '/sections/',
+      type: 'GET',
+      success: function(data) {
+        // Remove loading spinner
+        label.removeChild(loadingSpinner);
+
+        if (data.sections && data.sections.length > 0) {
+          // Add sections to dropdown
+          data.sections.forEach(function(section) {
+            const option = document.createElement('option');
+            option.value = section.id;
+            option.textContent = section.name;
+            sectionField.appendChild(option);
+          });
+
+          // Add success indicator
+          sectionField.classList.add('border-success');
+          setTimeout(() => {
+            sectionField.classList.remove('border-success');
+          }, 1000);
+        } else {
+          // No sections found
+          const option = document.createElement('option');
+          option.value = '';
+          option.textContent = 'No sections available for this class';
+          option.disabled = true;
+          sectionField.appendChild(option);
+        }
+      },
+      error: function(xhr) {
+        // Remove loading spinner
+        label.removeChild(loadingSpinner);
+
+        // Add error indicator
+        sectionField.classList.add('is-invalid');
+        console.error('Error loading sections:', xhr.responseText);
+
+        // Show error message
+        const errorMsg = document.createElement('div');
+        errorMsg.className = 'text-danger small';
+        errorMsg.textContent = 'Failed to load sections. Please try again.';
+        sectionContainer.appendChild(errorMsg);
+
+        setTimeout(() => {
+          sectionField.classList.remove('is-invalid');
+          if (sectionContainer.contains(errorMsg)) {
+            sectionContainer.removeChild(errorMsg);
+          }
+        }, 3000);
+      }
+    });
+  }
+
+  // Function to preview uploaded image
+  function previewImage(input) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      const previewContainer = document.querySelector('.photo-preview');
+
+      reader.onload = function(e) {
+        previewContainer.innerHTML = `<img src="${e.target.result}" alt="Student Photo" class="img-thumbnail" style="height: 150px; width: 150px; object-fit: cover;">`;
+      };
+
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  // Form validation function
+  function validateForm() {
+    const form = document.getElementById('studentForm');
+    let isValid = true;
+
+    // Required fields
+    const requiredFields = [
+      'fullname', 'current_class', 'address', 'Father_name', 'Father_mobile_number'
+    ];
+
+    // Clear all previous validations
+    form.querySelectorAll('.is-invalid').forEach(el => {
+      el.classList.remove('is-invalid');
+    });
+    form.querySelectorAll('.is-valid').forEach(el => {
+      el.classList.remove('is-valid');
+    });
+    form.querySelectorAll('.invalid-feedback').forEach(el => {
+      el.textContent = '';
+    });
+
+    // Validate required fields
+    requiredFields.forEach(fieldName => {
+      const field = form.querySelector(`[name="${fieldName}"]`);
+      if (!field) return; // Skip if field doesn't exist
+
+      const errorDiv = document.getElementById(`${fieldName}-error`) ||
+                      field.nextElementSibling;
+
+      if (!field.value || field.value.trim() === '') {
+        field.classList.add('is-invalid');
+        field.classList.remove('is-valid');
+        if (errorDiv) {
+          errorDiv.textContent = `${field.labels[0].textContent.replace('*', '').trim()} is required`;
+          errorDiv.style.display = 'block';
+        }
+        isValid = false;
+      } else {
+        field.classList.remove('is-invalid');
+        field.classList.add('is-valid');
+        if (errorDiv) {
+          errorDiv.textContent = '';
+        }
+      }
+    });
+
+    // Validate fullname (at least 3 characters)
+    const fullnameField = form.querySelector('[name="fullname"]');
+    if (fullnameField && fullnameField.value && fullnameField.value.trim().length < 3) {
+      fullnameField.classList.add('is-invalid');
+      fullnameField.classList.remove('is-valid');
+      const errorDiv = document.getElementById('fullname-error');
+      if (errorDiv) {
+        errorDiv.textContent = 'Name must be at least 3 characters long';
+        errorDiv.style.display = 'block';
+      }
+      isValid = false;
+    }
+
+    // Validate Aadhar number format (if provided)
+    const aadharField = form.querySelector('[name="aadhar"]');
+    if (aadharField && aadharField.value) {
+      if (!/^\d{12}$/.test(aadharField.value)) {
+        aadharField.classList.add('is-invalid');
+        aadharField.classList.remove('is-valid');
+        const errorDiv = aadharField.nextElementSibling.nextElementSibling;
+        if (errorDiv) {
+          errorDiv.textContent = 'Aadhar number must be exactly 12 digits';
+          errorDiv.style.display = 'block';
+        }
+        isValid = false;
+      } else {
+        aadharField.classList.remove('is-invalid');
+        aadharField.classList.add('is-valid');
+      }
+    }
+
+    // Validate Father's Aadhar number format (if provided)
+    const fatherAadharField = form.querySelector('[name="Father_aadhar"]');
+    if (fatherAadharField && fatherAadharField.value) {
+      if (!/^\d{12}$/.test(fatherAadharField.value)) {
+        fatherAadharField.classList.add('is-invalid');
+        fatherAadharField.classList.remove('is-valid');
+        const errorDiv = fatherAadharField.nextElementSibling.nextElementSibling;
+        if (errorDiv) {
+          errorDiv.textContent = 'Aadhar number must be exactly 12 digits';
+          errorDiv.style.display = 'block';
+        }
+        isValid = false;
+      } else {
+        fatherAadharField.classList.remove('is-invalid');
+        fatherAadharField.classList.add('is-valid');
+      }
+    }
+
+    // Validate mobile number format (if provided)
+    const mobileField = form.querySelector('[name="mobile_number"]');
+    if (mobileField && mobileField.value) {
+      if (!/^[0-9]{10,15}$/.test(mobileField.value)) {
+        mobileField.classList.add('is-invalid');
+        mobileField.classList.remove('is-valid');
+        const errorDiv = mobileField.nextElementSibling;
+        if (errorDiv) {
+          errorDiv.textContent = 'Mobile number must be 10-15 digits';
+          errorDiv.style.display = 'block';
+        }
+        isValid = false;
+      } else {
+        mobileField.classList.remove('is-invalid');
+        mobileField.classList.add('is-valid');
+      }
+    }
+
+    // Validate Father's mobile number format (required)
+    const fatherMobileField = form.querySelector('[name="Father_mobile_number"]');
+    if (fatherMobileField) {
+      if (!fatherMobileField.value || !/^[0-9]{10,15}$/.test(fatherMobileField.value)) {
+        fatherMobileField.classList.add('is-invalid');
+        fatherMobileField.classList.remove('is-valid');
+        const errorDiv = document.getElementById('Father_mobile_number-error');
+        if (errorDiv) {
+          errorDiv.textContent = fatherMobileField.value ? 'Mobile number must be 10-15 digits' : 'Father\'s mobile number is required';
+          errorDiv.style.display = 'block';
+        }
+        isValid = false;
+      } else {
+        fatherMobileField.classList.remove('is-invalid');
+        fatherMobileField.classList.add('is-valid');
+      }
+    }
+
+    // Validate email format (if provided)
+    const emailField = form.querySelector('[name="email_id"]');
+    if (emailField && emailField.value) {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailField.value)) {
+        emailField.classList.add('is-invalid');
+        emailField.classList.remove('is-valid');
+        const errorDiv = emailField.nextElementSibling;
+        if (errorDiv) {
+          errorDiv.textContent = 'Please enter a valid email address';
+          errorDiv.style.display = 'block';
+        }
+        isValid = false;
+      } else {
+        emailField.classList.remove('is-invalid');
+        emailField.classList.add('is-valid');
+      }
+    }
+
+    // Validate date of birth (not in future)
+    const dobField = form.querySelector('[name="date_of_birth"]');
+    if (dobField && dobField.value) {
+      const dob = new Date(dobField.value);
+      const today = new Date();
+      if (dob > today) {
+        dobField.classList.add('is-invalid');
+        dobField.classList.remove('is-valid');
+        const errorDiv = dobField.nextElementSibling;
+        if (errorDiv) {
+          errorDiv.textContent = 'Date of birth cannot be in the future';
+          errorDiv.style.display = 'block';
+        }
+        isValid = false;
+      } else {
+        dobField.classList.remove('is-invalid');
+        dobField.classList.add('is-valid');
+      }
+    }
+
+    return isValid;
+  }
+
+  // Function to handle form navigation
+  function setupFormNavigation() {
+    const navButtons = document.querySelectorAll('#formNavigation .btn');
+    const sections = document.querySelectorAll('.section-card');
+
+    navButtons.forEach(button => {
+      button.addEventListener('click', function(e) {
+        // Remove active class from all buttons
+        navButtons.forEach(b => b.classList.remove('active'));
+
+        // Add active class to clicked button
+        this.classList.add('active');
+
+        // Get the target section
+        const targetId = this.getAttribute('data-section');
+
+        // Find the corresponding section
+        const targetSection = document.getElementById(targetId);
+
+        if (targetSection) {
+          // Remove active-section class from all sections
+          sections.forEach(s => s.classList.remove('active-section'));
+
+          // Add active-section class to target section
+          targetSection.classList.add('active-section');
+
+          // Scroll to the section
+          targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+          // Add highlight effect
+          targetSection.classList.add('highlight-section');
+          setTimeout(() => {
+            targetSection.classList.remove('highlight-section');
+          }, 1000);
+        }
+      });
+    });
+  }
+
+  // Initialize form when document is ready
+  $(document).ready(function() {
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Setup form navigation
+    setupFormNavigation();
+
+    // Set up image preview
+    const passportField = document.querySelector('[name="passport"]');
+    if (passportField) {
+      passportField.addEventListener('change', function() {
+        previewImage(this);
+        updateProgressBar();
+      });
+    }
+
+    // Set up class change handler
+    const classField = document.querySelector('select[name="current_class"]');
+    if (classField) {
+      classField.addEventListener('change', function() {
+        loadSections(this.value);
+        updateProgressBar();
+      });
+
+      // Load sections for edit form
+      if (classField.value) {
+        loadSections(classField.value);
+
+        // Set the current section as selected after sections are loaded
+        setTimeout(function() {
+          const sectionField = document.querySelector('select[name="section"]');
+          const currentSection = '{{ object.section|default:"" }}';
+
+          if (currentSection && sectionField) {
+            // Find and select the option with the current section value
+            for (let i = 0; i < sectionField.options.length; i++) {
+              if (sectionField.options[i].textContent === currentSection) {
+                sectionField.options[i].selected = true;
+                break;
+              }
+            }
+          }
+        }, 500); // Small delay to ensure sections are loaded
+      }
+    }
+
+    // Set up form submission handler
+    const form = document.getElementById('studentForm');
+    if (form) {
+      form.addEventListener('submit', function(event) {
+        if (!validateForm()) {
+          event.preventDefault();
+
+          // Show validation error alert
+          const alertContainer = document.createElement('div');
+          alertContainer.className = 'alert alert-danger alert-dismissible fade show';
+          alertContainer.setAttribute('role', 'alert');
+          alertContainer.innerHTML = `
+            <strong><i class="fas fa-exclamation-triangle me-2"></i>Form Validation Error</strong>
+            <p class="mb-0">Please correct the highlighted fields before submitting the form.</p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          `;
+
+          // Insert alert at the top of the form
+          form.insertBefore(alertContainer, form.firstChild);
+
+          // Scroll to first error
+          const firstError = document.querySelector('.is-invalid');
+          if (firstError) {
+            // Find the section containing the error
+            const section = firstError.closest('.section-card');
+            if (section) {
+              // Get the section ID
+              const sectionId = section.id;
+
+              // Activate the corresponding navigation button
+              const navButtons = document.querySelectorAll('#formNavigation .btn');
+              navButtons.forEach(button => {
+                if (button.getAttribute('data-section') === sectionId) {
+                  button.click();
+                }
+              });
+            }
+
+            // Scroll to and focus on the error field
+            setTimeout(() => {
+              firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              firstError.focus();
+            }, 300);
+          }
+
+          // Auto-dismiss the alert after 5 seconds
+          setTimeout(() => {
+            const alert = document.querySelector('.alert');
+            if (alert) {
+              const bsAlert = new bootstrap.Alert(alert);
+              bsAlert.close();
+            }
+          }, 5000);
+        }
+      });
+    }
+
+    // Set up input change handlers for progress bar and real-time validation
+    const inputs = form.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+      // Update progress bar on input change
+      input.addEventListener('change', updateProgressBar);
+      input.addEventListener('keyup', updateProgressBar);
+
+      // Add real-time validation
+      input.addEventListener('blur', function() {
+        validateField(this);
+      });
+
+      // For select elements, validate on change
+      if (input.tagName === 'SELECT') {
+        input.addEventListener('change', function() {
+          validateField(this);
+        });
+      }
+    });
+
+    // Function to validate a single field
+    function validateField(field) {
+      const fieldName = field.getAttribute('name');
+
+      // Skip if this is not a field we want to validate
+      if (!fieldName) return;
+
+      // Check if it's a required field
+      const isRequired = ['fullname', 'current_class', 'address', 'Father_name', 'Father_mobile_number'].includes(fieldName);
+
+      // Get error div
+      const errorDiv = document.getElementById(`${fieldName}-error`) ||
+                      field.nextElementSibling;
+
+      // Clear previous validation
+      field.classList.remove('is-invalid');
+      field.classList.remove('is-valid');
+      if (errorDiv) errorDiv.textContent = '';
+
+      // Required field validation
+      if (isRequired && (!field.value || field.value.trim() === '')) {
+        field.classList.add('is-invalid');
+        if (errorDiv) {
+          errorDiv.textContent = `${field.labels[0].textContent.replace('*', '').trim()} is required`;
+          errorDiv.style.display = 'block';
+        }
+        return false;
+      }
+
+      // Field-specific validation
+      switch(fieldName) {
+        case 'fullname':
+          if (field.value && field.value.trim().length < 3) {
+            field.classList.add('is-invalid');
+            if (errorDiv) {
+              errorDiv.textContent = 'Name must be at least 3 characters long';
+              errorDiv.style.display = 'block';
+            }
+            return false;
+          }
+          break;
+
+        case 'aadhar':
+          if (field.value && !/^\d{12}$/.test(field.value)) {
+            field.classList.add('is-invalid');
+            const aadharErrorDiv = field.nextElementSibling.nextElementSibling;
+            if (aadharErrorDiv) {
+              aadharErrorDiv.textContent = 'Aadhar number must be exactly 12 digits';
+              aadharErrorDiv.style.display = 'block';
+            }
+            return false;
+          }
+          break;
+
+        case 'Father_aadhar':
+          if (field.value && !/^\d{12}$/.test(field.value)) {
+            field.classList.add('is-invalid');
+            const fatherAadharErrorDiv = field.nextElementSibling.nextElementSibling;
+            if (fatherAadharErrorDiv) {
+              fatherAadharErrorDiv.textContent = 'Aadhar number must be exactly 12 digits';
+              fatherAadharErrorDiv.style.display = 'block';
+            }
+            return false;
+          }
+          break;
+
+        case 'mobile_number':
+          if (field.value && !/^[0-9]{10,15}$/.test(field.value)) {
+            field.classList.add('is-invalid');
+            if (errorDiv) {
+              errorDiv.textContent = 'Mobile number must be 10-15 digits';
+              errorDiv.style.display = 'block';
+            }
+            return false;
+          }
+          break;
+
+        case 'Father_mobile_number':
+          if (!field.value || !/^[0-9]{10,15}$/.test(field.value)) {
+            field.classList.add('is-invalid');
+            if (errorDiv) {
+              errorDiv.textContent = field.value ? 'Mobile number must be 10-15 digits' : 'Father\'s mobile number is required';
+              errorDiv.style.display = 'block';
+            }
+            return false;
+          }
+          break;
+
+        case 'email_id':
+          if (field.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(field.value)) {
+            field.classList.add('is-invalid');
+            if (errorDiv) {
+              errorDiv.textContent = 'Please enter a valid email address';
+              errorDiv.style.display = 'block';
+            }
+            return false;
+          }
+          break;
+
+        case 'date_of_birth':
+          if (field.value) {
+            const dob = new Date(field.value);
+            const today = new Date();
+            if (dob > today) {
+              field.classList.add('is-invalid');
+              if (errorDiv) {
+                errorDiv.textContent = 'Date of birth cannot be in the future';
+                errorDiv.style.display = 'block';
+              }
+              return false;
+            }
+          }
+          break;
+      }
+
+      // If we got here, the field is valid
+      field.classList.add('is-valid');
+      return true;
+    }
+
+    // Initialize progress bar
+    updateProgressBar();
+
+    // Add animation to form sections
+    const formSections = document.querySelectorAll('.section-card');
+    formSections.forEach((section, index) => {
+      section.style.opacity = '0';
+      section.style.transform = 'translateY(20px)';
+      section.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+
+      setTimeout(() => {
+        section.style.opacity = '1';
+        section.style.transform = 'translateY(0)';
+      }, 100 * (index + 1));
+    });
+
+    // Add visual indicators to show current section while scrolling
+    function updateActiveSection() {
+      const sections = document.querySelectorAll('.section-card');
+      const navButtons = document.querySelectorAll('#formNavigation .btn');
+
+      let currentSectionIndex = 0;
+
+      sections.forEach((section, index) => {
+        const rect = section.getBoundingClientRect();
+        // Remove active class from all sections
+        section.classList.remove('active-section');
+
+        // If section is in viewport
+        if (rect.top <= 150 && rect.bottom >= 150) {
+          currentSectionIndex = index;
+          // Add active class to current section
+          section.classList.add('active-section');
+        }
+      });
+
+      // Update active button
+      navButtons.forEach((button, index) => {
+        if (index === currentSectionIndex) {
+          button.classList.add('active');
+        } else {
+          button.classList.remove('active');
+        }
+      });
+    }
+
+    // Call on page load
+    updateActiveSection();
+
+    // Call on scroll
+    window.addEventListener('scroll', updateActiveSection);
+
+    // Also update active section when window is resized
+    window.addEventListener('resize', updateActiveSection);
+  });
+
+</script>
+{% endblock morejs %}

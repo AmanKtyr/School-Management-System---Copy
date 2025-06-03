@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block breadcrumb-left %}
+<div class="breadcrumb-container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-chevron">
+      <li class="breadcrumb-item">
+        <a href="{% url 'home' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-home"></i> Home
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'exams:dashboard' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-graduation-cap"></i> Examination
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <i class="fas fa-calendar-alt"></i> Exam Schedules
+      </li>
+    </ol>
+  </nav>
+</div>
+{% endblock breadcrumb-left %}
+
+{% block title-icon %}fas fa-calendar-alt{% endblock title-icon %}
+
+{% block title %}Exam Schedules{% endblock title %}
+
+{% block subtitle %}Manage examination timetables{% endblock subtitle %}
+
+{% block content %}
+<div class="container-fluid exams-container">
+  <!-- Filter Card -->
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filter Schedules</h5>
+        </div>
+        <div class="card-body">
+          <form method="get" class="row g-3">
+            <div class="col-md-3">
+              <label for="{{ filter_form.exam.id_for_label }}" class="form-label">Exam</label>
+              {{ filter_form.exam|add_class:"form-select" }}
+            </div>
+            <div class="col-md-3">
+              <label for="{{ filter_form.student_class.id_for_label }}" class="form-label">Class</label>
+              {{ filter_form.student_class|add_class:"form-select"|attr:"id:class-filter" }}
+            </div>
+            <div class="col-md-3">
+              <label for="section" class="form-label">Section</label>
+              <select name="section" id="section-filter" class="form-select">
+                <option value="">-- All Sections --</option>
+                {% if request.GET.section %}
+                  <option value="{{ request.GET.section }}" selected>{{ request.GET.section }}</option>
+                {% endif %}
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label for="{{ filter_form.subject.id_for_label }}" class="form-label">Subject</label>
+              {{ filter_form.subject|add_class:"form-select" }}
+            </div>
+            <div class="col-md-3">
+              <label for="{{ filter_form.date_from.id_for_label }}" class="form-label">Date From</label>
+              {{ filter_form.date_from|add_class:"form-control" }}
+            </div>
+            <div class="col-md-3">
+              <label for="{{ filter_form.date_to.id_for_label }}" class="form-label">Date To</label>
+              {{ filter_form.date_to|add_class:"form-control" }}
+            </div>
+            <div class="col-md-9 d-flex align-items-end">
+              <button type="submit" class="btn btn-primary me-2">
+                <i class="fas fa-filter me-1"></i> Apply Filter
+              </button>
+              <a href="{% url 'exams:exam_schedule_list' %}" class="btn btn-secondary me-2">
+                <i class="fas fa-redo me-1"></i> Reset
+              </a>
+              <a href="{% url 'exams:exam_schedule_create' %}" class="btn btn-success">
+                <i class="fas fa-plus me-1"></i> Add New Schedule
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Schedule List -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Exam Schedules</h5>
+          <div>
+            <a href="{% url 'exams:exam_schedule_create' %}" class="btn btn-light btn-sm">
+              <i class="fas fa-plus me-1"></i> Add New Schedule
+            </a>
+            <a href="#" class="btn btn-light btn-sm ms-2">
+              <i class="fas fa-download me-1"></i> Export
+            </a>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover table-striped" id="scheduleTable">
+              <thead class="table-light">
+                <tr>
+                  <th>S/N</th>
+                  <th>Exam</th>
+                  <th>Subject</th>
+                  <th>Class</th>
+                  <th>Section</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Duration</th>
+                  <th>Venue</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for schedule in schedules %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ schedule.exam.name }}</td>
+                  <td>{{ schedule.subject.name }}</td>
+                  <td>{{ schedule.student_class.name }}</td>
+                  <td>{{ schedule.section|default:"-" }}</td>
+                  <td>{{ schedule.date|date:"d M, Y" }}</td>
+                  <td>{{ schedule.start_time|time:"h:i A" }} - {{ schedule.end_time|time:"h:i A" }}</td>
+                  <td>{{ schedule.duration_minutes }} mins</td>
+                  <td>{{ schedule.venue|default:"-" }}</td>
+                  <td>
+                    <div class="btn-group" role="group">
+                      <a href="{% url 'exams:exam_schedule_update' schedule.id %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                      <a href="{% url 'exams:exam_schedule_delete' schedule.id %}" class="btn btn-sm btn-outline-danger">
+                        <i class="fas fa-trash"></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="10" class="text-center py-4">
+                    <div class="d-flex flex-column align-items-center">
+                      <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                      <h5 class="text-muted">No exam schedules found</h5>
+                      <p class="text-muted">Create a new exam schedule to get started</p>
+                      <a href="{% url 'exams:exam_schedule_create' %}" class="btn btn-primary mt-2">
+                        <i class="fas fa-plus me-1"></i> Add New Schedule
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calendar View -->
+  <div class="row mt-4">
+    <div class="col-md-12">
+      <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0"><i class="fas fa-calendar me-2"></i>Exam Calendar</h5>
+        </div>
+        <div class="card-body">
+          <div id="examCalendar" class="p-3" style="height: 500px;">
+            <!-- Calendar will be rendered here by JavaScript -->
+            <div class="text-center py-5">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <p class="mt-3">Loading calendar...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block morejs %}
+<script>
+  $(document).ready(function() {
+    $('#scheduleTable').DataTable({
+      "paging": true,
+      "lengthChange": true,
+      "searching": true,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false,
+      "responsive": true,
+      "language": {
+        "emptyTable": "No exam schedules found",
+        "zeroRecords": "No matching records found",
+        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+        "infoEmpty": "Showing 0 to 0 of 0 entries",
+        "infoFiltered": "(filtered from _MAX_ total entries)",
+        "search": "Search:",
+        "paginate": {
+          "first": "First",
+          "last": "Last",
+          "next": "Next",
+          "previous": "Previous"
+        }
+      }
+    });
+
+    // Calendar initialization would go here
+    // This is a placeholder for future implementation
+    setTimeout(function() {
+      $('#examCalendar').html('<div class="alert alert-info">Calendar view will be implemented in a future update.</div>');
+    }, 1500);
+  });
+</script>
+{% endblock morejs %}

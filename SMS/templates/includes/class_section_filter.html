@@ -1,0 +1,30 @@
+{% load static %}
+
+<div class="card shadow p-3 mb-4">
+    <h5 class="mb-3">🔍 Filter</h5>
+    <form method="GET" class="row g-3" id="filter-form">
+        <div class="col-md-3">
+            {{ filter_form.class_name.label_tag }}
+            {{ filter_form.class_name }}
+        </div>
+        <div class="col-md-3">
+            {{ filter_form.section.label_tag }}
+            {{ filter_form.section }}
+        </div>
+        {% if show_search %}
+        <div class="col-md-3">
+            <label class="form-label">Search</label>
+            <input type="text" class="form-control" name="search" placeholder="Search..." value="{{ request.GET.search }}">
+        </div>
+        {% endif %}
+        <div class="{% if show_search %}col-md-3{% else %}col-md-6{% endif %}">
+            <label class="form-label">&nbsp;</label>
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="fas fa-filter me-2"></i>Apply Filter
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Class-Section filter functionality is loaded from the global JS file -->
+<script src="{% static 'dist/js/class-section-filter.js' %}"></script>

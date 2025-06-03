@@ -1,0 +1,9 @@
+First Term – April - July (Unit Test + Formative Assessment)
+Second Term – August - November (Mid-Term Exam / Half-Yearly)
+Third Term – December - March (Final Exam / Annual Exam)
+
+
+
+
+.btn-primary
+#1E3C72

@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block breadcrumb-left %}
+<div class="breadcrumb-container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-chevron">
+      <li class="breadcrumb-item">
+        <a href="{% url 'home' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-home"></i> Home
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="#" class="text-decoration-none fw-bold">
+          <i class="fas fa-copy"></i> Management
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <i class="fas fa-calendar-alt"></i> Current Session & Term
+      </li>
+    </ol>
+  </nav>
+</div>
+{% endblock breadcrumb-left %}
+
+{% block title-icon %}fas fa-calendar-alt{% endblock title-icon %}
+
+{% block title %}Current Session & Term{% endblock title %}
+
+{% block subtitle %}Set the active academic session and term{% endblock subtitle %}
+
+
+
+{% block title-side %}{% endblock title-side %}
+
+{% block content %}
+<form method="POST">
+  {% csrf_token %}
+
+  <div class="mb-3">
+    {% for field in form %}
+    <div class="form-group row">
+      <div class="col-2">{{ field.label_tag}}</div>
+      <div class="col-6">
+        {{ field | add_class:"form-control"}}
+        <span class="small">{{ field.help_text |safe}}</span>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+
+  <input type="submit" value="Save" class="w-25 btn btn-primary">
+
+</form>
+
+{% endblock content %}

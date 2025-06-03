@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admit Card - {{ admit_card.student.fullname }}</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 1cm;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #333;
+      position: relative;
+    }
+    .watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-45deg);
+      font-size: 8rem;
+      font-weight: 700;
+      color: rgba(30, 60, 114, 0.05);
+      white-space: nowrap;
+      z-index: -1;
+      text-transform: uppercase;
+    }
+    .admit-card {
+      border: 2px solid #1E3C72;
+      padding: 0;
+      position: relative;
+      background-color: #fff;
+      z-index: 1;
+    }
+    .admit-card-header {
+      background: linear-gradient(135deg, #1E3C72, #2A5298);
+      color: white;
+      padding: 15px;
+      text-align: center;
+      border-bottom: 2px solid #1E3C72;
+    }
+    .admit-card-header h1 {
+      margin: 0;
+      font-size: 24px;
+      text-transform: uppercase;
+    }
+    .admit-card-header h2 {
+      margin: 5px 0 0;
+      font-size: 18px;
+      font-weight: normal;
+    }
+    .admit-card-body {
+      padding: 20px;
+    }
+    .logo-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .logo {
+      width: 80px;
+      height: 80px;
+    }
+    .college-info {
+      text-align: center;
+      flex-grow: 1;
+    }
+    .college-info h2 {
+      margin: 0;
+      font-size: 22px;
+      color: #1E3C72;
+    }
+    .college-info p {
+      margin: 5px 0 0;
+      font-size: 14px;
+    }
+    .student-info {
+      display: flex;
+      margin-bottom: 20px;
+    }
+    .student-photo {
+      width: 120px;
+      height: 150px;
+      border: 1px solid #ddd;
+      margin-right: 20px;
+      background-color: #f8f9fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 12px;
+      color: #6c757d;
+      text-align: center;
+    }
+    .student-details {
+      flex-grow: 1;
+    }
+    .student-details table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .student-details table td {
+      padding: 8px;
+      border-bottom: 1px solid #eee;
+    }
+    .student-details table td:first-child {
+      font-weight: bold;
+      width: 40%;
+    }
+    .exam-schedule {
+      margin-top: 20px;
+    }
+    .exam-schedule h3 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      color: #1E3C72;
+      border-bottom: 2px solid #1E3C72;
+      padding-bottom: 5px;
+    }
+    .exam-schedule table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    .exam-schedule table th, .exam-schedule table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+      font-size: 14px;
+    }
+    .exam-schedule table th {
+      background-color: #f8f9fa;
+      font-weight: bold;
+    }
+    .admit-card-footer {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+      padding: 0 20px 20px;
+    }
+    .signature {
+      text-align: center;
+      width: 30%;
+    }
+    .signature-line {
+      border-top: 1px solid #000;
+      margin-top: 40px;
+      padding-top: 5px;
+    }
+    .qr-code {
+      text-align: center;
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      display: inline-block;
+      background-color: white;
+    }
+    .qr-code img {
+      width: 100px;
+      height: 100px;
+    }
+    .qr-code p {
+      margin: 5px 0 0;
+      font-size: 12px;
+      color: #6c757d;
+    }
+    .instructions {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    .instructions h3 {
+      margin: 0 0 10px;
+      font-size: 16px;
+      color: #1E3C72;
+    }
+    .instructions ul {
+      margin: 0;
+      padding-left: 20px;
+      font-size: 12px;
+    }
+    .instructions li {
+      margin-bottom: 5px;
+    }
+    .barcode {
+      text-align: center;
+      margin: 15px 0;
+      padding: 10px;
+      background-color: #f8f9fa;
+      border-radius: 5px;
+    }
+    .barcode p {
+      margin: 5px 0 0;
+      font-size: 14px;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+    .generation-info {
+      text-align: right;
+      font-size: 10px;
+      color: #6c757d;
+      margin-top: 10px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div class="watermark">{{ profile.college_name|default:"OFFICIAL" }}</div>
+
+  <div class="admit-card">
+    <div class="admit-card-header">
+      <h1>Admit Card</h1>
+      <h2>{{ admit_card.exam.name }}</h2>
+    </div>
+
+    <div class="admit-card-body">
+      <div class="logo-container">
+        {% if profile.college_logo %}
+        <img src="{{ profile.college_logo.url }}" alt="College Logo" class="logo">
+        {% else %}
+        <img src="https://via.placeholder.com/80" alt="College Logo" class="logo">
+        {% endif %}
+        <div class="college-info">
+          <h2>{{ profile.college_name|default:"COLLEGE NAME" }}</h2>
+          <p>{{ profile.college_address|default:"College Address, City, State - PIN" }}</p>
+          <p>Phone: {{ profile.college_phone|default:"123-456-7890" }} | Email: {{ profile.college_email|default:"info@college.edu" }}</p>
+          {% if profile.established_year or profile.college_type or profile.principal_name %}
+          <p>Est: {{ profile.established_year|default:"" }} | {{ profile.college_type|default:"" }} | Principal: {{ profile.principal_name|default:"" }}</p>
+          {% endif %}
+        </div>
+        <div style="width: 80px;"></div> <!-- Spacer for alignment -->
+      </div>
+
+      <div class="student-info">
+        <div class="student-photo">
+          {% if admit_card.student.photo %}
+          <img src="{{ admit_card.student.photo.url }}" alt="Student Photo" width="120" height="150">
+          {% else %}
+          <p>Photo<br>Not<br>Available</p>
+          {% endif %}
+        </div>
+
+        <div class="student-details">
+          <table>
+            <tr>
+              <td>Roll Number:</td>
+              <td><strong>{{ admit_card.roll_number }}</strong></td>
+            </tr>
+            <tr>
+              <td>Student Name:</td>
+              <td>{{ admit_card.student.fullname }}</td>
+            </tr>
+            <tr>
+              <td>Registration Number:</td>
+              <td>{{ admit_card.student.registration_number }}</td>
+            </tr>
+            <tr>
+              <td>Class:</td>
+              <td>{{ admit_card.student.current_class.name }}</td>
+            </tr>
+            <tr>
+              <td>Section:</td>
+              <td>{{ admit_card.student.section|default:"-" }}</td>
+            </tr>
+            <tr>
+              <td>Exam Period:</td>
+              <td>{{ admit_card.exam.start_date|date:"d M, Y" }} to {{ admit_card.exam.end_date|date:"d M, Y" }}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="barcode">
+        <p>{{ admit_card.roll_number }}</p>
+      </div>
+
+      <div class="exam-schedule">
+        <h3>Examination Schedule</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>S/N</th>
+              <th>Date</th>
+              <th>Day</th>
+              <th>Subject</th>
+              <th>Time</th>
+              <th>Room</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for schedule in exam_schedules %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ schedule.date|date:"d M, Y" }}</td>
+              <td>{{ schedule.date|date:"l" }}</td>
+              <td>{{ schedule.subject.name }}</td>
+              <td>{{ schedule.start_time }} - {{ schedule.end_time }}</td>
+              <td>{{ schedule.room|default:"TBA" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6" style="text-align: center;">No schedule available yet.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="instructions">
+        <h3>Important Instructions:</h3>
+        <ul>
+          <li>Candidates must bring this Admit Card to the examination hall on each day of examination.</li>
+          <li>Candidates should be seated in the examination hall 15 minutes before the commencement of the examination.</li>
+          <li>No candidate will be allowed to enter the examination hall 30 minutes after the commencement of the examination.</li>
+          <li>Mobile phones, calculators, and other electronic devices are strictly prohibited in the examination hall.</li>
+          <li>Candidates must follow all the instructions given by the invigilator.</li>
+          <li>Any candidate found using unfair means will be disqualified.</li>
+        </ul>
+      </div>
+
+      <div class="admit-card-footer">
+        <div class="signature">
+          <div class="signature-line">Student's Signature</div>
+        </div>
+
+        <div class="qr-code">
+          <img src="data:image/png;base64,{{ qr_code_base64 }}" alt="QR Code">
+          <p>Scan to verify</p>
+        </div>
+
+        <div class="signature">
+          <div class="signature-line">{{ profile.principal_name|default:"Principal's" }} Signature</div>
+        </div>
+      </div>
+
+      <div class="generation-info">
+        Generated on: {{ generation_date|date:"d M, Y" }} | ID: {{ admit_card.id }}
+      </div>
+    </div>
+  </div>
+</body>
+</html>

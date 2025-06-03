@@ -1,0 +1,260 @@
+{% extends 'corecode/system_settings_base.html' %}
+{% load static %}
+
+{% block settings-icon %}fas fa-shield-alt{% endblock settings-icon %}
+{% block settings-title %}Security & Logs{% endblock settings-title %}
+{% block settings-icon-title %}fas fa-shield-alt{% endblock settings-icon-title %}
+{% block settings-page-title %}Security & Logs{% endblock settings-page-title %}
+{% block settings-subtitle %}Monitor system security and activity logs{% endblock settings-subtitle %}
+
+{% block content-icon %}fas fa-shield-alt{% endblock content-icon %}
+{% block content-title %}Security Overview{% endblock content-title %}
+
+{% block settings-content %}
+<div class="row mb-4">
+  <div class="col-md-12">
+    <div class="alert alert-info d-flex align-items-center" role="alert">
+      <i class="fas fa-info-circle fa-2x me-3"></i>
+      <div>
+        <h5 class="alert-heading">Security Monitoring</h5>
+        <p class="mb-0">View system security status and activity logs. Monitor user actions and system events.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Security Stats -->
+<div class="row mb-4">
+  <div class="col-md-3">
+    <div class="card bg-primary text-white h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h6 class="mb-0">Active Sessions</h6>
+            <h2 class="mb-0">24</h2>
+          </div>
+          <i class="fas fa-users fa-2x opacity-50"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card bg-success text-white h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h6 class="mb-0">System Status</h6>
+            <h2 class="mb-0">Secure</h2>
+          </div>
+          <i class="fas fa-check-circle fa-2x opacity-50"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card bg-warning text-white h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h6 class="mb-0">Failed Logins</h6>
+            <h2 class="mb-0">3</h2>
+          </div>
+          <i class="fas fa-exclamation-triangle fa-2x opacity-50"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card bg-info text-white h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h6 class="mb-0">Last Backup</h6>
+            <h2 class="mb-0">2h ago</h2>
+          </div>
+          <i class="fas fa-database fa-2x opacity-50"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Activity Logs -->
+<div class="card mb-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Activity Logs</h5>
+    <div>
+      <button class="btn btn-sm btn-outline-secondary me-2">
+        <i class="fas fa-download me-1"></i>Export
+      </button>
+      <button class="btn btn-sm btn-outline-primary">
+        <i class="fas fa-filter me-1"></i>Filter
+      </button>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>User</th>
+            <th>Action</th>
+            <th>IP Address</th>
+            <th>Status</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>2025-04-17 08:45:23</td>
+            <td>admin</td>
+            <td>User Login</td>
+            <td>192.168.1.100</td>
+            <td><span class="badge bg-success">Success</span></td>
+            <td>
+              <button class="btn btn-sm btn-link" data-bs-toggle="modal" data-bs-target="#logDetailModal">
+                View Details
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>2025-04-17 08:30:15</td>
+            <td>teacher1</td>
+            <td>Grade Update</td>
+            <td>192.168.1.101</td>
+            <td><span class="badge bg-success">Success</span></td>
+            <td>
+              <button class="btn btn-sm btn-link" data-bs-toggle="modal" data-bs-target="#logDetailModal">
+                View Details
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>2025-04-17 08:15:45</td>
+            <td>unknown</td>
+            <td>Login Attempt</td>
+            <td>192.168.1.102</td>
+            <td><span class="badge bg-danger">Failed</span></td>
+            <td>
+              <button class="btn btn-sm btn-link" data-bs-toggle="modal" data-bs-target="#logDetailModal">
+                View Details
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <nav class="mt-3">
+      <ul class="pagination justify-content-center">
+        <li class="page-item disabled">
+          <a class="page-link" href="#" tabindex="-1">Previous</a>
+        </li>
+        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+        <li class="page-item"><a class="page-link" href="#">2</a></li>
+        <li class="page-item"><a class="page-link" href="#">3</a></li>
+        <li class="page-item">
+          <a class="page-link" href="#">Next</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<!-- Security Settings -->
+<div class="card">
+  <div class="card-header">
+    <h5 class="mb-0"><i class="fas fa-cog me-2"></i>Security Settings</h5>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-6">
+        <h6>Login Security</h6>
+        <div class="mb-3">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="2fa" checked>
+            <label class="form-check-label" for="2fa">Two-Factor Authentication</label>
+          </div>
+        </div>
+        <div class="mb-3">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="failedAttempts" checked>
+            <label class="form-check-label" for="failedAttempts">Lock account after failed attempts</label>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <h6>Data Security</h6>
+        <div class="mb-3">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="autoBackup" checked>
+            <label class="form-check-label" for="autoBackup">Automatic Backups</label>
+          </div>
+        </div>
+        <div class="mb-3">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="encryption" checked>
+            <label class="form-check-label" for="encryption">Data Encryption</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Log Detail Modal -->
+<div class="modal fade" id="logDetailModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Log Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <dl class="row">
+          <dt class="col-sm-4">Timestamp</dt>
+          <dd class="col-sm-8">2025-04-17 08:45:23</dd>
+          
+          <dt class="col-sm-4">User</dt>
+          <dd class="col-sm-8">admin</dd>
+          
+          <dt class="col-sm-4">Action</dt>
+          <dd class="col-sm-8">User Login</dd>
+          
+          <dt class="col-sm-4">IP Address</dt>
+          <dd class="col-sm-8">192.168.1.100</dd>
+          
+          <dt class="col-sm-4">Browser</dt>
+          <dd class="col-sm-8">Chrome 120.0.0</dd>
+          
+          <dt class="col-sm-4">Operating System</dt>
+          <dd class="col-sm-8">Windows 11</dd>
+          
+          <dt class="col-sm-4">Status</dt>
+          <dd class="col-sm-8"><span class="badge bg-success">Success</span></dd>
+          
+          <dt class="col-sm-4">Additional Info</dt>
+          <dd class="col-sm-8">Login successful from authorized location</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock settings-content %}
+
+{% block page-scripts %}
+<script>
+$(document).ready(function() {
+  // Initialize tooltips
+  $('[data-toggle="tooltip"]').tooltip();
+  
+  // Initialize switches
+  $('.form-check-input').on('change', function() {
+    const setting = $(this).attr('id');
+    const enabled = $(this).is(':checked');
+    console.log(`Security setting ${setting} changed to ${enabled}`);
+    // Implement API call to update security settings
+  });
+});
+</script>
+{% endblock page-scripts %}

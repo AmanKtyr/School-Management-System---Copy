@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Complete Payment History</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 10px;
+            color: #333;
+            font-size: 9pt;
+        }
+        .history-container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .school-info {
+            text-align: right;
+        }
+        .student-info, .payment-info {
+            margin-bottom: 10px;
+        }
+        .info-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 5px;
+            text-align: left;
+            font-size: 8pt;
+        }
+        th {
+            background-color: #f5f5f5;
+        }
+        .text-end {
+            text-align: right;
+        }
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+        .signature {
+            text-align: right;
+            border-top: 1px solid #333;
+            display: inline-block;
+            padding-top: 5px;
+            margin-top: 30px;
+        }
+        .total-row {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="history-container">
+        <div class="header">
+            <div>
+                <h2 style="margin:3px 0; font-size:14pt;">Complete Payment History</h2>
+                <p style="margin:1px 0; font-size:8pt;">Generated: {{ generation_date|date:"d M Y H:i" }}</p>
+                <p style="margin:1px 0; font-size:8pt;">Session: {{ current_session|default:"Current Session" }} | Term: {{ current_term|default:"Current Term" }}</p>
+            </div>
+            <div class="school-info" style="display:flex; align-items:center;">
+                {% if profile.college_logo %}
+                <img src="{{ profile.college_logo.url }}" alt="School Logo" style="width:40px; height:40px; margin-right:8px;">
+                {% endif %}
+                <div>
+                    <h3 style="margin:3px 0; font-size:12pt;">{{ profile.college_name|default:"School Management System" }}</h3>
+                    <p style="margin:1px 0; font-size:8pt;">{{ profile.college_address|default:"123 School Street, City" }}</p>
+                    <p style="margin:1px 0; font-size:8pt;">{{ profile.college_phone|default:"Phone" }} | {{ profile.college_email|default:"Email" }}</p>
+                    <p style="margin:1px 0; font-size:7pt;">Est: {{ profile.established_year|default:"" }} | {{ profile.college_type|default:"" }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <div class="student-info">
+                <h4 style="margin:5px 0;">Student Information</h4>
+                <table style="border:none; margin:0;">
+                    <tr style="border:none;">
+                        <td style="border:none; padding:2px; width:50%;"><strong>Name:</strong> {{ student.fullname }}</td>
+                        <td style="border:none; padding:2px;"><strong>Reg No:</strong> {{ student.registration_number }}</td>
+                    </tr>
+                    <tr style="border:none;">
+                        <td style="border:none; padding:2px;"><strong>Class:</strong> {{ student.current_class }}</td>
+                        <td style="border:none; padding:2px;"><strong>Section:</strong> {{ student.section }}</td>
+                    </tr>
+                    <tr style="border:none;">
+                        <td style="border:none; padding:2px;"><strong>Gender:</strong> {{ student.gender|title }}</td>
+                        <td style="border:none; padding:2px;"><strong>Father:</strong> {{ student.Father_name }}</td>
+                    </tr>
+                    <tr style="border:none;">
+                        <td style="border:none; padding:2px;" colspan="2"><strong>Contact:</strong> {{ student.Father_mobile_number }}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="payment-info">
+                <h4 style="margin:5px 0;">Payment Summary</h4>
+                <table style="border:none; margin:0;">
+                    <tr style="border:none;">
+                        <td style="border:none; padding:2px;"><strong>Total Payments:</strong></td>
+                        <td style="border:none; padding:2px;">{{ payments|length }}</td>
+                    </tr>
+                    <tr style="border:none;">
+                        <td style="border:none; padding:2px;"><strong>Total Amount Paid:</strong></td>
+                        <td style="border:none; padding:2px;">₹{{ total_paid|floatformat:2 }}</td>
+                    </tr>
+                    {% if student.get_due_fee > 0 %}
+                    <tr style="border:none;">
+                        <td style="border:none; padding:2px;"><strong>Pending Fees:</strong></td>
+                        <td style="border:none; padding:2px;">₹{{ student.get_due_fee|floatformat:2 }}</td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+
+        <table style="margin-bottom:5px;">
+            <thead>
+                <tr>
+                    <th style="padding:3px; text-align:center; width:5%;">S/N</th>
+                    <th style="padding:3px;">Date</th>
+                    <th style="padding:3px;">Amount (₹)</th>
+                    <th style="padding:3px;">Category</th>
+                    <th style="padding:3px;">Payment Method</th>
+                    <th style="padding:3px;">Transaction ID</th>
+                    <th style="padding:3px;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in payments %}
+                <tr>
+                    <td style="padding:3px; text-align:center;">{{ forloop.counter }}</td>
+                    <td style="padding:3px;">{{ payment.date|date:"d-m-Y" }}</td>
+                    <td class="text-end" style="padding:3px;">₹{{ payment.amount|floatformat:2 }}</td>
+                    <td style="padding:3px;">{{ payment.fee_category }}</td>
+                    <td style="padding:3px;">{{ payment.payment_method }}</td>
+                    <td style="padding:3px;">
+                        {% if payment.transaction_id %}
+                            {{ payment.transaction_id }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td style="padding:3px;">{{ payment.status }}</td>
+                </tr>
+                {% endfor %}
+                <tr class="total-row">
+                    <td colspan="2" style="padding:3px; text-align:right;"><strong>Total</strong></td>
+                    <td class="text-end" style="padding:3px;"><strong>₹{{ total_paid|floatformat:2 }}</strong></td>
+                    <td colspan="4" style="padding:3px;"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="footer">
+            <div>
+                <p style="margin:2px 0;">Thank you for your payments!</p>
+                <p style="margin:2px 0; font-size:7pt;">This is a computer-generated document and does not require a signature.</p>
+                <p style="margin:2px 0; font-size:7pt;">For queries: {{ profile.admin_email|default:profile.college_email }} | {{ profile.admin_contact|default:profile.college_phone }}</p>
+            </div>
+            <div>
+                <div class="signature">
+                    <p style="margin:2px 0;"><strong>Authorized Signature</strong></p>
+                </div>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 10px; font-size: 7pt; color: #999;">
+            {{ profile.college_name|default:"School Management System" }} - Valid Document
+        </div>
+    </div>
+</body>
+</html>

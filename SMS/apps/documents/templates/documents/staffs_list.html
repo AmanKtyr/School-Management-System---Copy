@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Staff Documents{% endblock title %}
+
+{% block breadcrumb %}
+<div class="breadcrumb-bar">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'documents:dashboard' %}">Document Management</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Staff Documents</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="card-title">Staff Documents</h2>
+            <a href="{% url 'documents:document_upload' %}" class="btn btn-primary">
+              <i class="fas fa-upload me-2"></i> Upload Document
+            </a>
+          </div>
+          
+          <!-- Search and Filter -->
+          <div class="row mb-4">
+            <div class="col-md-12">
+              <div class="card bg-light">
+                <div class="card-body">
+                  <form method="get" class="row g-3">
+                    <div class="col-md-6">
+                      <input type="text" class="form-control" name="search" placeholder="Search by name or registration number" value="{{ request.GET.search|default:'' }}">
+                    </div>
+                    <div class="col-md-4">
+                      <select class="form-select" name="status">
+                        <option value="">All Status</option>
+                        <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option>
+                        <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                      </select>
+                    </div>
+                    <div class="col-md-2">
+                      <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-2"></i> Filter
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Staff Table -->
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>S/N</th>
+                  <th>Staff Name</th>
+                  <th>Registration No.</th>
+                  <th>Status</th>
+                  <th>Documents</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in staffs_with_docs %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ item.staff.fullname }}</td>
+                  <td>{{ item.staff.registration_number }}</td>
+                  <td>
+                    {% if item.staff.current_status == 'active' %}
+                    <span class="badge bg-success">Active</span>
+                    {% else %}
+                    <span class="badge bg-secondary">Inactive</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <span class="badge bg-primary">{{ item.document_count }}</span>
+                  </td>
+                  <td>
+                    <div class="btn-group" role="group">
+                      <a href="{% url 'documents:staff_documents_detail' item.staff.id %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-folder-open me-1"></i> View Documents
+                      </a>
+                      <a href="{% url 'staff-detail' item.staff.id %}" class="btn btn-sm btn-outline-info">
+                        <i class="fas fa-user me-1"></i> Staff Profile
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="6" class="text-center">No staff found</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block extrascripts %}
+<script>
+  $(document).ready(function() {
+    // Any staff documents-specific JavaScript can go here
+  });
+</script>
+{% endblock extrascripts %}

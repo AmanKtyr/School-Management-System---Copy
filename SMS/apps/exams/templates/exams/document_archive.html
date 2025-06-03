@@ -1,0 +1,384 @@
+{% extends 'exams/base_exams.html' %}
+{% load static %}
+
+{% block exam-breadcrumb %}
+<li class="breadcrumb-item">
+  <a href="{% url 'exams:document_management' %}"><i class="fas fa-file-archive"></i> Document Management</a>
+</li>
+<li class="breadcrumb-item active" aria-current="page">
+  <i class="fas fa-archive"></i> Document Archive
+</li>
+{% endblock exam-breadcrumb %}
+
+{% block title-icon %}fas fa-archive{% endblock title-icon %}
+
+{% block title %}Document Archive{% endblock title %}
+
+{% block subtitle %}Search and access all examination documents{% endblock subtitle %}
+
+{% block page-actions %}
+<div class="btn-group">
+  <a href="{% url 'exams:document_management' %}" class="btn btn-outline-primary">
+    <i class="fas fa-arrow-left me-2"></i> Back to Document Center
+  </a>
+  <a href="{% url 'exams:document_generate' doc_type='templates' %}" class="btn btn-outline-success">
+    <i class="fas fa-download me-2"></i> Download Templates
+  </a>
+  <a href="{% url 'exams:document_generate' doc_type='bulk' %}" class="btn btn-primary">
+    <i class="fas fa-copy me-2"></i> Bulk Generate
+  </a>
+</div>
+{% endblock page-actions %}
+
+{% block content %}
+<div class="container-fluid exams-container">
+  <!-- Search and Filter Section -->
+  <div class="card border-0 rounded-3 shadow-sm mb-4">
+    <div class="card-header bg-gradient-primary text-white rounded-top">
+      <h5 class="mb-0 fw-bold"><i class="fas fa-search me-2"></i>Search & Filter Documents</h5>
+    </div>
+    <div class="card-body">
+      <form method="get" action="{% url 'exams:document_archive' %}" id="document-filter-form">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label for="type" class="form-label">Document Type</label>
+            <select class="form-select" id="type" name="type">
+              <option value="all" {% if doc_type == 'all' %}selected{% endif %}>All Documents</option>
+              <option value="admit_cards" {% if doc_type == 'admit_cards' %}selected{% endif %}>Admit Cards</option>
+              <option value="question_papers" {% if doc_type == 'question_papers' %}selected{% endif %}>Question Papers</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label for="exam" class="form-label">Exam</label>
+            <select class="form-select" id="exam" name="exam">
+              <option value="">All Exams</option>
+              {% for exam in exams %}
+              <option value="{{ exam.id }}" {% if selected_exam == exam.id|stringformat:"i" %}selected{% endif %}>{{ exam.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label for="class" class="form-label">Class</label>
+            <select class="form-select" id="class" name="class">
+              <option value="">All Classes</option>
+              {% for class in classes %}
+              <option value="{{ class.id }}" {% if selected_class == class.id|stringformat:"i" %}selected{% endif %}>{{ class.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label for="search" class="form-label">Search</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="search" name="search" placeholder="Search..." value="{{ search_query }}">
+              <button class="btn btn-primary" type="submit">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <label for="date_from" class="form-label">Date From</label>
+            <input type="date" class="form-control" id="date_from" name="date_from" value="{{ date_from|date:'Y-m-d' }}">
+          </div>
+          <div class="col-md-3">
+            <label for="date_to" class="form-label">Date To</label>
+            <input type="date" class="form-control" id="date_to" name="date_to" value="{{ date_to|date:'Y-m-d' }}">
+          </div>
+          <div class="col-md-6 d-flex align-items-end">
+            <div class="btn-group w-100">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-filter me-2"></i> Apply Filters
+              </button>
+              <a href="{% url 'exams:document_archive' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-times me-2"></i> Clear Filters
+              </a>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Document Archive Tabs -->
+  <div class="card border-0 rounded-3 shadow-sm">
+    <div class="card-header bg-white p-0 rounded-top">
+      <ul class="nav nav-tabs" id="documentTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab" aria-controls="all" aria-selected="true">
+            <i class="fas fa-folder-open me-2"></i>All Documents
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="admit-cards-tab" data-bs-toggle="tab" data-bs-target="#admit-cards" type="button" role="tab" aria-controls="admit-cards" aria-selected="false">
+            <i class="fas fa-id-card me-2"></i>Admit Cards
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="question-papers-tab" data-bs-toggle="tab" data-bs-target="#question-papers" type="button" role="tab" aria-controls="question-papers" aria-selected="false">
+            <i class="fas fa-file-alt me-2"></i>Question Papers
+          </button>
+        </li>
+      </ul>
+    </div>
+    <div class="card-body p-0">
+      <div class="tab-content" id="documentTabsContent">
+        <!-- All Documents Tab -->
+        <div class="tab-pane fade show active" id="all" role="tabpanel" aria-labelledby="all-tab">
+          {% if admit_cards.exists or question_papers.exists %}
+          <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th class="ps-3">S/N</th>
+                  <th>Document Type</th>
+                  <th>Title/Name</th>
+                  <th>Related To</th>
+                  <th>Date</th>
+                  <th class="pe-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for card in admit_cards %}
+                <tr>
+                  <td class="ps-3">{{ forloop.counter }}</td>
+                  <td>
+                    <span class="badge bg-warning">Admit Card</span>
+                  </td>
+                  <td>
+                    <span class="fw-bold">{{ card.student.fullname }}</span><br>
+                    <small class="text-muted">Roll: {{ card.roll_number }}</small>
+                  </td>
+                  <td>
+                    <span>{{ card.exam.name }}</span><br>
+                    <small class="text-muted">{{ card.student.current_class.name }} {{ card.student.section }}</small>
+                  </td>
+                  <td>{{ card.generated_on|date:"d M, Y" }}</td>
+                  <td class="pe-3">
+                    <div class="btn-group" role="group">
+                      <a href="{% url 'exams:admit_card_view' card.id %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-eye"></i>
+                      </a>
+                      <a href="{% url 'exams:document_download' 'admit_card' card.id %}" class="btn btn-sm btn-outline-success">
+                        <i class="fas fa-download"></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+                
+                {% for paper in question_papers %}
+                <tr>
+                  <td class="ps-3">{{ admit_cards.count|add:forloop.counter }}</td>
+                  <td>
+                    <span class="badge bg-danger">Question Paper</span>
+                  </td>
+                  <td>
+                    <span class="fw-bold">{{ paper.subject.name }}</span><br>
+                    <small class="text-muted">{{ paper.exam.name }}</small>
+                  </td>
+                  <td>
+                    <span>{{ paper.student_class.name }}</span>
+                    {% if paper.section %}
+                    <span>Section {{ paper.section }}</span>
+                    {% endif %}
+                  </td>
+                  <td>{{ paper.created_at|date:"d M, Y" }}</td>
+                  <td class="pe-3">
+                    <div class="btn-group" role="group">
+                      {% if paper.file %}
+                      <a href="{% url 'exams:document_download' 'question_paper' paper.id %}" class="btn btn-sm btn-outline-success">
+                        <i class="fas fa-download"></i>
+                      </a>
+                      {% else %}
+                      <button class="btn btn-sm btn-outline-secondary" disabled>
+                        <i class="fas fa-download"></i>
+                      </button>
+                      {% endif %}
+                      <a href="{% url 'exams:question_paper_update' paper.id %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="text-center py-5">
+            <div class="d-flex flex-column align-items-center py-3">
+              <i class="fas fa-folder-open fa-4x text-muted mb-3"></i>
+              <h5 class="text-muted">No documents found</h5>
+              <p class="text-muted mb-3">Try adjusting your search filters or generate new documents</p>
+              <div class="btn-group">
+                <a href="{% url 'exams:admit_card_generate' %}" class="btn btn-warning text-white">
+                  <i class="fas fa-id-card me-1"></i> Generate Admit Cards
+                </a>
+                <a href="{% url 'exams:question_paper_create' %}" class="btn btn-danger">
+                  <i class="fas fa-file-alt me-1"></i> Upload Question Papers
+                </a>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        
+        <!-- Admit Cards Tab -->
+        <div class="tab-pane fade" id="admit-cards" role="tabpanel" aria-labelledby="admit-cards-tab">
+          {% if admit_cards.exists %}
+          <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th class="ps-3">S/N</th>
+                  <th>Student</th>
+                  <th>Roll Number</th>
+                  <th>Exam</th>
+                  <th>Class & Section</th>
+                  <th>Generated On</th>
+                  <th>Status</th>
+                  <th class="pe-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for card in admit_cards %}
+                <tr>
+                  <td class="ps-3">{{ forloop.counter }}</td>
+                  <td>{{ card.student.fullname }}</td>
+                  <td>{{ card.roll_number }}</td>
+                  <td>{{ card.exam.name }}</td>
+                  <td>{{ card.student.current_class.name }} {{ card.student.section }}</td>
+                  <td>{{ card.generated_on|date:"d M, Y" }}</td>
+                  <td>
+                    {% if card.is_printed %}
+                    <span class="badge bg-success">Printed</span>
+                    {% else %}
+                    <span class="badge bg-warning">Pending</span>
+                    {% endif %}
+                  </td>
+                  <td class="pe-3">
+                    <div class="btn-group" role="group">
+                      <a href="{% url 'exams:admit_card_view' card.id %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-eye"></i>
+                      </a>
+                      <a href="{% url 'exams:document_download' 'admit_card' card.id %}" class="btn btn-sm btn-outline-success">
+                        <i class="fas fa-download"></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="text-center py-5">
+            <div class="d-flex flex-column align-items-center py-3">
+              <i class="fas fa-id-card fa-4x text-muted mb-3"></i>
+              <h5 class="text-muted">No admit cards found</h5>
+              <p class="text-muted mb-3">Try adjusting your search filters or generate new admit cards</p>
+              <a href="{% url 'exams:admit_card_generate' %}" class="btn btn-warning text-white">
+                <i class="fas fa-plus me-1"></i> Generate Admit Cards
+              </a>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        
+        <!-- Question Papers Tab -->
+        <div class="tab-pane fade" id="question-papers" role="tabpanel" aria-labelledby="question-papers-tab">
+          {% if question_papers.exists %}
+          <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th class="ps-3">S/N</th>
+                  <th>Subject</th>
+                  <th>Exam</th>
+                  <th>Class</th>
+                  <th>Section</th>
+                  <th>Created At</th>
+                  <th>File</th>
+                  <th class="pe-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for paper in question_papers %}
+                <tr>
+                  <td class="ps-3">{{ forloop.counter }}</td>
+                  <td>{{ paper.subject.name }}</td>
+                  <td>{{ paper.exam.name }}</td>
+                  <td>{{ paper.student_class.name }}</td>
+                  <td>{{ paper.section|default:"-" }}</td>
+                  <td>{{ paper.created_at|date:"d M, Y" }}</td>
+                  <td>
+                    {% if paper.file %}
+                    <span class="badge bg-success">Available</span>
+                    {% else %}
+                    <span class="badge bg-danger">Not Available</span>
+                    {% endif %}
+                  </td>
+                  <td class="pe-3">
+                    <div class="btn-group" role="group">
+                      {% if paper.file %}
+                      <a href="{% url 'exams:document_download' 'question_paper' paper.id %}" class="btn btn-sm btn-outline-success">
+                        <i class="fas fa-download"></i>
+                      </a>
+                      {% else %}
+                      <button class="btn btn-sm btn-outline-secondary" disabled>
+                        <i class="fas fa-download"></i>
+                      </button>
+                      {% endif %}
+                      <a href="{% url 'exams:question_paper_update' paper.id %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="text-center py-5">
+            <div class="d-flex flex-column align-items-center py-3">
+              <i class="fas fa-file-alt fa-4x text-muted mb-3"></i>
+              <h5 class="text-muted">No question papers found</h5>
+              <p class="text-muted mb-3">Try adjusting your search filters or upload new question papers</p>
+              <a href="{% url 'exams:question_paper_create' %}" class="btn btn-danger">
+                <i class="fas fa-upload me-1"></i> Upload Question Paper
+              </a>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block exam-js %}
+<script>
+  $(document).ready(function() {
+    // Set active tab based on document type filter
+    const docType = '{{ doc_type }}';
+    if (docType === 'admit_cards') {
+      $('#documentTabs button[data-bs-target="#admit-cards"]').tab('show');
+    } else if (docType === 'question_papers') {
+      $('#documentTabs button[data-bs-target="#question-papers"]').tab('show');
+    }
+    
+    // Update form when tab changes
+    $('#documentTabs button').on('shown.bs.tab', function (e) {
+      const target = $(e.target).data('bs-target');
+      if (target === '#admit-cards') {
+        $('#type').val('admit_cards');
+      } else if (target === '#question-papers') {
+        $('#type').val('question_papers');
+      } else {
+        $('#type').val('all');
+      }
+    });
+  });
+</script>
+{% endblock exam-js %}

@@ -1,0 +1,184 @@
+{% extends 'exams/base_exams.html' %}
+{% load static %}
+
+{% block exam-breadcrumb %}
+
+<li class="breadcrumb-item active" aria-current="page">
+  <i class="fas fa-book-reader"></i> User Guide
+</li>
+{% endblock exam-breadcrumb %}
+
+{% block title-icon %}fas fa-book-reader{% endblock title-icon %}
+
+{% block title %}Examination System Guide{% endblock title %}
+
+{% block subtitle %}Step by step guide to manage examinations{% endblock subtitle %}
+
+{% block content %}
+<div class="container-fluid">
+  <!-- Quick Navigation -->
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="fas fa-list-ol me-2"></i>Quick Navigation</h5>
+        </div>
+        <div class="card-body">
+          <div class="list-group list-group-flush">
+            <a href="#basic-setup" class="list-group-item list-group-item-action">1. Basic Setup</a>
+            <a href="#exam-creation" class="list-group-item list-group-item-action">2. Creating an Exam</a>
+            <a href="#question-papers" class="list-group-item list-group-item-action">3. Managing Question Papers</a>
+            <a href="#scheduling" class="list-group-item list-group-item-action">4. Exam Scheduling</a>
+            <a href="#seating" class="list-group-item list-group-item-action">5. Seating Arrangements</a>
+            <a href="#invigilators" class="list-group-item list-group-item-action">6. Invigilator Assignment</a>
+            <a href="#admit-cards" class="list-group-item list-group-item-action">7. Admit Cards</a>
+            <a href="#marks" class="list-group-item list-group-item-action">8. Marks Entry</a>
+            <a href="#results" class="list-group-item list-group-item-action">9. Results & Analysis</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detailed Sections -->
+  <div class="row">
+    <div class="col-md-12">
+      <!-- Basic Setup -->
+      <div id="basic-setup" class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-gradient-primary text-white">
+          <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>1. Basic Setup</h5>
+        </div>
+        <div class="card-body">
+          <div class="steps-guide">
+            <div class="step mb-4">
+              <h6 class="fw-bold text-primary">1.1 Set Academic Session</h6>
+              <p>First, ensure the current academic session is set correctly:</p>
+              <ul>
+                <li>Go to Management → Current Session & Term</li>
+                <li>Select the active academic session and term</li>
+                <li>This setting affects all exam operations</li>
+              </ul>
+            </div>
+            <div class="step mb-4">
+              <h6 class="fw-bold text-primary">1.2 Configure Exam Types</h6>
+              <p>Set up different types of examinations:</p>
+              <ul>
+                <li>Navigate to Examination → Settings → Exam Types</li>
+                <li>Add exam types (e.g., Midterm, Final, Unit Test)</li>
+                <li>Define characteristics for each exam type</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Exam Creation -->
+      <div id="exam-creation" class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-gradient-success text-white">
+          <h5 class="mb-0"><i class="fas fa-plus-circle me-2"></i>2. Creating an Exam</h5>
+        </div>
+        <div class="card-body">
+          <div class="steps-guide">
+            <div class="step mb-4">
+              <h6 class="fw-bold text-success">2.1 Create New Exam</h6>
+              <p>Steps to create a new examination:</p>
+              <ol>
+                <li>Go to Examination → Exams → Create New</li>
+                <li>Fill in basic details:
+                  <ul>
+                    <li>Exam name</li>
+                    <li>Exam type</li>
+                    <li>Start and end dates</li>
+                    <li>Applicable classes</li>
+                  </ul>
+                </li>
+                <li>Save the exam details</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Question Papers -->
+      <div id="question-papers" class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-gradient-warning text-white">
+          <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>3. Managing Question Papers</h5>
+        </div>
+        <div class="card-body">
+          <div class="steps-guide">
+            <div class="step mb-4">
+              <h6 class="fw-bold text-warning">3.1 Upload Question Papers</h6>
+              <p>Process for managing question papers:</p>
+              <ol>
+                <li>Navigate to Question Papers section</li>
+                <li>Choose paper type:
+                  <ul>
+                    <li>Manual upload (PDF/DOC)</li>
+                    <li>Auto-generation (Excel template)</li>
+                  </ul>
+                </li>
+                <li>Set paper details:
+                  <ul>
+                    <li>Subject and class</li>
+                    <li>Total marks and passing marks</li>
+                    <li>Duration and instructions</li>
+                  </ul>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Continue with other sections... -->
+      <!-- Add similar cards for Scheduling, Seating, Invigilators, etc. -->
+
+    </div>
+  </div>
+
+  <!-- Help & Support -->
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-info text-white">
+          <h5 class="mb-0"><i class="fas fa-question-circle me-2"></i>Need Help?</h5>
+        </div>
+        <div class="card-body text-center">
+          <p class="mb-3">Still have questions? Contact our support team:</p>
+          <div class="d-flex justify-content-center gap-3">
+            <a href="#" class="btn btn-outline-primary">
+              <i class="fas fa-envelope me-2"></i>Email Support
+            </a>
+            <a href="#" class="btn btn-outline-success">
+              <i class="fas fa-video me-2"></i>Video Tutorials
+            </a>
+            <a href="#" class="btn btn-outline-info">
+              <i class="fas fa-book me-2"></i>Documentation
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.steps-guide .step {
+  position: relative;
+  padding-left: 20px;
+  border-left: 2px solid #e9ecef;
+}
+
+.steps-guide .step:before {
+  content: '';
+  position: absolute;
+  left: -7px;
+  top: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #007bff;
+}
+</style>
+{% endblock content %}

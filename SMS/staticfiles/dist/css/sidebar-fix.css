@@ -1,0 +1,347 @@
+/* Sidebar Fix CSS - This will override other styles */
+
+/* Main sidebar container */
+.main-sidebar {
+  background: linear-gradient(90deg, black, #1E3C72) !important;
+  color: white !important;
+  height: 100vh !important;
+  width: 250px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding: 0 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  transition: width 0.3s ease-in-out !important;
+  z-index: 1000 !important;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Sidebar brand header */
+.main-sidebar .brand-link {
+  height: 57px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  padding: 10px 15px !important;
+  background: linear-gradient(90deg, black, #1E3C72) !important;
+  color: white !important;
+  transition: all 0.3s ease !important;
+}
+
+.main-sidebar .brand-link:hover {
+  background: linear-gradient(90deg, #000000, #16345A) !important;
+  color: #ffc107 !important;
+}
+
+.main-sidebar .brand-link .brand-image {
+  margin-right: 10px !important;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important;
+  transition: all 0.3s ease !important;
+}
+
+.main-sidebar .brand-link:hover .brand-image {
+  transform: scale(1.05) !important;
+}
+
+.main-sidebar .brand-link .brand-text {
+  font-size: 1.1rem !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Sidebar nav container */
+.main-sidebar .sidebar {
+  padding: 10px !important;
+  height: calc(100vh - 57px) !important;
+  overflow-y: auto !important;
+  background: transparent !important;
+  position: relative !important;
+  width: 100% !important;
+}
+
+/* Nav link styling */
+.nav-sidebar .nav-link {
+  color: white !important;
+  padding: 8px 15px !important;
+  border-radius: 5px !important;
+  transition: all 0.3s ease !important;
+  text-decoration: none !important;
+  margin-bottom: 5px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.nav-sidebar .nav-link:hover {
+  color: #ffc107 !important;
+  background-color: rgba(73, 80, 87, 0.5) !important;
+  transform: translateX(5px) !important;
+  text-decoration: none !important;
+}
+
+.nav-sidebar .nav-link.active {
+  background-color: rgba(30, 60, 114, 0.7) !important;
+  color: #ffc107 !important;
+  font-weight: bold !important;
+}
+
+/* Nav link icon styling with colors */
+.nav-sidebar .nav-link .nav-icon {
+  margin-right: 10px !important;
+  width: 1.6rem !important;
+  text-align: center !important;
+  font-size: 1.1rem !important;
+  transition: all 0.3s ease !important;
+}
+
+/* Colored icons */
+.nav-sidebar .nav-item:nth-child(1) .nav-link .nav-icon { color: #FF5252 !important; }
+.nav-sidebar .nav-item:nth-child(2) .nav-link .nav-icon { color: #4FC3F7 !important; }
+.nav-sidebar .nav-item:nth-child(3) .nav-link .nav-icon { color: #9C27B0 !important; }
+.nav-sidebar .nav-item:nth-child(4) .nav-link .nav-icon { color: #FFC107 !important; }
+.nav-sidebar .nav-item:nth-child(5) .nav-link .nav-icon { color: #4CAF50 !important; }
+.nav-sidebar .nav-item:nth-child(6) .nav-link .nav-icon { color: #FF9800 !important; }
+.nav-sidebar .nav-item:nth-child(7) .nav-link .nav-icon { color: #E91E63 !important; }
+.nav-sidebar .nav-item:nth-child(8) .nav-link .nav-icon { color: #9C27B0 !important; }
+.nav-sidebar .nav-item:nth-child(9) .nav-link .nav-icon { color: #FF5722 !important; }
+.nav-sidebar .nav-item:nth-child(10) .nav-link .nav-icon { color: #2196F3 !important; }
+
+/* Nav link text styling */
+.nav-sidebar .nav-link p {
+  margin: 0 !important;
+  transition: all 0.3s ease !important;
+}
+
+/* Fix for AdminLTE sidebar mini state */
+.sidebar-mini.sidebar-collapse .main-sidebar,
+.sidebar-mini.sidebar-collapse .main-sidebar::before,
+body.sidebar-collapse .main-sidebar,
+body.sidebar-collapse .main-sidebar::before {
+  margin-left: 0 !important;
+  width: 4.6rem !important;
+  overflow: visible !important;
+  transition: width 0.3s ease-in-out !important;
+}
+
+/* Brand link in collapsed state */
+.sidebar-mini.sidebar-collapse .main-sidebar .brand-link,
+body.sidebar-collapse .main-sidebar .brand-link {
+  justify-content: center !important;
+  padding: 10px 5px !important;
+}
+
+.sidebar-mini.sidebar-collapse .main-sidebar .brand-link .brand-text,
+body.sidebar-collapse .main-sidebar .brand-link .brand-text {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+.sidebar-mini.sidebar-collapse .main-sidebar .brand-link .brand-image,
+body.sidebar-collapse .main-sidebar .brand-link .brand-image {
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+}
+
+/* Brand link in hover state when collapsed */
+.sidebar-mini.sidebar-collapse .main-sidebar:hover .brand-link,
+body.sidebar-collapse .main-sidebar:hover .brand-link,
+.main-sidebar.sidebar-hover .brand-link {
+  justify-content: flex-start !important;
+  padding: 10px 15px !important;
+}
+
+.sidebar-mini.sidebar-collapse .main-sidebar:hover .brand-link .brand-text,
+body.sidebar-collapse .main-sidebar:hover .brand-link .brand-text,
+.main-sidebar.sidebar-hover .brand-link .brand-text {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.sidebar-mini.sidebar-collapse .main-sidebar:hover .brand-link .brand-image,
+body.sidebar-collapse .main-sidebar:hover .brand-link .brand-image,
+.main-sidebar.sidebar-hover .brand-link .brand-image {
+  margin-right: 10px !important;
+}
+
+.sidebar-mini.sidebar-collapse .content-wrapper,
+.sidebar-mini.sidebar-collapse .main-footer,
+.sidebar-mini.sidebar-collapse .main-header,
+body.sidebar-collapse .content-wrapper,
+body.sidebar-collapse .main-footer,
+body.sidebar-collapse .main-header {
+  margin-left: 4.6rem !important;
+  transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out !important;
+}
+
+/* Fix for sidebar mini nav links */
+.sidebar-mini.sidebar-collapse .main-sidebar .nav-sidebar .nav-link,
+body.sidebar-collapse .main-sidebar .nav-sidebar .nav-link {
+  width: 4.6rem !important;
+  padding: 8px 0 !important;
+  text-align: center !important;
+  display: block !important;
+}
+
+.sidebar-mini.sidebar-collapse .main-sidebar .nav-sidebar .nav-link .nav-icon,
+body.sidebar-collapse .main-sidebar .nav-sidebar .nav-link .nav-icon {
+  margin: 0 auto !important;
+  width: 2rem !important;
+  font-size: 1.2rem !important;
+  text-align: center !important;
+  display: block !important;
+}
+
+.sidebar-mini.sidebar-collapse .main-sidebar .nav-sidebar .nav-link p,
+body.sidebar-collapse .main-sidebar .nav-sidebar .nav-link p {
+  width: 0 !important;
+  height: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  display: none !important;
+  visibility: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transition: all 0.3s ease !important;
+}
+
+/* Fix for sidebar mini hover state */
+.sidebar-mini.sidebar-collapse .main-sidebar:hover,
+body.sidebar-collapse .main-sidebar:hover,
+.main-sidebar.sidebar-hover {
+  width: 250px !important;
+  z-index: 1038 !important;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3) !important;
+  transition: width 0.3s ease-in-out !important;
+}
+
+.sidebar-mini.sidebar-collapse .main-sidebar:hover .nav-sidebar .nav-link,
+body.sidebar-collapse .main-sidebar:hover .nav-sidebar .nav-link,
+.main-sidebar.sidebar-hover .nav-sidebar .nav-link {
+  width: 100% !important;
+  padding: 8px 15px !important;
+  text-align: left !important;
+  display: flex !important;
+  transition: all 0.3s ease !important;
+}
+
+.sidebar-mini.sidebar-collapse .main-sidebar:hover .nav-sidebar .nav-link .nav-icon,
+body.sidebar-collapse .main-sidebar:hover .nav-sidebar .nav-link .nav-icon,
+.main-sidebar.sidebar-hover .nav-sidebar .nav-link .nav-icon {
+  margin-right: 10px !important;
+  width: 1.6rem !important;
+  text-align: center !important;
+  display: inline-block !important;
+  transition: all 0.3s ease !important;
+}
+
+.sidebar-mini.sidebar-collapse .main-sidebar:hover .nav-sidebar .nav-link p,
+body.sidebar-collapse .main-sidebar:hover .nav-sidebar .nav-link p,
+.main-sidebar.sidebar-hover .nav-sidebar .nav-link p {
+  width: auto !important;
+  height: auto !important;
+  opacity: 1 !important;
+  display: inline-block !important;
+  visibility: visible !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transition: all 0.3s ease !important;
+}
+
+/* Fix for content wrapper */
+.content-wrapper {
+  margin-left: 250px !important;
+  width: calc(100% - 250px) !important;
+  padding-bottom: 60px !important;
+  min-height: calc(100vh - 60px) !important;
+  transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out !important;
+}
+
+/* When sidebar is collapsed */
+body.sidebar-collapse .content-wrapper,
+.sidebar-mini.sidebar-collapse .content-wrapper {
+  margin-left: 4.6rem !important;
+  width: calc(100% - 4.6rem) !important;
+  transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out !important;
+}
+
+/* Fix for footer positioning */
+.main-footer {
+  transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out !important;
+  margin-left: 250px !important;
+  width: calc(100% - 250px) !important;
+  position: fixed !important;
+  bottom: 0 !important;
+  z-index: 1000 !important;
+}
+
+/* Footer when sidebar is collapsed */
+body.sidebar-collapse .main-footer,
+.sidebar-mini.sidebar-collapse .main-footer {
+  margin-left: 4.6rem !important;
+  width: calc(100% - 4.6rem) !important;
+  transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out !important;
+}
+
+/* Fix for main header */
+.main-header {
+  transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out !important;
+}
+
+/* Fix for AdminLTE layout issues */
+body:not(.sidebar-mini-md):not(.sidebar-mini-xs):not(.layout-top-nav) .content-wrapper,
+body:not(.sidebar-mini-md):not(.sidebar-mini-xs):not(.layout-top-nav) .main-footer,
+body:not(.sidebar-mini-md):not(.sidebar-mini-xs):not(.layout-top-nav) .main-header {
+  transition: margin-left 0.3s ease-in-out !important;
+}
+
+/* Fix for sidebar toggle button */
+.nav-link[data-widget="pushmenu"] {
+  transition: all 0.3s ease !important;
+}
+
+.nav-link[data-widget="pushmenu"]:hover {
+  color: #ffc107 !important;
+  transform: scale(1.1) !important;
+}
+
+/* Fix for AdminLTE's body classes */
+body.layout-fixed {
+  overflow-x: hidden !important;
+}
+
+/* Fix for any remaining issues */
+.os-content-glue,
+.os-viewport,
+.os-content,
+.os-padding,
+.os-host {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+}
+
+/* Fix for AdminLTE's overlay */
+.sidebar-overlay {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Fix for specific transitions */
+.main-sidebar,
+.main-sidebar::before,
+.content-wrapper,
+.main-footer,
+.main-header,
+.nav-sidebar .nav-link,
+.nav-sidebar .nav-link p,
+.nav-sidebar .nav-link .nav-icon {
+  transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s ease-in-out !important;
+}

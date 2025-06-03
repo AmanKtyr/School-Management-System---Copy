@@ -1,0 +1,335 @@
+<!-- UDISE Student Information Report Modal -->
+<div class="modal fade" id="udiseInfoModal" tabindex="-1" aria-labelledby="udiseInfoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="udiseInfoModalLabel">
+          <i class="fas fa-info-circle me-2"></i> Student Information Report
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-0">
+        <!-- Student Information Report Format -->
+        <div class="card border-0 shadow-sm mb-0">
+          <div class="card-header bg-primary text-white text-center py-3">
+            <h5 class="mb-0">Student Information Report</h5>
+            <p class="mb-0 small">Student Database Management System (SDMS)</p>
+          </div>
+          <div class="card-body p-0">
+            <!-- Student Header Information -->
+            <table class="table table-bordered mb-0">
+              <tr>
+                <td colspan="3" class="fw-bold">Student Name: {{ object.fullname }}</td>
+                <td>Class: {{ object.current_class }}</td>
+                <td>Section: {{ object.section }}</td>
+              </tr>
+            </table>
+
+            <!-- General Information Section -->
+            <table class="table table-bordered mb-0">
+              <tr class="bg-light">
+                <td colspan="6" class="fw-bold">General Information of Student</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">1</td>
+                <td>Gender (as Per School record/School Admission Register)</td>
+                <td>{{ object.get_gender_display }}</td>
+                <td style="width: 30px;" class="text-center">2</td>
+                <td>Mother Tongue of the Student</td>
+                <td>{{ udise_info.mother_tongue|default:"58-HINDI-Bhojpuri" }}</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">3</td>
+                <td>Date of Birth (as Per School record/School Admission Register) (DD/MM/YYYY)</td>
+                <td>{{ object.date_of_birth|date:"d/m/Y" }}</td>
+                <td style="width: 30px;" class="text-center">4</td>
+                <td>Permanent Education Number</td>
+                <td>{{ object.registration_number }}</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">5</td>
+                <td>Aadhaar Number of the Student</td>
+                <td>{{ object.aadhar|default:"Not provided" }}</td>
+                <td style="width: 30px;" class="text-center">6</td>
+                <td>Name of the Father</td>
+                <td>{{ object.Father_name }}</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">7</td>
+                <td>Name of the Mother</td>
+                <td>{{ object.Mother_name|default:"Not provided" }}</td>
+                <td style="width: 30px;" class="text-center">8</td>
+                <td>Father's Aadhaar Number</td>
+                <td>{{ object.Father_aadhar|default:"Not provided" }}</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">9</td>
+                <td>Whether belongs to EWS (Disadvantaged Group)?</td>
+                <td>{% if udise_info.is_ews %}Yes{% else %}No{% endif %}</td>
+                <td style="width: 30px;" class="text-center">10</td>
+                <td>Category</td>
+                <td>{{ object.category }}</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">11</td>
+                <td>Whether CWSN (Child With Special Needs)?</td>
+                <td>{% if udise_info.is_cwsn %}Yes{% else %}No{% endif %}</td>
+                <td style="width: 30px;" class="text-center">12</td>
+                <td>Type of Disability</td>
+                <td>{{ udise_info.disability_type|default:"NA" }}</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">13</td>
+                <td>Whether having Disability Certificate</td>
+                <td>{% if udise_info.has_disability_certificate %}Yes{% else %}No{% endif %}</td>
+                <td style="width: 30px;" class="text-center">14</td>
+                <td>Disability Percentage (in %)</td>
+                <td>{{ udise_info.disability_percentage|default:"0" }}</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">15</td>
+                <td>Whether the Student is Indian National?</td>
+                <td>{% if udise_info.is_indian %}Yes{% else %}No{% endif %}</td>
+                <td style="width: 30px;" class="text-center">16</td>
+                <td>Is this Student identified as Out-of-School Child?</td>
+                <td>{% if udise_info.is_out_of_school %}Yes{% else %}No{% endif %}</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">17</td>
+                <td>When the Child is mainstreamed</td>
+                <td>{{ udise_info.mainstreamed_year|default:"NA" }}</td>
+                <td style="width: 30px;" class="text-center">18</td>
+                <td>Mobile Number (of Student/Parent/Guardian)</td>
+                <td>{{ object.mobile_number|default:"Not provided" }}</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">19</td>
+                <td>Alternate Mobile Number (of Student/Parent/Guardian)</td>
+                <td>{{ udise_info.alternate_mobile|default:"Not provided" }}</td>
+                <td style="width: 30px;" class="text-center">20</td>
+                <td>Contact email-id (of Student/Parent/Guardian)</td>
+                <td>{{ object.email_id|default:"Not provided" }}</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">21</td>
+                <td>Blood Group</td>
+                <td colspan="4">{{ udise_info.blood_group|default:"Under Investigation - Result will be updated soon" }}</td>
+              </tr>
+            </table>
+
+            <!-- Enrollment Details Section -->
+            <table class="table table-bordered mb-0">
+              <tr class="bg-light">
+                <td colspan="6" class="fw-bold">Enrollment Detail of the Student</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">1</td>
+                <td>Admission Number in Present School</td>
+                <td>{{ object.registration_number }}</td>
+                <td style="width: 30px;" class="text-center">2</td>
+                <td>Admitted / Enrolled Under (Only for Pvt. Unaided)</td>
+                <td>{{ udise_info.admitted_under|default:"NA" }}</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">3</td>
+                <td>Admission Date (DD/ MM/ YYYY) in Present School</td>
+                <td>{{ object.date_of_admission|date:"d/m/Y" }}</td>
+                <td style="width: 30px;" class="text-center">4</td>
+                <td>Class in which Student is Studying</td>
+                <td>{{ object.current_class }}</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">5</td>
+                <td>Section</td>
+                <td>{{ object.section }}</td>
+                <td style="width: 30px;" class="text-center">6</td>
+                <td>Roll Number in the Class</td>
+                <td>{{ object.registration_number|slice:"-3:" }}</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">7</td>
+                <td>Medium of Instruction</td>
+                <td>4-Hindi</td>
+                <td style="width: 30px;" class="text-center">8</td>
+                <td>Languages Group Studied by the Student</td>
+                <td>Hindi_English</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">9</td>
+                <td>Is the previous class studied - result of the examinations</td>
+                <td>1-Promoted/Passed</td>
+                <td style="width: 30px;" class="text-center">10</td>
+                <td>Academic Stream opted by student</td>
+                <td>NA</td>
+              </tr>
+            </table>
+
+            <!-- Facility Details Section -->
+            <table class="table table-bordered mb-0">
+              <tr class="bg-light">
+                <td colspan="6" class="fw-bold">Facility Detail of the Student</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">1</td>
+                <td>Whether Student has been screened for Specific Learning Disability (SLD)?</td>
+                <td colspan="4">{% if udise_info.sld_screened %}Yes{% else %}No{% endif %}</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">2</td>
+                <td>Student's Address</td>
+                <td colspan="4">{{ object.address|default:"Not provided" }}</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">3</td>
+                <td>Whether Facilities provided to the Student (for the year of filling data)</td>
+                <td>NA</td>
+                <td style="width: 30px;" class="text-center">4</td>
+                <td>Has the student appeared in State Level Competitions/Olympics/National level Competitions?</td>
+                <td>No</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">5</td>
+                <td>Facilities provided to Student in case of CWSN (for the year of filling data)</td>
+                <td colspan="4">{% if udise_info.is_cwsn %}Available{% else %}NA{% endif %}</td>
+              </tr>
+            </table>
+
+            <!-- Documents Section -->
+            <table class="table table-bordered mb-0">
+              <tr class="bg-light">
+                <td colspan="6" class="fw-bold">Documents</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">1</td>
+                <td>Student Photo</td>
+                <td colspan="4">{% if object.passport %}Available{% else %}Not uploaded{% endif %}</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">2</td>
+                <td>Aadhaar Card</td>
+                <td colspan="4">{% if object.aadhar %}Available{% else %}Not provided{% endif %}</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">3</td>
+                <td>Birth Certificate</td>
+                <td colspan="4">Not uploaded</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">4</td>
+                <td>Transfer Certificate (if applicable)</td>
+                <td colspan="4">Not uploaded</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">5</td>
+                <td>Category Certificate (if applicable)</td>
+                <td colspan="4">{% if object.category != "N/A" and object.category != "Gen" %}Required{% else %}Not applicable{% endif %}</td>
+              </tr>
+              <tr>
+                <td style="width: 30px;" class="text-center">6</td>
+                <td>Disability Certificate (if applicable)</td>
+                <td colspan="4">{% if udise_info.has_disability_certificate %}Available{% else %}Not uploaded{% endif %}</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <a href="{% url 'student-update-udise' object.id %}" class="btn btn-warning">
+          <i class="fas fa-edit me-2"></i> Update Information
+        </a>
+        <button type="button" class="btn btn-primary" onclick="printUDISEReport()">
+          <i class="fas fa-print me-2"></i> Print Report
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Print functionality for UDISE report -->
+<script>
+  function printUDISEReport() {
+    const modalContent = document.querySelector('#udiseInfoModal .modal-body').innerHTML;
+    const printWindow = window.open('', '_blank');
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Student Information Report - {{ object.fullname }}</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <style>
+          body { font-size: 12px; }
+          .card-header { background-color: #0d6efd; color: white; text-align: center; padding: 10px; }
+          table { width: 100%; border-collapse: collapse; margin-bottom: 0; }
+          table td, table th { border: 1px solid #ddd; padding: 6px; }
+          .bg-light { background-color: #f8f9fa; }
+          .fw-bold { font-weight: bold; }
+          .text-center { text-align: center; }
+          .section-title {
+            background-color: #0d6efd;
+            color: white;
+            text-align: center;
+            padding: 8px;
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 14px;
+          }
+          @media print {
+            @page { size: A4; margin: 1cm; }
+            body { margin: 0; padding: 0; }
+            .card-header { background-color: #0d6efd !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .bg-light { background-color: #f8f9fa !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .section-title { background-color: #0d6efd !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            table { page-break-inside: avoid; }
+            tr { page-break-inside: avoid; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container-fluid mt-3">
+          <div class="card border-0 mb-0">
+            <div class="card-header text-white text-center py-3">
+              <h5 class="mb-0">Student Information Report</h5>
+              <p class="mb-0 small">Student Database Management System (SDMS)</p>
+            </div>
+            <div class="card-body p-0">
+              ${modalContent}
+            </div>
+            <div class="card-footer text-center p-3">
+              <p class="mb-0 small">Generated on: ${new Date().toLocaleString()}</p>
+              <p class="mb-0 small">This is a computer-generated document. No signature is required.</p>
+              <div class="row mt-4">
+                <div class="col-4 text-center">
+                  <div style="border-top: 1px solid #000; display: inline-block; width: 150px; margin-top: 50px;">
+                    Student Signature
+                  </div>
+                </div>
+                <div class="col-4 text-center">
+                  <div style="border-top: 1px solid #000; display: inline-block; width: 150px; margin-top: 50px;">
+                    Parent/Guardian Signature
+                  </div>
+                </div>
+                <div class="col-4 text-center">
+                  <div style="border-top: 1px solid #000; display: inline-block; width: 150px; margin-top: 50px;">
+                    Principal Signature & Seal
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <script>
+          window.onload = function() {
+            setTimeout(function() {
+              window.print();
+            }, 500);
+          }
+        <\/script>
+      </body>
+      </html>
+    `);
+
+    printWindow.document.close();
+  }
+</script>

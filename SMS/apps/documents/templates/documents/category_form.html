@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if object %}Edit Category{% else %}New Category{% endif %}{% endblock title %}
+
+{% block breadcrumb %}
+<div class="breadcrumb-bar">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'documents:dashboard' %}">Document Management</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'documents:category_list' %}">Document Categories</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{% if object %}Edit Category{% else %}New Category{% endif %}</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-8 mx-auto">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">{% if object %}Edit Category{% else %}New Category{% endif %}</h4>
+        </div>
+        <div class="card-body">
+          <form method="post">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+              <label for="id_name" class="form-label">Category Name <span class="text-danger">*</span></label>
+              {{ form.name.errors }}
+              <input type="text" class="form-control {% if form.name.errors %}is-invalid{% endif %}" id="id_name" name="name" value="{{ form.name.value|default:'' }}" required>
+            </div>
+            
+            <div class="mb-3">
+              <label for="id_description" class="form-label">Description</label>
+              {{ form.description.errors }}
+              <textarea class="form-control {% if form.description.errors %}is-invalid{% endif %}" id="id_description" name="description" rows="3">{{ form.description.value|default:'' }}</textarea>
+            </div>
+            
+            <div class="d-flex justify-content-end">
+              <a href="{% url 'documents:category_list' %}" class="btn btn-outline-secondary me-2">Cancel</a>
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-2"></i> {% if object %}Update{% else %}Save{% endif %} Category
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid exams-container">
+    <div class="row justify-content-center align-items-center min-vh-100">
+        <div class="col-md-8 text-center">
+            <div class="card border-0 shadow-lg">
+                <div class="card-body p-5">
+                    <!-- School Logo Animation -->
+                    <div class="school-logo-container mb-4">
+                        <div class="school-logo-404">
+                            <i class="fas fa-graduation-cap fa-4x text-primary"></i>
+                        </div>
+                    </div>
+
+                    <!-- Error Message -->
+                    <h1 class="display-1 text-gradient fw-bold">404</h1>
+                    <h2 class="h3 mb-4 text-primary">Oops! Page Not Found</h2>
+                    
+                    <!-- Custom Message -->
+                    <div class="error-message mb-4">
+                        <p class="lead text-muted">
+                            We couldn't find what you're looking for at {{ request.path }}
+                        </p>
+                        <p class="text-muted">
+                            Don't worry! You can navigate back to safety using the options below.
+                        </p>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <a href="{% url 'home' %}" class="btn btn-outline-primary me-3 mb-2">
+                            <i class="fas fa-home me-2"></i>Back to Dashboard
+                        </a>
+                        <a href="{% url 'exams:exam_list' %}" class="btn btn-primary mb-2">
+                            <i class="fas fa-graduation-cap me-2"></i>View Exams
+                        </a>
+                    </div>
+
+                    <!-- Help Section -->
+                    <div class="mt-4 pt-3 border-top">
+                        <h6 class="text-muted mb-3">Need Help?</h6>
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="{% url 'exams:exam_guide' %}" class="text-decoration-none">
+                                <i class="fas fa-book-reader me-1"></i> View Guide
+                            </a>
+                            <span class="text-muted">|</span>
+                            <a href="#" class="text-decoration-none" onclick="window.history.back()">
+                                <i class="fas fa-arrow-left me-1"></i> Go Back
+                            </a>
+                            <span class="text-muted">|</span>
+                            <a href="#" class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#reportIssueModal">
+                                <i class="fas fa-flag me-1"></i> Report Issue
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- School Name -->
+            <div class="mt-4 text-muted">
+                <small>{{ profile.college_name|default:"MySchool" }} - Empowering Education</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Report Issue Modal -->
+<div class="modal fade" id="reportIssueModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Report an Issue</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted">Please contact your system administrator:</p>
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fas fa-envelope me-2 text-primary"></i>
+                    <span>admin@{{ request.get_host }}</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-info-circle me-2 text-primary"></i>
+                    <span>Include the URL and any relevant details about what you were trying to access.</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add custom styles -->
+{% block extracss %}
+<style>
+    .school-logo-404 {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto;
+        background: linear-gradient(135deg, #1E3C72, #2A5298);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 20px rgba(30, 60, 114, 0.2);
+        animation: float 3s infinite ease-in-out;
+    }
+
+    .school-logo-404 i {
+        color: #fff;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    .text-gradient {
+        background: linear-gradient(135deg, #1E3C72, #2A5298);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .action-buttons .btn {
+        min-width: 160px;
+        border-radius: 50px;
+        padding: 10px 20px;
+        transition: all 0.3s ease;
+    }
+
+    .action-buttons .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+</style>
+{% endblock extracss %}

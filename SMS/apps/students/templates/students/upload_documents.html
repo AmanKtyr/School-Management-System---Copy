@@ -1,0 +1,363 @@
+{% extends 'base.html' %}
+
+{% block breadcrumb-left %}
+<div class="breadcrumb-container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-chevron">
+      <li class="breadcrumb-item">
+        <a href="{% url 'home' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-home"></i> Home
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'student-list' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-user-graduate"></i> Students
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'student-detail' student.id %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-id-card"></i> {{ student.fullname }}
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <i class="fas fa-file-upload"></i> Upload Documents
+      </li>
+    </ol>
+  </nav>
+</div>
+{% endblock breadcrumb-left %}
+
+{% block title %}
+Upload Documents for {{ student.fullname }}
+{% endblock title %}
+
+{% block content %}
+<div class="card shadow-lg border-0">
+  <div class="card-header bg-gradient-primary text-white">
+    <h4 class="mb-0"><i class="fas fa-file-upload"></i> Document Upload</h4>
+  </div>
+  <div class="card-body">
+    <div class="alert alert-info shadow-sm">
+      <div class="d-flex align-items-center">
+        <i class="fas fa-info-circle fa-2x me-3"></i>
+        <div>
+          <h5 class="mb-1">Upload Required Documents</h5>
+          <p class="mb-0">Please upload all the required documents. Supported formats: PDF, JPG, JPEG, PNG.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4 border-0 shadow-sm">
+      <div class="card-header bg-light">
+        <h5 class="mb-0"><i class="fas fa-user-graduate"></i> Student Information</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <p><strong>Name:</strong> {{ student.fullname }}</p>
+            <p><strong>Class:</strong> {{ student.current_class }} {{ student.section }}</p>
+          </div>
+          <div class="col-md-6">
+            <p><strong>Registration Number:</strong> {{ student.registration_number }}</p>
+            <p><strong>Document Number:</strong> {{ documents.document_number }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <div class="row">
+        <!-- Aadhar Card -->
+        <div class="col-md-6 mb-3">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-header bg-light">
+              <h5 class="mb-0"><i class="fas fa-id-card"></i> Aadhar Card</h5>
+            </div>
+            <div class="card-body">
+              {% if documents.aadhar_card %}
+                <div class="alert alert-success">
+                  <div class="d-flex align-items-center">
+                    <i class="fas fa-check-circle fa-2x me-3"></i>
+                    <div>
+                      <h6 class="mb-0">Document Uploaded</h6>
+                      <a href="{{ documents.aadhar_card.url }}" class="btn btn-sm btn-info mt-2" target="_blank">
+                        <i class="fas fa-eye"></i> View Document
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+              <div class="mt-2">
+                <label for="aadhar_card_number" class="form-label">Aadhar Card Number</label>
+                <input type="text" class="form-control mb-2" id="aadhar_card_number" name="aadhar_card_number" value="{{ documents.aadhar_card_number }}" placeholder="Enter document number">
+
+                <label for="aadhar_card" class="form-label">Upload Aadhar Card</label>
+                <input type="file" class="form-control" id="aadhar_card" name="aadhar_card" accept=".pdf,.jpg,.jpeg,.png">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Parent Photo -->
+        <div class="col-md-6 mb-3">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-header bg-light">
+              <h5 class="mb-0"><i class="fas fa-user"></i> Parent Photo</h5>
+            </div>
+            <div class="card-body">
+              {% if documents.parent_photo %}
+                <div class="alert alert-success">
+                  <div class="d-flex align-items-center">
+                    <i class="fas fa-check-circle fa-2x me-3"></i>
+                    <div>
+                      <h6 class="mb-0">Document Uploaded</h6>
+                      <a href="{{ documents.parent_photo.url }}" class="btn btn-sm btn-info mt-2" target="_blank">
+                        <i class="fas fa-eye"></i> View Document
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+              <div class="mt-2">
+                <label for="parent_photo_number" class="form-label">Parent Photo Number</label>
+                <input type="text" class="form-control mb-2" id="parent_photo_number" name="parent_photo_number" value="{{ documents.parent_photo_number }}" placeholder="Enter document number">
+
+                <label for="parent_photo" class="form-label">Upload Parent Photo</label>
+                <input type="file" class="form-control" id="parent_photo" name="parent_photo" accept=".jpg,.jpeg,.png">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Parent ID Proof -->
+        <div class="col-md-6 mb-3">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-header bg-light">
+              <h5 class="mb-0"><i class="fas fa-id-badge"></i> Parent ID Proof</h5>
+            </div>
+            <div class="card-body">
+              {% if documents.parent_id_proof %}
+                <div class="alert alert-success">
+                  <div class="d-flex align-items-center">
+                    <i class="fas fa-check-circle fa-2x me-3"></i>
+                    <div>
+                      <h6 class="mb-0">Document Uploaded</h6>
+                      <a href="{{ documents.parent_id_proof.url }}" class="btn btn-sm btn-info mt-2" target="_blank">
+                        <i class="fas fa-eye"></i> View Document
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+              <div class="mt-2">
+                <label for="parent_id_proof_number" class="form-label">Parent ID Proof Number</label>
+                <input type="text" class="form-control mb-2" id="parent_id_proof_number" name="parent_id_proof_number" value="{{ documents.parent_id_proof_number }}" placeholder="Enter document number">
+
+                <label for="parent_id_proof" class="form-label">Upload Parent ID Proof</label>
+                <input type="file" class="form-control" id="parent_id_proof" name="parent_id_proof" accept=".pdf,.jpg,.jpeg,.png">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Previous Marksheet -->
+        <div class="col-md-6 mb-3">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-header bg-light">
+              <h5 class="mb-0"><i class="fas fa-file-alt"></i> Previous Marksheet</h5>
+            </div>
+            <div class="card-body">
+              {% if documents.previous_marksheet %}
+                <div class="alert alert-success">
+                  <div class="d-flex align-items-center">
+                    <i class="fas fa-check-circle fa-2x me-3"></i>
+                    <div>
+                      <h6 class="mb-0">Document Uploaded</h6>
+                      <a href="{{ documents.previous_marksheet.url }}" class="btn btn-sm btn-info mt-2" target="_blank">
+                        <i class="fas fa-eye"></i> View Document
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+              <div class="mt-2">
+                <label for="previous_marksheet_number" class="form-label">Previous Marksheet Number</label>
+                <input type="text" class="form-control mb-2" id="previous_marksheet_number" name="previous_marksheet_number" value="{{ documents.previous_marksheet_number }}" placeholder="Enter document number">
+
+                <label for="previous_marksheet" class="form-label">Upload Previous Marksheet</label>
+                <input type="file" class="form-control" id="previous_marksheet" name="previous_marksheet" accept=".pdf,.jpg,.jpeg,.png">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Transfer Certificate -->
+        <div class="col-md-6 mb-3">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-header bg-light">
+              <h5 class="mb-0"><i class="fas fa-certificate"></i> Transfer Certificate</h5>
+            </div>
+            <div class="card-body">
+              {% if documents.transfer_certificate %}
+                <div class="alert alert-success">
+                  <div class="d-flex align-items-center">
+                    <i class="fas fa-check-circle fa-2x me-3"></i>
+                    <div>
+                      <h6 class="mb-0">Document Uploaded</h6>
+                      <a href="{{ documents.transfer_certificate.url }}" class="btn btn-sm btn-info mt-2" target="_blank">
+                        <i class="fas fa-eye"></i> View Document
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+              <div class="mt-2">
+                <label for="transfer_certificate_number" class="form-label">Transfer Certificate Number</label>
+                <input type="text" class="form-control mb-2" id="transfer_certificate_number" name="transfer_certificate_number" value="{{ documents.transfer_certificate_number }}" placeholder="Enter document number">
+
+                <label for="transfer_certificate" class="form-label">Upload Transfer Certificate</label>
+                <input type="file" class="form-control" id="transfer_certificate" name="transfer_certificate" accept=".pdf,.jpg,.jpeg,.png">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Character Certificate -->
+        <div class="col-md-6 mb-3">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-header bg-light">
+              <h5 class="mb-0"><i class="fas fa-award"></i> Character Certificate</h5>
+            </div>
+            <div class="card-body">
+              {% if documents.character_certificate %}
+                <div class="alert alert-success">
+                  <div class="d-flex align-items-center">
+                    <i class="fas fa-check-circle fa-2x me-3"></i>
+                    <div>
+                      <h6 class="mb-0">Document Uploaded</h6>
+                      <a href="{{ documents.character_certificate.url }}" class="btn btn-sm btn-info mt-2" target="_blank">
+                        <i class="fas fa-eye"></i> View Document
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+              <div class="mt-2">
+                <label for="character_certificate_number" class="form-label">Character Certificate Number</label>
+                <input type="text" class="form-control mb-2" id="character_certificate_number" name="character_certificate_number" value="{{ documents.character_certificate_number }}" placeholder="Enter document number">
+
+                <label for="character_certificate" class="form-label">Upload Character Certificate</label>
+                <input type="file" class="form-control" id="character_certificate" name="character_certificate" accept=".pdf,.jpg,.jpeg,.png">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Caste Certificate -->
+        <div class="col-md-6 mb-3">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-header bg-light">
+              <h5 class="mb-0"><i class="fas fa-file-contract"></i> Caste Certificate</h5>
+            </div>
+            <div class="card-body">
+              {% if documents.caste_certificate %}
+                <div class="alert alert-success">
+                  <div class="d-flex align-items-center">
+                    <i class="fas fa-check-circle fa-2x me-3"></i>
+                    <div>
+                      <h6 class="mb-0">Document Uploaded</h6>
+                      <a href="{{ documents.caste_certificate.url }}" class="btn btn-sm btn-info mt-2" target="_blank">
+                        <i class="fas fa-eye"></i> View Document
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+              <div class="mt-2">
+                <label for="caste_certificate_number" class="form-label">Caste Certificate Number</label>
+                <input type="text" class="form-control mb-2" id="caste_certificate_number" name="caste_certificate_number" value="{{ documents.caste_certificate_number }}" placeholder="Enter document number">
+
+                <label for="caste_certificate" class="form-label">Upload Caste Certificate</label>
+                <input type="file" class="form-control" id="caste_certificate" name="caste_certificate" accept=".pdf,.jpg,.jpeg,.png">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Medical Certificate -->
+        <div class="col-md-6 mb-3">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-header bg-light">
+              <h5 class="mb-0"><i class="fas fa-notes-medical"></i> Medical Certificate</h5>
+            </div>
+            <div class="card-body">
+              {% if documents.medical_certificate %}
+                <div class="alert alert-success">
+                  <div class="d-flex align-items-center">
+                    <i class="fas fa-check-circle fa-2x me-3"></i>
+                    <div>
+                      <h6 class="mb-0">Document Uploaded</h6>
+                      <a href="{{ documents.medical_certificate.url }}" class="btn btn-sm btn-info mt-2" target="_blank">
+                        <i class="fas fa-eye"></i> View Document
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+              <div class="mt-2">
+                <label for="medical_certificate_number" class="form-label">Medical Certificate Number</label>
+                <input type="text" class="form-control mb-2" id="medical_certificate_number" name="medical_certificate_number" value="{{ documents.medical_certificate_number }}" placeholder="Enter document number">
+
+                <label for="medical_certificate" class="form-label">Upload Medical Certificate</label>
+                <input type="file" class="form-control" id="medical_certificate" name="medical_certificate" accept=".pdf,.jpg,.jpeg,.png">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Other Document -->
+        <div class="col-md-6 mb-3">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-header bg-light">
+              <h5 class="mb-0"><i class="fas fa-file"></i> Other Document</h5>
+            </div>
+            <div class="card-body">
+              {% if documents.other_document %}
+                <div class="alert alert-success">
+                  <div class="d-flex align-items-center">
+                    <i class="fas fa-check-circle fa-2x me-3"></i>
+                    <div>
+                      <h6 class="mb-0">Document Uploaded</h6>
+                      <a href="{{ documents.other_document.url }}" class="btn btn-sm btn-info mt-2" target="_blank">
+                        <i class="fas fa-eye"></i> View Document
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+              <div class="mt-2">
+                <label for="other_document_number" class="form-label">Other Document Number</label>
+                <input type="text" class="form-control mb-2" id="other_document_number" name="other_document_number" value="{{ documents.other_document_number }}" placeholder="Enter document number">
+
+                <label for="other_document" class="form-label">Upload Other Document</label>
+                <input type="file" class="form-control" id="other_document" name="other_document" accept=".pdf,.jpg,.jpeg,.png">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4 text-center">
+        <button type="submit" class="btn btn-primary btn-lg shadow">
+          <i class="fas fa-save"></i> Save Documents
+        </button>
+        <a href="{% url 'student-detail' student.id %}" class="btn btn-secondary btn-lg shadow">
+          <i class="fas fa-arrow-left"></i> Back to Profile
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock content %}

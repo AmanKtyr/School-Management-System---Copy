@@ -1,0 +1,1110 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block breadcrumb-left %}
+<div class="breadcrumb-container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-chevron">
+      <li class="breadcrumb-item">
+        <a href="{% url 'home' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-home"></i> Home
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="#" class="text-decoration-none fw-bold">
+          <i class="fas fa-copy"></i> Management
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <i class="fas fa-money-bill-wave"></i> Fee Settings
+      </li>
+    </ol>
+  </nav>
+</div>
+{% endblock breadcrumb-left %}
+
+{% block title-icon %}fas fa-money-bill-wave{% endblock title-icon %}
+
+{% block title %}Fee Settings{% endblock title %}
+
+{% block subtitle %}Configure and manage fee structure for different classes{% endblock subtitle %}
+
+{% block page-actions %}
+<a href="{% url 'fee_settings_list' %}" class="btn btn-outline-primary">
+  <i class="fas fa-list me-2"></i>View All Settings
+</a>
+{% endblock page-actions %}
+
+{% block content %}
+<style>
+    /* Modern Fee Settings Styles */
+    .fee-settings-container {
+        padding: 20px 0;
+    }
+
+    /* Card Styles */
+    .card-custom {
+        background-color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        margin-bottom: 30px;
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+
+    .card-custom:hover {
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .card-header-custom {
+        background: linear-gradient(135deg, #1E3C72, #2A5298);
+        color: white;
+        padding: 20px 25px;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .card-body-custom {
+        padding: 25px;
+    }
+
+    /* Dashboard Stats */
+    .stats-container {
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        height: 100%;
+        transition: transform 0.3s ease;
+        border-left: 5px solid;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .stat-card.primary {
+        border-color: #1E3C72;
+    }
+
+    .stat-card.success {
+        border-color: #1cc88a;
+    }
+
+    .stat-card.warning {
+        border-color: #f6c23e;
+    }
+
+    .stat-card.info {
+        border-color: #36b9cc;
+    }
+
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+    }
+
+    .stat-card.primary .stat-icon {
+        background: rgba(30, 60, 114, 0.1);
+        color: #1E3C72;
+    }
+
+    .stat-card.success .stat-icon {
+        background: rgba(28, 200, 138, 0.1);
+        color: #1cc88a;
+    }
+
+    .stat-card.warning .stat-icon {
+        background: rgba(246, 194, 62, 0.1);
+        color: #f6c23e;
+    }
+
+    .stat-card.info .stat-icon {
+        background: rgba(54, 185, 204, 0.1);
+        color: #36b9cc;
+    }
+
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    /* Table Styles */
+    .table-container {
+        background-color: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .table thead th {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        color: #495057;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        padding: 15px;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .table tbody td {
+        padding: 15px;
+        vertical-align: middle;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(30, 60, 114, 0.03);
+    }
+
+    /* Button Styles */
+    .btn-add-fee {
+        background: linear-gradient(135deg, #1E3C72, #2A5298);
+        color: white;
+        font-weight: 600;
+        border-radius: 8px;
+        padding: 10px 20px;
+        border: none;
+        box-shadow: 0 4px 10px rgba(30, 60, 114, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .btn-add-fee:hover {
+        background: linear-gradient(135deg, #2A5298, #1E3C72);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(30, 60, 114, 0.3);
+    }
+
+    .save-btn {
+        background: linear-gradient(135deg, #1cc88a, #13a673);
+        color: white;
+        padding: 12px 30px;
+        font-weight: bold;
+        font-size: 16px;
+        border-radius: 8px;
+        border: none;
+        box-shadow: 0 4px 10px rgba(28, 200, 138, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .save-btn:hover {
+        background: linear-gradient(135deg, #13a673, #1cc88a);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(28, 200, 138, 0.3);
+    }
+
+    .btn-remove-fee {
+        background-color: transparent;
+        border: none;
+        color: #e74a3b;
+        font-size: 18px;
+        transition: all 0.2s;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-remove-fee:hover {
+        background-color: rgba(231, 74, 59, 0.1);
+        color: #e74a3b;
+        transform: scale(1.1);
+    }
+
+    /* Form Styles */
+    .form-control, .form-select {
+        padding: 0.65rem 1rem;
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #1E3C72;
+        box-shadow: 0 0 0 0.25rem rgba(30, 60, 114, 0.15);
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Total Amount Section */
+    .total-amount {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        padding: 20px 25px;
+        margin-top: 25px;
+        border-radius: 10px;
+        border-left: 5px solid #1E3C72;
+    }
+
+    .total-amount h3 {
+        color: #1E3C72;
+        font-weight: 700;
+    }
+
+    /* Alert Styles */
+    .alert-custom {
+        border-radius: 8px;
+        padding: 15px 20px;
+        margin-bottom: 20px;
+        border: none;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .alert-custom.alert-success {
+        background-color: rgba(28, 200, 138, 0.1);
+        border-left: 5px solid #1cc88a;
+        color: #13a673;
+    }
+
+    .alert-custom.alert-info {
+        background-color: rgba(54, 185, 204, 0.1);
+        border-left: 5px solid #36b9cc;
+        color: #2c9faf;
+    }
+
+    .alert-custom.alert-warning {
+        background-color: rgba(246, 194, 62, 0.1);
+        border-left: 5px solid #f6c23e;
+        color: #dda20a;
+    }
+
+    .alert-custom.alert-danger {
+        background-color: rgba(231, 74, 59, 0.1);
+        border-left: 5px solid #e74a3b;
+        color: #be2617;
+    }
+
+    /* Fee Templates Section */
+    .template-card {
+        border: 1px solid #e3e6f0;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .template-card:hover {
+        background-color: rgba(30, 60, 114, 0.05);
+        border-color: #1E3C72;
+    }
+
+    .template-card.active {
+        background-color: rgba(30, 60, 114, 0.1);
+        border-color: #1E3C72;
+    }
+
+    /* Loading Spinner */
+    .spinner-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        visibility: hidden;
+        opacity: 0;
+        transition: all 0.3s;
+    }
+
+    .spinner-overlay.show {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .card-body-custom {
+            padding: 15px;
+        }
+
+        .stat-card {
+            margin-bottom: 15px;
+        }
+
+        .table thead th {
+            font-size: 0.75rem;
+            padding: 10px;
+        }
+
+        .table tbody td {
+            padding: 10px;
+        }
+    }
+
+    /* Animation */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+        animation: fadeIn 0.5s ease forwards;
+    }
+
+    .fade-in-delay-1 {
+        animation: fadeIn 0.5s ease 0.1s forwards;
+        opacity: 0;
+    }
+
+    .fade-in-delay-2 {
+        animation: fadeIn 0.5s ease 0.2s forwards;
+        opacity: 0;
+    }
+
+    .fade-in-delay-3 {
+        animation: fadeIn 0.5s ease 0.3s forwards;
+        opacity: 0;
+    }
+</style>
+
+<div class="fee-settings-container">
+    <div class="container">
+        <!-- Loading Spinner -->
+        <div class="spinner-overlay" id="loadingSpinner">
+            <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+
+        <!-- Alerts Section -->
+        {% if messages %}
+        <div class="messages mb-4">
+            {% for message in messages %}
+            <div class="alert alert-custom alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                <i class="fas fa-info-circle me-2"></i>{{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Dashboard Stats -->
+        <div class="row stats-container fade-in">
+            <div class="col-md-3 mb-4">
+                <div class="stat-card primary">
+                    <div class="stat-icon">
+                        <i class="fas fa-school"></i>
+                    </div>
+                    <div class="stat-value">{{ selected_class.name|default:"--" }}</div>
+                    <div class="stat-label">Selected Class</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="stat-card success">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-value">{{ selected_section|default:"--" }}</div>
+                    <div class="stat-label">Selected Section</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="stat-card warning">
+                    <div class="stat-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="stat-value">₹<span id="stat-total-amount">0.00</span></div>
+                    <div class="stat-label">Total Fee Amount</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="stat-card info">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="stat-value">{{ fee_settings.frequency|default:"--" }}</div>
+                    <div class="stat-label">Payment Frequency</div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Filter Card -->
+        <div class="card-custom fade-in-delay-1">
+            <div class="card-header-custom">
+                <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Select Class & Section</h5>
+            </div>
+            <div class="card-body-custom">
+                {% include 'includes/class_section_filter.html' with filter_form=filter_form show_search=False %}
+            </div>
+        </div>
+
+        <!-- Fee Templates Section (Only visible when class is selected) -->
+        {% if selected_class %}
+        <div class="card-custom fade-in-delay-2">
+            <div class="card-header-custom">
+                <h5 class="mb-0"><i class="fas fa-copy me-2"></i>Fee Templates</h5>
+            </div>
+            <div class="card-body-custom">
+                <p class="text-muted mb-3">Select a template to quickly apply common fee structures</p>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="template-card" id="template-standard" data-template="standard">
+                            <h6><i class="fas fa-star me-2 text-warning"></i>Standard Fee Structure</h6>
+                            <p class="text-muted mb-0 small">Includes tuition, development, and library fees</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="template-card" id="template-comprehensive" data-template="comprehensive">
+                            <h6><i class="fas fa-award me-2 text-info"></i>Comprehensive Package</h6>
+                            <p class="text-muted mb-0 small">All standard fees plus extracurricular activities</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="template-card" id="template-minimal" data-template="minimal">
+                            <h6><i class="fas fa-feather me-2 text-success"></i>Basic Structure</h6>
+                            <p class="text-muted mb-0 small">Essential fees only</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Settings Form -->
+        <div class="card-custom fade-in-delay-3">
+            {% if selected_class %}
+            <div class="card-header-custom">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-0"><i class="fas fa-cog me-2"></i>Fee Configuration</h5>
+                        <p class="mb-0 small text-white-50">For Class {{ selected_class.name }} {% if selected_section %}Section {{ selected_section }}{% endif %}</p>
+                    </div>
+                    <div>
+                        <a href="{% url 'fee_settings_list' %}" class="btn btn-sm btn-light">
+                            <i class="fas fa-list me-1"></i> View All
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body-custom">
+                <form method="post" action="" id="feeSettingsForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="class_id" id="selectedClassId" value="{{ selected_class.id }}">
+                    <input type="hidden" name="section" id="selectedSection" value="{{ selected_section|default:'' }}">
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="frequency" class="form-label">
+                                    <i class="fas fa-sync-alt me-1 text-primary"></i> Fee Frequency
+                                    <span class="text-muted ms-1" style="font-size: 0.85rem;">(How often fees are collected)</span>
+                                </label>
+                                <select class="form-select" id="frequency" name="frequency" required>
+                                    <option value="">Select Frequency...</option>
+                                    <option value="Monthly" {% if fee_settings.frequency == 'Monthly' %}selected{% endif %}>Monthly</option>
+                                    <option value="Quarterly" {% if fee_settings.frequency == 'Quarterly' %}selected{% endif %}>Quarterly</option>
+                                    <option value="Half-Yearly" {% if fee_settings.frequency == 'Half-Yearly' %}selected{% endif %}>Half-Yearly</option>
+                                    <option value="Annually" {% if fee_settings.frequency == 'Annually' %}selected{% endif %}>Annually</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="due_date" class="form-label">
+                                    <i class="fas fa-calendar-day me-1 text-primary"></i> Due Date
+                                    <span class="text-muted ms-1" style="font-size: 0.85rem;">(When payment is expected)</span>
+                                </label>
+                                <input type="date" class="form-control" id="due_date" name="due_date" value="{{ fee_settings.due_date|date:'Y-m-d' }}" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container mb-4">
+                        <table class="table table-hover" id="feeTable">
+                            <thead>
+                                <tr>
+                                    <th width="30%">Fee Type</th>
+                                    <th width="20%">Amount (₹)</th>
+                                    <th width="20%">Late Fee (₹)</th>
+                                    <th width="20%">Discount (%)</th>
+                                    <th width="10%">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if existing_fees %}
+                                    {% for fee in existing_fees %}
+                                    <tr class="fee-row">
+                                        <td>
+                                            <input type="text" class="form-control" name="fee_type[]" value="{{ fee.fee_type }}" placeholder="e.g., Tuition Fee" required>
+                                        </td>
+                                        <td>
+                                            <div class="input-group">
+                                                <span class="input-group-text">₹</span>
+                                                <input type="number" class="form-control amount" name="amount[]" value="{{ fee.amount }}" min="0" step="0.01" required>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="input-group">
+                                                <span class="input-group-text">₹</span>
+                                                <input type="number" class="form-control" name="late_fee[]" value="{{ fee.late_fee|default:0 }}" min="0" step="0.01">
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="input-group">
+                                                <input type="number" class="form-control discount" name="discount[]" value="{{ fee.discount|default:0 }}" min="0" max="100" step="0.01">
+                                                <span class="input-group-text">%</span>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn-remove-fee" data-bs-toggle="tooltip" title="Remove Fee">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr class="fee-row">
+                                        <td>
+                                            <input type="text" class="form-control" name="fee_type[]" placeholder="e.g., Tuition Fee" required>
+                                        </td>
+                                        <td>
+                                            <div class="input-group">
+                                                <span class="input-group-text">₹</span>
+                                                <input type="number" class="form-control amount" name="amount[]" min="0" step="0.01" placeholder="0.00" required>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="input-group">
+                                                <span class="input-group-text">₹</span>
+                                                <input type="number" class="form-control" name="late_fee[]" min="0" step="0.01" value="0" placeholder="0.00">
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="input-group">
+                                                <input type="number" class="form-control discount" name="discount[]" min="0" max="100" step="0.01" value="0" placeholder="0">
+                                                <span class="input-group-text">%</span>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn-remove-fee" data-bs-toggle="tooltip" title="Remove Fee">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <button type="button" class="btn btn-add-fee" id="add-fee">
+                            <i class="fas fa-plus me-2"></i>Add Fee Type
+                        </button>
+
+                        <div class="d-flex align-items-center">
+                            <div class="form-check form-switch me-3">
+                                <input class="form-check-input" type="checkbox" id="applyToAllStudents" name="apply_to_all_students" checked>
+                                <label class="form-check-label" for="applyToAllStudents">Apply to all students in this class</label>
+                            </div>
+
+                            <button type="button" class="btn btn-outline-secondary" id="previewBtn">
+                                <i class="fas fa-eye me-2"></i>Preview
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="total-amount">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h4 class="mb-0"><i class="fas fa-calculator me-2"></i>Total Fees</h4>
+                                <small class="text-muted">After applying discounts</small>
+                            </div>
+                            <div class="col-auto">
+                                <h3 class="mb-0">₹<span id="total-amount">0.00</span></h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="button" class="btn btn-outline-secondary" id="resetBtn">
+                            <i class="fas fa-undo me-2"></i>Reset Form
+                        </button>
+                        <button type="submit" class="save-btn">
+                            <i class="fas fa-save me-2"></i>Save Fee Settings
+                        </button>
+                    </div>
+                </form>
+            </div>
+            {% else %}
+            <div class="card-body-custom">
+                <div class="text-center py-5">
+                    <img src="{% static 'img/select-class.svg' %}" alt="Select Class" style="width: 180px; margin-bottom: 20px; opacity: 0.7;">
+                    <h4 class="text-primary">Please Select a Class</h4>
+                    <p class="text-muted">Choose a class and section from the filter above to configure fee settings.</p>
+                    <a href="{% url 'fee_settings_list' %}" class="btn btn-outline-primary mt-3">
+                        <i class="fas fa-list me-2"></i>View Existing Fee Settings
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Fee Preview Modal -->
+        <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="previewModalLabel"><i class="fas fa-eye me-2"></i>Fee Structure Preview</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="preview-content">
+                            <div class="d-flex justify-content-between mb-4">
+                                <div>
+                                    <h5>Class: <span id="preview-class">--</span></h5>
+                                    <p class="mb-0">Section: <span id="preview-section">--</span></p>
+                                </div>
+                                <div>
+                                    <h5>Frequency: <span id="preview-frequency">--</span></h5>
+                                    <p class="mb-0">Due Date: <span id="preview-due-date">--</span></p>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Sr. No.</th>
+                                            <th>Fee Type</th>
+                                            <th>Amount (₹)</th>
+                                            <th>Late Fee (₹)</th>
+                                            <th>Discount (%)</th>
+                                            <th>Final Amount (₹)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="preview-fees">
+                                        <!-- Will be populated by JavaScript -->
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="table-primary">
+                                            <th colspan="5" class="text-end">Total Amount:</th>
+                                            <th>₹<span id="preview-total">0.00</span></th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="printPreview">
+                            <i class="fas fa-print me-2"></i>Print Preview
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function () {
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Calculate total fee amount
+    function calculateTotal() {
+        let total = 0;
+        $(".amount").each(function () {
+            let amount = parseFloat($(this).val()) || 0;
+            let discount = parseFloat($(this).closest("tr").find(".discount").val()) || 0;
+            total += (amount - (amount * discount / 100));
+        });
+
+        // Update both total displays
+        $("#total-amount").text(total.toFixed(2));
+        $("#stat-total-amount").text(total.toFixed(2));
+
+        return total;
+    }
+
+    // Initialize total calculation
+    calculateTotal();
+
+    // Add new fee row
+    $("#add-fee").on('click', function () {
+        const newRow = `
+        <tr class="fee-row">
+            <td>
+                <input type="text" class="form-control" name="fee_type[]" placeholder="e.g., Tuition Fee" required>
+            </td>
+            <td>
+                <div class="input-group">
+                    <span class="input-group-text">₹</span>
+                    <input type="number" class="form-control amount" name="amount[]" min="0" step="0.01" placeholder="0.00" required>
+                </div>
+            </td>
+            <td>
+                <div class="input-group">
+                    <span class="input-group-text">₹</span>
+                    <input type="number" class="form-control" name="late_fee[]" min="0" step="0.01" value="0" placeholder="0.00">
+                </div>
+            </td>
+            <td>
+                <div class="input-group">
+                    <input type="number" class="form-control discount" name="discount[]" min="0" max="100" step="0.01" value="0" placeholder="0">
+                    <span class="input-group-text">%</span>
+                </div>
+            </td>
+            <td class="text-center">
+                <button type="button" class="btn-remove-fee" data-bs-toggle="tooltip" title="Remove Fee">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        </tr>`;
+
+        $("#feeTable tbody").append(newRow);
+
+        // Re-initialize tooltips for new elements
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Animate the new row
+        $("#feeTable tbody tr:last-child").hide().fadeIn(300);
+
+        // Update total
+        calculateTotal();
+    });
+
+    // Remove fee row
+    $(document).on('click', '.btn-remove-fee', function () {
+        const row = $(this).closest('tr');
+
+        // Animate removal
+        row.fadeOut(300, function() {
+            row.remove();
+            calculateTotal();
+        });
+    });
+
+    // Update totals when amount or discount changes
+    $(document).on('input', '.amount, .discount', function () {
+        calculateTotal();
+    });
+
+    // Class filter change
+    $('#class-filter').change(function () {
+        $('#selectedClassId').val($(this).val());
+        // Don't auto-submit, wait for Apply Filter button
+    });
+
+    // Section filter change
+    $('#section-filter').change(function () {
+        $('#selectedSection').val($(this).val());
+        // Don't auto-submit, wait for Apply Filter button
+    });
+
+    // Update hidden fields when form is submitted
+    $('#filter-form').on('submit', function() {
+        // Show loading spinner
+        $('#loadingSpinner').addClass('show');
+
+        $('#selectedClassId').val($('#class-filter').val());
+        $('#selectedSection').val($('#section-filter').val());
+    });
+
+    // Fee template selection
+    $('.template-card').on('click', function() {
+        const templateType = $(this).data('template');
+
+        // Remove active class from all templates
+        $('.template-card').removeClass('active');
+
+        // Add active class to selected template
+        $(this).addClass('active');
+
+        // Clear existing fee rows except the first one
+        if ($("#feeTable tbody tr").length > 1) {
+            $("#feeTable tbody tr:not(:first)").remove();
+        }
+
+        // Reset first row values
+        $("#feeTable tbody tr:first input").val('');
+        $("#feeTable tbody tr:first .amount").val('');
+        $("#feeTable tbody tr:first .discount").val('0');
+        $("#feeTable tbody tr:first input[name='late_fee[]']").val('0');
+
+        // Apply template based on selection
+        if (templateType === 'standard') {
+            // Standard template: Tuition, Development, Library
+            $("#feeTable tbody tr:first input[name='fee_type[]']").val('Tuition Fee');
+            $("#feeTable tbody tr:first .amount").val('5000');
+
+            // Add Development Fee
+            $("#add-fee").click();
+            $("#feeTable tbody tr:last input[name='fee_type[]']").val('Development Fee');
+            $("#feeTable tbody tr:last .amount").val('2000');
+
+            // Add Library Fee
+            $("#add-fee").click();
+            $("#feeTable tbody tr:last input[name='fee_type[]']").val('Library Fee');
+            $("#feeTable tbody tr:last .amount").val('500');
+
+            // Set frequency to Quarterly
+            $("#frequency").val('Quarterly');
+
+        } else if (templateType === 'comprehensive') {
+            // Comprehensive template: All standard fees plus extracurricular
+            $("#feeTable tbody tr:first input[name='fee_type[]']").val('Tuition Fee');
+            $("#feeTable tbody tr:first .amount").val('6000');
+
+            // Add Development Fee
+            $("#add-fee").click();
+            $("#feeTable tbody tr:last input[name='fee_type[]']").val('Development Fee');
+            $("#feeTable tbody tr:last .amount").val('2500');
+
+            // Add Library Fee
+            $("#add-fee").click();
+            $("#feeTable tbody tr:last input[name='fee_type[]']").val('Library Fee');
+            $("#feeTable tbody tr:last .amount").val('800');
+
+            // Add Computer Lab Fee
+            $("#add-fee").click();
+            $("#feeTable tbody tr:last input[name='fee_type[]']").val('Computer Lab Fee');
+            $("#feeTable tbody tr:last .amount").val('1200');
+
+            // Add Sports Fee
+            $("#add-fee").click();
+            $("#feeTable tbody tr:last input[name='fee_type[]']").val('Sports & Activities Fee');
+            $("#feeTable tbody tr:last .amount").val('1500');
+
+            // Set frequency to Quarterly
+            $("#frequency").val('Quarterly');
+
+        } else if (templateType === 'minimal') {
+            // Minimal template: Just essential fees
+            $("#feeTable tbody tr:first input[name='fee_type[]']").val('Tuition Fee');
+            $("#feeTable tbody tr:first .amount").val('4000');
+
+            // Add Examination Fee
+            $("#add-fee").click();
+            $("#feeTable tbody tr:last input[name='fee_type[]']").val('Examination Fee');
+            $("#feeTable tbody tr:last .amount").val('800');
+
+            // Set frequency to Monthly
+            $("#frequency").val('Monthly');
+        }
+
+        // Set a default due date (15 days from now)
+        const today = new Date();
+        today.setDate(today.getDate() + 15);
+        const dueDate = today.toISOString().split('T')[0];
+        $("#due_date").val(dueDate);
+
+        // Update total
+        calculateTotal();
+    });
+
+    // Preview button click
+    $('#previewBtn').on('click', function() {
+        // Get form data
+        const className = $('#class-filter option:selected').text();
+        const sectionName = $('#section-filter option:selected').text() || 'All Sections';
+        const frequency = $('#frequency option:selected').text();
+
+        // Format due date
+        let dueDate = $('#due_date').val();
+        if (dueDate) {
+            const dueDateObj = new Date(dueDate);
+            dueDate = dueDateObj.toLocaleDateString('en-IN', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            });
+        } else {
+            dueDate = 'Not specified';
+        }
+
+        // Update preview header
+        $('#preview-class').text(className);
+        $('#preview-section').text(sectionName);
+        $('#preview-frequency').text(frequency);
+        $('#preview-due-date').text(dueDate);
+
+        // Clear existing fee rows
+        $('#preview-fees').empty();
+
+        // Add fee rows to preview
+        let totalAmount = 0;
+        let rowNum = 1;
+
+        $('.fee-row').each(function() {
+            const feeType = $(this).find('input[name="fee_type[]"]').val();
+            const amount = parseFloat($(this).find('.amount').val()) || 0;
+            const lateFee = parseFloat($(this).find('input[name="late_fee[]"]').val()) || 0;
+            const discount = parseFloat($(this).find('.discount').val()) || 0;
+
+            // Calculate final amount after discount
+            const finalAmount = amount - (amount * discount / 100);
+            totalAmount += finalAmount;
+
+            // Add row to preview table
+            $('#preview-fees').append(`
+                <tr>
+                    <td>${rowNum}</td>
+                    <td>${feeType || 'Not specified'}</td>
+                    <td>₹${amount.toFixed(2)}</td>
+                    <td>₹${lateFee.toFixed(2)}</td>
+                    <td>${discount}%</td>
+                    <td>₹${finalAmount.toFixed(2)}</td>
+                </tr>
+            `);
+
+            rowNum++;
+        });
+
+        // Update total in preview
+        $('#preview-total').text(totalAmount.toFixed(2));
+
+        // Show the modal
+        const previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
+        previewModal.show();
+    });
+
+    // Print preview button
+    $('#printPreview').on('click', function() {
+        const printContent = $('.preview-content').html();
+        const printWindow = window.open('', '_blank');
+
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Fee Structure Preview</title>
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    th { background-color: #f2f2f2; }
+                    .text-end { text-align: right; }
+                    h5 { margin-bottom: 5px; }
+                    p { margin-top: 0; }
+                    .table-primary { background-color: #e6f2ff; }
+                </style>
+            </head>
+            <body>
+                <h2>Fee Structure Preview</h2>
+                ${printContent}
+                <div style="margin-top: 30px; text-align: right;">
+                    <p>Generated on: ${new Date().toLocaleDateString('en-IN', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    })}</p>
+                </div>
+            </body>
+            </html>
+        `);
+
+        printWindow.document.close();
+        printWindow.focus();
+
+        // Print after a short delay to ensure content is loaded
+        setTimeout(function() {
+            printWindow.print();
+        }, 500);
+    });
+
+    // Reset form button
+    $('#resetBtn').on('click', function() {
+        if (confirm('Are you sure you want to reset the form? All unsaved changes will be lost.')) {
+            // Clear all fee rows except the first one
+            if ($("#feeTable tbody tr").length > 1) {
+                $("#feeTable tbody tr:not(:first)").remove();
+            }
+
+            // Reset first row values
+            $("#feeTable tbody tr:first input").val('');
+            $("#feeTable tbody tr:first .amount").val('');
+            $("#feeTable tbody tr:first .discount").val('0');
+            $("#feeTable tbody tr:first input[name='late_fee[]']").val('0');
+
+            // Reset frequency
+            $("#frequency").val('');
+
+            // Reset due date
+            $("#due_date").val('');
+
+            // Remove active class from templates
+            $('.template-card').removeClass('active');
+
+            // Update total
+            calculateTotal();
+        }
+    });
+
+    // Form submission
+    $('#feeSettingsForm').on('submit', function(e) {
+        // Show loading spinner
+        $('#loadingSpinner').addClass('show');
+
+        // Basic validation
+        const frequency = $('#frequency').val();
+        const dueDate = $('#due_date').val();
+        const feeTypes = $('input[name="fee_type[]"]').map(function() { return $(this).val(); }).get();
+
+        if (!frequency) {
+            e.preventDefault();
+            alert('Please select a fee frequency.');
+            $('#loadingSpinner').removeClass('show');
+            return false;
+        }
+
+        if (!dueDate) {
+            e.preventDefault();
+            alert('Please select a due date.');
+            $('#loadingSpinner').removeClass('show');
+            return false;
+        }
+
+        if (feeTypes.length === 0 || feeTypes.some(type => !type)) {
+            e.preventDefault();
+            alert('Please add at least one fee type with all fields filled.');
+            $('#loadingSpinner').removeClass('show');
+            return false;
+        }
+
+        // If validation passes, form will submit normally
+        return true;
+    });
+
+    // Hide loading spinner when page is fully loaded
+    $(window).on('load', function() {
+        $('#loadingSpinner').removeClass('show');
+    });
+});
+</script>
+{% endblock %}

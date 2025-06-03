@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block breadcrumb-left %}
+<div class="breadcrumb-container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-chevron">
+      <li class="breadcrumb-item">
+        <a href="{% url 'home' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-home"></i> Home
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'attendance:attendance_list' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-calendar-check"></i> Attendance
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <i class="fas fa-chalkboard-teacher"></i> Staff Attendance
+      </li>
+    </ol>
+  </nav>
+</div>
+{% endblock breadcrumb-left %}
+
+{% block title-icon %}fas fa-chalkboard-teacher{% endblock title-icon %}
+
+{% block title %}Staff Attendance{% endblock title %}
+
+{% block subtitle %}Track and manage attendance records for teaching staff{% endblock subtitle %}
+
+{% block page-actions %}
+<button type="button" class="btn btn-primary">
+  <i class="fas fa-plus-circle me-2"></i> Take Attendance
+</button>
+{% endblock page-actions %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Staff Attendance List</h2>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Staff Name</th>
+                <th>Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Example row -->
+            <tr>
+                <td>1</td>
+                <td>John Doe</td>
+                <td>2023-10-01</td>
+                <td>Present</td>
+            </tr>
+            <!-- Add dynamic rows here -->
+        </tbody>
+    </table>
+</div>
+{% endblock %}

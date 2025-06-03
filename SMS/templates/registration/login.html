@@ -1,0 +1,201 @@
+{% load static %}
+{% load widget_tweaks %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>{{ profile.college_name | default:"MySchool" }}</title>
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="{% static 'plugins/fontawesome-free/css/all.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/toastr/toastr.min.css' %}">
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="{% static 'dist/css/login-page.css' %}">
+
+  <style>
+    body {
+      background: url("{% static 'dist/img/bg.jpg' %}") no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      animation: fadeIn 1s ease-in;
+      color: #333;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .container {
+      width: 1200px;
+      display: flex;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0px 15px 40px rgba(0, 0, 0, 0.3);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    .left-section {
+      width: 50%;
+      background: linear-gradient(135deg, #1E3C72,rgb(9, 32, 48));
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 70px;
+      text-align: center;
+      animation: slideInLeft 1s ease-in-out;
+    }
+    .right-section {
+      width: 50%;
+      padding: 90px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      animation: slideInRight 1s ease-in-out;
+    }
+    @keyframes slideInLeft {
+      from { transform: translateX(-100px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideInRight {
+      from { transform: translateX(100px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    .logo img {
+      width: 300px;
+      animation: bounceIn 1s ease-in-out;
+    }
+    @keyframes bounceIn {
+      0% { transform: scale(0.5); opacity: 0; }
+      50% { transform: scale(1.1); opacity: 1; }
+      100% { transform: scale(1); }
+    }
+    input {
+      width: 100%;
+      padding: 15px;
+      margin: 16px 0;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+      transition: 0.3s;
+      font-size: 16px;
+    }
+    input:focus {
+      border-color: #3282B8;
+      outline: none;
+      box-shadow: 0px 0px 10px rgba(50, 130, 184, 0.5);
+    }
+    .login-btn {
+      background: #0F4C75;
+      color: white;
+      padding: 15px;
+      border: none;
+      width: 100%;
+      cursor: pointer;
+      border-radius: 12px;
+      transition: 0.3s;
+      font-size: 18px;
+      font-weight: bold;
+      animation: slideUp 0.5s ease-in-out;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .login-btn:hover {
+      background: #1B262C;
+      box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    .forgot-link {
+      display: block;
+      margin-top: 18px;
+      color: #3282B8;
+      text-decoration: none;
+      transition: 0.3s;
+    }
+    .forgot-link:hover {
+      text-decoration: underline;
+      color: #0F4C75;
+    }
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 6px 0;
+      font-size: 14px;
+    }
+    .error-msg {
+      color: red;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="left-section">
+      <div class="logo">
+        {% if profile.college_logo.url %}
+          <img src="{{ profile.college_logo.url }}" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+        {% else %}
+          <img src="{% static 'path/to/default-logo.png' %}" alt="Default Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+        {% endif %}
+      </div>
+      <h1>Welcome to {{ profile.college_name | default:"MySchool" }}</h1>
+      <h3>Your Gateway to Learning</h3>
+      <p>Login to access your student or teacher portal.</p>
+    </div>
+    <div class="right-section">
+      <h1>Login</h1>
+      <h3>Access Your Account</h3>
+      {% if form.errors %}
+        <p class="error-msg">Invalid username or password. Please try again.</p>
+      {% endif %}
+      {% if next and user.is_authenticated %}
+        <p class="error-msg">You do not have permission to access this page. Please login with an authorized account.</p>
+      {% endif %}
+      <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+        <input type="text" id="id_username" name="username" placeholder="Username" aria-label="Username">
+        <div style="position: relative;">
+          <input type="password" id="id_password" name="password" placeholder="Password" aria-label="Password">
+          <span id="togglePassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;">
+            <i class="fas fa-eye"></i>
+          </span>
+        </div>
+        <div class="remember-me">
+          <input type="checkbox" name="remember_me" id="remember_me">
+          <label for="remember_me">Remember Me</label>
+        </div>
+        <button type="submit" class="login-btn">Login</button>
+        <input type="hidden" name="next" value="{{ next }}">
+      </form>
+      <a class="forgot-link" href="#">Forgot Username / Password?</a>
+    </div>
+  </div>
+  
+  <!-- Scripts -->
+  <script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
+  <script src="{% static 'plugins/toastr/toastr.min.js' %}"></script>
+  <script>
+    document.getElementById("togglePassword").addEventListener("click", function() {
+      var passwordInput = document.getElementById("id_password");
+      if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        this.innerHTML = '<i class="fas fa-eye-slash"></i>';
+      } else {
+        passwordInput.type = "password";
+        this.innerHTML = '<i class="fas fa-eye"></i>';
+      }
+    });
+  </script>
+</body>
+</html>

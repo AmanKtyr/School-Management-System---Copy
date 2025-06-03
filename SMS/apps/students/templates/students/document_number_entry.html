@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block breadcrumb-left %}
+<div class="breadcrumb-container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-chevron">
+      <li class="breadcrumb-item">
+        <a href="{% url 'home' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-home"></i> Home
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'student-list' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-user-graduate"></i> Students
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'student-detail' student.id %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-id-card"></i> {{ student.fullname }}
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <i class="fas fa-hashtag"></i> Document Number
+      </li>
+    </ol>
+  </nav>
+</div>
+{% endblock breadcrumb-left %}
+
+{% block title %}
+Enter Document Number for {{ student.fullname }}
+{% endblock title %}
+
+{% block content %}
+<div class="card shadow-lg border-0">
+  <div class="card-header bg-gradient-primary text-white">
+    <h4 class="mb-0"><i class="fas fa-file-upload"></i> Document Upload - Step 1</h4>
+  </div>
+  <div class="card-body">
+    <div class="alert alert-info shadow-sm">
+      <div class="d-flex align-items-center">
+        <i class="fas fa-info-circle fa-2x me-3"></i>
+        <div>
+          <h5 class="mb-1">Document Upload Process</h5>
+          <p class="mb-0">Please enter the document number before proceeding to upload the required documents.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4 border-0 shadow-sm">
+      <div class="card-header bg-light">
+        <h5 class="mb-0"><i class="fas fa-user-graduate"></i> Student Information</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <p><strong>Name:</strong> {{ student.fullname }}</p>
+            <p><strong>Class:</strong> {{ student.current_class }} {{ student.section }}</p>
+          </div>
+          <div class="col-md-6">
+            <p><strong>Registration Number:</strong> {{ student.registration_number }}</p>
+            <p><strong>Admission Date:</strong> {{ student.date_of_admission }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <form method="POST">
+      {% csrf_token %}
+
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-light">
+          <h5 class="mb-0"><i class="fas fa-hashtag"></i> Document Number</h5>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label for="document_number" class="form-label">Enter Document Number</label>
+            <input type="text" class="form-control form-control-lg" id="document_number" name="document_number"
+                  value="{{ documents.document_number }}" placeholder="Enter document number" required>
+            <small class="form-text text-muted">This number will be associated with all documents uploaded for this student.</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-light">
+          <h5 class="mb-0"><i class="fas fa-list-check"></i> Required Documents</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item"><i class="fas fa-check-circle text-success"></i> Aadhar Card</li>
+                <li class="list-group-item"><i class="fas fa-check-circle text-success"></i> Parent Photo</li>
+                <li class="list-group-item"><i class="fas fa-check-circle text-success"></i> Parent ID Proof</li>
+                <li class="list-group-item"><i class="fas fa-check-circle text-success"></i> Previous Marksheet</li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item"><i class="fas fa-check-circle text-success"></i> Transfer Certificate</li>
+                <li class="list-group-item"><i class="fas fa-check-circle text-success"></i> Character Certificate</li>
+                <li class="list-group-item"><i class="fas fa-check-circle text-success"></i> Caste Certificate</li>
+                <li class="list-group-item"><i class="fas fa-check-circle text-success"></i> Medical Certificate</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4 text-center">
+        <button type="submit" class="btn btn-primary btn-lg shadow">
+          <i class="fas fa-arrow-right"></i> Continue to Upload Documents
+        </button>
+        <a href="{% url 'student-detail' student.id %}" class="btn btn-secondary btn-lg shadow">
+          <i class="fas fa-times"></i> Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock content %}

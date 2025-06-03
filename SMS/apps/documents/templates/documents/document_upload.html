@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Upload Document{% endblock title %}
+
+{% block breadcrumb %}
+<div class="breadcrumb-bar">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'documents:dashboard' %}">Document Management</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Upload Document</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">Upload New Document</h4>
+        </div>
+        <div class="card-body">
+          <form method="post" enctype="multipart/form-data" id="documentUploadForm">
+            {% csrf_token %}
+            
+            <div class="row mb-4">
+              <div class="col-md-12">
+                <div class="card bg-light">
+                  <div class="card-body">
+                    <h5 class="card-title">Document Type</h5>
+                    <div class="row">
+                      <div class="col-md-6 mb-3">
+                        <label for="entity_type" class="form-label">Entity Type <span class="text-danger">*</span></label>
+                        <select class="form-select" id="entity_type" name="entity_type" required>
+                          <option value="">Select Entity Type</option>
+                          <option value="student">Student</option>
+                          <option value="staff">Staff</option>
+                          <option value="exam">Exam</option>
+                          <option value="general">General</option>
+                        </select>
+                      </div>
+                      <div class="col-md-6 mb-3">
+                        <label for="document_type" class="form-label">Document Type <span class="text-danger">*</span></label>
+                        <select class="form-select" id="document_type" name="document_type" required>
+                          <option value="">Select Document Type</option>
+                          {% for doc_type in document_types %}
+                          <option value="{{ doc_type.id }}">{{ doc_type.name }}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Entity Selection (will be shown/hidden based on entity type) -->
+            <div class="row mb-4">
+              <div class="col-md-12">
+                <div class="card bg-light entity-section" id="student-section" style="display: none;">
+                  <div class="card-body">
+                    <h5 class="card-title">Student Information</h5>
+                    <div class="mb-3">
+                      <label for="student" class="form-label">Select Student <span class="text-danger">*</span></label>
+                      <select class="form-select" id="student" name="student">
+                        <option value="">Select Student</option>
+                        {% for student in form.student.field.queryset %}
+                        <option value="{{ student.id }}">{{ student.fullname }} ({{ student.registration_number }})</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="card bg-light entity-section" id="staff-section" style="display: none;">
+                  <div class="card-body">
+                    <h5 class="card-title">Staff Information</h5>
+                    <div class="mb-3">
+                      <label for="staff" class="form-label">Select Staff <span class="text-danger">*</span></label>
+                      <select class="form-select" id="staff" name="staff">
+                        <option value="">Select Staff</option>
+                        {% for staff in form.staff.field.queryset %}
+                        <option value="{{ staff.id }}">{{ staff.fullname }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="card bg-light entity-section" id="exam-section" style="display: none;">
+                  <div class="card-body">
+                    <h5 class="card-title">Exam Information</h5>
+                    <div class="mb-3">
+                      <label for="exam" class="form-label">Select Exam <span class="text-danger">*</span></label>
+                      <select class="form-select" id="exam" name="exam">
+                        <option value="">Select Exam</option>
+                        {% for exam in form.exam.field.queryset %}
+                        <option value="{{ exam.id }}">{{ exam.name }} ({{ exam.session }} {{ exam.term }})</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Document Details -->
+            <div class="row mb-4">
+              <div class="col-md-12">
+                <div class="card bg-light">
+                  <div class="card-body">
+                    <h5 class="card-title">Document Details</h5>
+                    <div class="row">
+                      <div class="col-md-6 mb-3">
+                        <label for="title" class="form-label">Document Title <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                      </div>
+                      <div class="col-md-6 mb-3">
+                        <label for="document_number" class="form-label">Document Number</label>
+                        <input type="text" class="form-control" id="document_number" name="document_number">
+                      </div>
+                      <div class="col-md-12 mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                      </div>
+                      <div class="col-md-6 mb-3">
+                        <label for="tags" class="form-label">Tags (comma-separated)</label>
+                        <input type="text" class="form-control" id="tags" name="tags" placeholder="e.g. important, official, certificate">
+                      </div>
+                      <div class="col-md-6 mb-3">
+                        <label for="expiry_date" class="form-label">Expiry Date (if applicable)</label>
+                        <input type="date" class="form-control" id="expiry_date" name="expiry_date">
+                      </div>
+                      <div class="col-md-12 mb-3">
+                        <label for="file" class="form-label">Document File <span class="text-danger">*</span></label>
+                        <input type="file" class="form-control" id="file" name="file" required>
+                        <div class="form-text">Supported formats: PDF, DOC, DOCX, JPG, PNG (Max size: 10MB)</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-12 text-end">
+                <a href="{% url 'documents:dashboard' %}" class="btn btn-outline-secondary me-2">Cancel</a>
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-upload me-2"></i> Upload Document
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block extrascripts %}
+<script>
+  $(document).ready(function() {
+    // Show/hide entity sections based on entity type selection
+    $('#entity_type').change(function() {
+      var entityType = $(this).val();
+      $('.entity-section').hide();
+      
+      if (entityType === 'student') {
+        $('#student-section').show();
+        $('#student').prop('required', true);
+        $('#staff').prop('required', false);
+        $('#exam').prop('required', false);
+      } else if (entityType === 'staff') {
+        $('#staff-section').show();
+        $('#student').prop('required', false);
+        $('#staff').prop('required', true);
+        $('#exam').prop('required', false);
+      } else if (entityType === 'exam') {
+        $('#exam-section').show();
+        $('#student').prop('required', false);
+        $('#staff').prop('required', false);
+        $('#exam').prop('required', true);
+      } else {
+        $('#student').prop('required', false);
+        $('#staff').prop('required', false);
+        $('#exam').prop('required', false);
+      }
+      
+      // Update document types based on entity type
+      $.ajax({
+        url: "{% url 'documents:api_document_types' %}",
+        data: {
+          'entity_type': entityType
+        },
+        dataType: 'json',
+        success: function(data) {
+          var options = '<option value="">Select Document Type</option>';
+          for (var i = 0; i < data.length; i++) {
+            options += '<option value="' + data[i].id + '">' + data[i].name + '</option>';
+          }
+          $('#document_type').html(options);
+        }
+      });
+    });
+    
+    // Form validation
+    $('#documentUploadForm').submit(function(e) {
+      var entityType = $('#entity_type').val();
+      
+      if (entityType === 'student' && $('#student').val() === '') {
+        e.preventDefault();
+        alert('Please select a student');
+        return false;
+      } else if (entityType === 'staff' && $('#staff').val() === '') {
+        e.preventDefault();
+        alert('Please select a staff member');
+        return false;
+      } else if (entityType === 'exam' && $('#exam').val() === '') {
+        e.preventDefault();
+        alert('Please select an exam');
+        return false;
+      }
+      
+      return true;
+    });
+  });
+</script>
+{% endblock extrascripts %}

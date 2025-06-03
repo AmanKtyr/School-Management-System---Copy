@@ -1,0 +1,843 @@
+{% extends 'corecode/system_settings_base.html' %}
+{% load static %}
+
+{% block settings-icon %}fas fa-file-export{% endblock settings-icon %}
+{% block settings-title %}Backup & Restore{% endblock settings-title %}
+{% block settings-icon-title %}fas fa-file-export{% endblock settings-icon-title %}
+{% block settings-page-title %}Backup & Restore{% endblock settings-page-title %}
+{% block settings-subtitle %}Manage system backups and data restoration{% endblock settings-subtitle %}
+
+{% block content-icon %}fas fa-file-export{% endblock content-icon %}
+{% block content-title %}Data Backup & Restore{% endblock content-title %}
+
+{% block settings-content %}
+<div class="row mb-4">
+  <div class="col-md-12">
+    <div class="alert alert-info d-flex align-items-center" role="alert">
+      <i class="fas fa-info-circle fa-2x me-3"></i>
+      <div>
+        <h5 class="alert-heading">Backup & Restore</h5>
+        <p class="mb-0">Create backups of your system data and restore from previous backups when needed. Regular backups are recommended to prevent data loss.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <!-- Backup Options -->
+  <div class="col-md-6 mb-4">
+    <div class="card settings-card h-100">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-download me-2"></i> Create Backup</h5>
+      </div>
+      <div class="card-body">
+        <form id="backupForm">
+          <div class="mb-3">
+            <label class="form-label fw-bold">Backup Type</label>
+            <select class="form-select" id="backupType">
+              <option value="full" selected>Full Backup (All Data)</option>
+              <option value="database">Database Only</option>
+              <option value="media">Media Files Only</option>
+              <option value="settings">Settings Only</option>
+              <option value="custom">Custom Backup</option>
+            </select>
+          </div>
+
+          <div id="customBackupOptions" class="mb-3 d-none">
+            <label class="form-label fw-bold">Select Data to Include</label>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="backupStudents" checked>
+              <label class="form-check-label" for="backupStudents">Students Data</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="backupStaff" checked>
+              <label class="form-check-label" for="backupStaff">Staff Data</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="backupClasses" checked>
+              <label class="form-check-label" for="backupClasses">Classes & Subjects</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="backupResults" checked>
+              <label class="form-check-label" for="backupResults">Exam Results</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="backupAttendance" checked>
+              <label class="form-check-label" for="backupAttendance">Attendance Records</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="backupFees" checked>
+              <label class="form-check-label" for="backupFees">Fee Records</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="backupSettings" checked>
+              <label class="form-check-label" for="backupSettings">System Settings</label>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">Backup Format</label>
+            <select class="form-select" id="backupFormat">
+              <option value="zip" selected>ZIP Archive</option>
+              <option value="sql">SQL Dump</option>
+              <option value="json">JSON Format</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">Backup Name</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="backupName" value="backup_{{ current_date|default:'2023_04_17' }}">
+              <span class="input-group-text">.zip</span>
+            </div>
+            <div class="form-text">Leave blank for auto-generated name</div>
+          </div>
+
+          <div class="mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="encryptBackup">
+              <label class="form-check-label fw-bold" for="encryptBackup">Encrypt Backup</label>
+            </div>
+            <div class="form-text">Adds password protection to your backup</div>
+          </div>
+
+          <div id="encryptionOptions" class="mb-3 d-none">
+            <label class="form-label fw-bold">Encryption Password</label>
+            <input type="password" class="form-control" id="encryptionPassword">
+            <div class="form-text text-danger">Remember this password! You cannot restore without it.</div>
+          </div>
+
+          <div class="d-grid">
+            <button type="button" class="btn btn-primary" id="createBackupBtn">
+              <i class="fas fa-download me-2"></i> Create Backup
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Restore Options -->
+  <div class="col-md-6 mb-4">
+    <div class="card settings-card h-100">
+      <div class="card-header bg-warning text-dark">
+        <h5 class="mb-0"><i class="fas fa-upload me-2"></i> Restore Data</h5>
+      </div>
+      <div class="card-body">
+        <div class="alert alert-warning">
+          <i class="fas fa-exclamation-triangle me-2"></i> Restoring data will overwrite current data. Make sure to create a backup before proceeding.
+        </div>
+
+        <form id="restoreForm">
+          <div class="mb-3">
+            <label class="form-label fw-bold">Select Backup File</label>
+            <input type="file" class="form-control" id="restoreFile" accept=".zip,.sql,.json">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">Restore Options</label>
+            <select class="form-select" id="restoreOptions">
+              <option value="full" selected>Full Restore (All Data)</option>
+              <option value="merge">Merge with Existing Data</option>
+              <option value="selective">Selective Restore</option>
+            </select>
+          </div>
+
+          <div id="selectiveRestoreOptions" class="mb-3 d-none">
+            <label class="form-label fw-bold">Select Data to Restore</label>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="restoreStudents" checked>
+              <label class="form-check-label" for="restoreStudents">Students Data</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="restoreStaff" checked>
+              <label class="form-check-label" for="restoreStaff">Staff Data</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="restoreClasses" checked>
+              <label class="form-check-label" for="restoreClasses">Classes & Subjects</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="restoreResults" checked>
+              <label class="form-check-label" for="restoreResults">Exam Results</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="restoreAttendance" checked>
+              <label class="form-check-label" for="restoreAttendance">Attendance Records</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="restoreFees" checked>
+              <label class="form-check-label" for="restoreFees">Fee Records</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="restoreSettings">
+              <label class="form-check-label" for="restoreSettings">System Settings</label>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="backupBeforeRestore" checked>
+              <label class="form-check-label fw-bold" for="backupBeforeRestore">Backup Current Data Before Restore</label>
+            </div>
+            <div class="form-text">Recommended for safety</div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">Encryption Password (if needed)</label>
+            <input type="password" class="form-control" id="restorePassword" placeholder="Leave blank if backup is not encrypted">
+          </div>
+
+          <div class="d-grid">
+            <button type="button" class="btn btn-warning" id="restoreBackupBtn">
+              <i class="fas fa-upload me-2"></i> Restore Data
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Backup History -->
+  <div class="col-md-12 mb-4">
+    <div class="card settings-card">
+      <div class="card-header bg-info text-white">
+        <h5 class="mb-0"><i class="fas fa-history me-2"></i> Backup History</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>Backup Name</th>
+                <th>Date Created</th>
+                <th>Type</th>
+                <th>Size</th>
+                <th>Created By</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if backups %}
+                {% for backup in backups %}
+                <tr id="backup-row-{{ backup.id }}">
+                  <td>{{ backup.name }}</td>
+                  <td>{{ backup.created_at|date:"Y-m-d H:i" }}</td>
+                  <td>
+                    {% if backup.backup_type == 'full' %}
+                      <span class="badge bg-primary">Full</span>
+                    {% elif backup.backup_type == 'database' %}
+                      <span class="badge bg-info">Database</span>
+                    {% elif backup.backup_type == 'media' %}
+                      <span class="badge bg-success">Media</span>
+                    {% elif backup.backup_type == 'settings' %}
+                      <span class="badge bg-warning">Settings</span>
+                    {% elif backup.backup_type == 'custom' %}
+                      <span class="badge bg-secondary">Custom</span>
+                    {% endif %}
+                    {% if backup.is_encrypted %}
+                      <span class="badge bg-danger"><i class="fas fa-lock"></i></span>
+                    {% endif %}
+                  </td>
+                  <td>{{ backup.size }}</td>
+                  <td>{{ backup.created_by.username|default:"system" }}</td>
+                  <td class="text-end">
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-sm btn-outline-primary download-backup"
+                        data-id="{{ backup.id }}" data-name="{{ backup.name }}">
+                        <i class="fas fa-download"></i>
+                      </button>
+                      <button type="button" class="btn btn-sm btn-outline-success restore-backup"
+                        data-id="{{ backup.id }}" data-name="{{ backup.name }}">
+                        <i class="fas fa-undo"></i>
+                      </button>
+                      <button type="button" class="btn btn-sm btn-outline-danger delete-backup"
+                        data-id="{{ backup.id }}" data-name="{{ backup.name }}">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="6" class="text-center">No backups found. Create your first backup using the form on the left.</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Automated Backup Settings -->
+  <div class="col-md-12 mb-4">
+    <div class="card settings-card">
+      <div class="card-header bg-success text-white">
+        <h5 class="mb-0"><i class="fas fa-clock me-2"></i> Automated Backup Settings</h5>
+      </div>
+      <div class="card-body">
+        <form id="automatedBackupForm">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="enableAutomatedBackups" {% if automated_settings.enabled %}checked{% endif %}>
+                <label class="form-check-label fw-bold" for="enableAutomatedBackups">Enable Automated Backups</label>
+              </div>
+              <div class="form-text">System will automatically create backups according to schedule</div>
+              {% if automated_settings.next_backup %}
+              <div class="mt-2">
+                <span class="badge bg-info">Next backup: <span id="nextBackupTime">{{ automated_settings.next_backup|date:"Y-m-d H:i:s" }}</span></span>
+              </div>
+              {% endif %}
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Backup Frequency</label>
+              <select class="form-select" id="backupFrequency">
+                <option value="daily">Daily</option>
+                <option value="weekly" selected>Weekly</option>
+                <option value="biweekly">Bi-weekly</option>
+                <option value="monthly">Monthly</option>
+              </select>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Backup Time</label>
+              <input type="time" class="form-control" id="backupTime" value="02:00">
+              <div class="form-text">Recommended during off-hours</div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Day of Week (for Weekly)</label>
+              <select class="form-select" id="backupDay">
+                <option value="1">Monday</option>
+                <option value="2">Tuesday</option>
+                <option value="3">Wednesday</option>
+                <option value="4">Thursday</option>
+                <option value="5">Friday</option>
+                <option value="6">Saturday</option>
+                <option value="0" selected>Sunday</option>
+              </select>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Retention Policy</label>
+              <select class="form-select" id="retentionPolicy">
+                <option value="5">Keep last 5 backups</option>
+                <option value="10" selected>Keep last 10 backups</option>
+                <option value="20">Keep last 20 backups</option>
+                <option value="all">Keep all backups</option>
+              </select>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Backup Type</label>
+              <select class="form-select" id="automatedBackupType">
+                <option value="full" selected>Full Backup</option>
+                <option value="database">Database Only</option>
+                <option value="incremental">Incremental Backup</option>
+              </select>
+            </div>
+
+            <div class="col-md-12 mb-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="notifyOnBackup" checked>
+                <label class="form-check-label fw-bold" for="notifyOnBackup">Send Email Notification After Backup</label>
+              </div>
+              <div class="form-text">Receive email notifications when automated backups complete</div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end">
+            <button type="button" class="btn btn-success" id="saveAutomatedSettingsBtn">
+              <i class="fas fa-save me-2"></i> Save Automated Backup Settings
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Navigation -->
+  <div class="col-md-12">
+    <div class="d-flex justify-content-between">
+      <button type="button" class="btn btn-outline-secondary" onclick="window.location.href='{% url 'system_settings_dashboard' %}'">
+        <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Backup Progress Modal -->
+<div class="modal fade" id="backupProgressModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title"><i class="fas fa-spinner fa-spin me-2"></i> Backup in Progress</h5>
+      </div>
+      <div class="modal-body">
+        <div class="text-center mb-3">
+          <div class="progress mb-3">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%" id="backupProgressBar"></div>
+          </div>
+          <p id="backupProgressText">Preparing backup...</p>
+        </div>
+        <div class="alert alert-info">
+          <i class="fas fa-info-circle me-2"></i> Please do not close this window or navigate away during the backup process.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Restore Progress Modal -->
+<div class="modal fade" id="restoreProgressModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-warning text-dark">
+        <h5 class="modal-title"><i class="fas fa-spinner fa-spin me-2"></i> Restore in Progress</h5>
+      </div>
+      <div class="modal-body">
+        <div class="text-center mb-3">
+          <div class="progress mb-3">
+            <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning" role="progressbar" style="width: 0%" id="restoreProgressBar"></div>
+          </div>
+          <p id="restoreProgressText">Preparing to restore...</p>
+        </div>
+        <div class="alert alert-warning">
+          <i class="fas fa-exclamation-triangle me-2"></i> Please do not close this window or navigate away during the restore process.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock settings-content %}
+
+{% block settings-js %}
+<script>
+  $(document).ready(function() {
+    // Initialize modals
+    var backupProgressModal = new bootstrap.Modal(document.getElementById('backupProgressModal'));
+    var restoreProgressModal = new bootstrap.Modal(document.getElementById('restoreProgressModal'));
+
+    // Toggle custom backup options
+    $('#backupType').on('change', function() {
+      if ($(this).val() === 'custom') {
+        $('#customBackupOptions').removeClass('d-none');
+      } else {
+        $('#customBackupOptions').addClass('d-none');
+      }
+
+      // Update file extension based on backup type and format
+      updateFileExtension();
+    });
+
+    // Toggle encryption options
+    $('#encryptBackup').on('change', function() {
+      if ($(this).is(':checked')) {
+        $('#encryptionOptions').removeClass('d-none');
+      } else {
+        $('#encryptionOptions').addClass('d-none');
+      }
+    });
+
+    // Toggle selective restore options
+    $('#restoreOptions').on('change', function() {
+      if ($(this).val() === 'selective') {
+        $('#selectiveRestoreOptions').removeClass('d-none');
+      } else {
+        $('#selectiveRestoreOptions').addClass('d-none');
+      }
+    });
+
+    // Update file extension when format changes
+    $('#backupFormat').on('change', function() {
+      updateFileExtension();
+    });
+
+    function updateFileExtension() {
+      const format = $('#backupFormat').val();
+      const type = $('#backupType').val();
+
+      let extension = '.zip';
+      if (format === 'sql') {
+        extension = '.sql';
+      } else if (format === 'json') {
+        extension = '.json';
+      }
+
+      $('.input-group-text').text(extension);
+    }
+
+    // Function to update backup progress
+    function updateBackupProgress(progress, message) {
+      $('#backupProgressBar').css('width', progress + '%');
+      $('#backupProgressText').text(message);
+    }
+
+    // Function to update restore progress
+    function updateRestoreProgress(progress, message) {
+      $('#restoreProgressBar').css('width', progress + '%');
+      $('#restoreProgressText').text(message);
+    }
+
+    // Create Backup
+    $('#createBackupBtn').on('click', function() {
+      // Validate form
+      if ($('#encryptBackup').is(':checked') && $('#encryptionPassword').val() === '') {
+        toastr.error('Please enter an encryption password');
+        return;
+      }
+
+      // Show progress modal
+      backupProgressModal.show();
+      updateBackupProgress(5, 'Preparing backup...');
+
+      // Get form data
+      const backupType = $('#backupType').val();
+      const backupFormat = $('#backupFormat').val();
+      const backupName = $('#backupName').val();
+      const encrypt = $('#encryptBackup').is(':checked');
+      const password = $('#encryptionPassword').val();
+
+      // Prepare request data
+      const requestData = {
+        backup_type: backupType,
+        backup_format: backupFormat,
+        backup_name: backupName,
+        encrypt: encrypt,
+        password: password
+      };
+
+      // Add custom backup options if selected
+      if (backupType === 'custom') {
+        requestData.include_students = $('#backupStudents').is(':checked');
+        requestData.include_staff = $('#backupStaff').is(':checked');
+        requestData.include_classes = $('#backupClasses').is(':checked');
+        requestData.include_results = $('#backupResults').is(':checked');
+        requestData.include_attendance = $('#backupAttendance').is(':checked');
+        requestData.include_fees = $('#backupFees').is(':checked');
+        requestData.include_settings = $('#backupSettings').is(':checked');
+        requestData.include_database = true; // Always include database in custom backups
+        requestData.include_media = true; // Always include media in custom backups
+      }
+
+      // Send AJAX request to create backup
+      $.ajax({
+        url: '{% url "create_backup_ajax" %}',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(requestData),
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}'
+        },
+        success: function(response) {
+          updateBackupProgress(100, 'Backup completed successfully!');
+
+          // Hide modal after a delay
+          setTimeout(function() {
+            backupProgressModal.hide();
+
+            // Show success message
+            toastr.success('Backup created successfully');
+
+            // Reset progress bar for next time
+            setTimeout(function() {
+              $('#backupProgressBar').css('width', '0%');
+
+              // Reload the page to show the new backup
+              window.location.reload();
+            }, 500);
+          }, 1000);
+        },
+        error: function(xhr, status, error) {
+          backupProgressModal.hide();
+
+          // Show error message
+          let errorMessage = 'An error occurred while creating the backup';
+          if (xhr.responseJSON && xhr.responseJSON.error) {
+            errorMessage = xhr.responseJSON.error;
+          }
+          toastr.error(errorMessage);
+        },
+        xhr: function() {
+          const xhr = new window.XMLHttpRequest();
+
+          // Upload progress
+          xhr.upload.addEventListener("progress", function(evt) {
+            if (evt.lengthComputable) {
+              const percentComplete = evt.loaded / evt.total * 100;
+
+              // Update progress based on the current stage
+              if (percentComplete < 25) {
+                updateBackupProgress(10 + percentComplete * 0.8, 'Preparing backup...');
+              } else if (percentComplete < 50) {
+                updateBackupProgress(30 + (percentComplete - 25) * 1.2, 'Backing up database...');
+              } else if (percentComplete < 75) {
+                updateBackupProgress(60 + (percentComplete - 50) * 0.8, 'Backing up media files...');
+              } else {
+                updateBackupProgress(80 + (percentComplete - 75) * 0.8, 'Finalizing backup...');
+              }
+            }
+          }, false);
+
+          return xhr;
+        }
+      });
+    });
+
+    // Restore Backup from file upload
+    $('#restoreBackupBtn').on('click', function() {
+      // Validate form
+      if ($('#restoreFile').val() === '') {
+        toastr.error('Please select a backup file to restore');
+        return;
+      }
+
+      // Confirm restore
+      if (!confirm('Are you sure you want to restore from backup? This will overwrite current data.')) {
+        return;
+      }
+
+      // Show progress modal
+      restoreProgressModal.show();
+      updateRestoreProgress(5, 'Preparing to restore...');
+
+      // Create FormData object
+      const formData = new FormData();
+      formData.append('file', $('#restoreFile')[0].files[0]);
+      formData.append('restore_type', $('#restoreOptions').val());
+      formData.append('backup_before_restore', $('#backupBeforeRestore').is(':checked'));
+      formData.append('password', $('#restorePassword').val());
+
+      // Add selective restore options if selected
+      if ($('#restoreOptions').val() === 'selective') {
+        formData.append('restore_students', $('#restoreStudents').is(':checked'));
+        formData.append('restore_staff', $('#restoreStaff').is(':checked'));
+        formData.append('restore_classes', $('#restoreClasses').is(':checked'));
+        formData.append('restore_results', $('#restoreResults').is(':checked'));
+        formData.append('restore_attendance', $('#restoreAttendance').is(':checked'));
+        formData.append('restore_fees', $('#restoreFees').is(':checked'));
+        formData.append('restore_settings', $('#restoreSettings').is(':checked'));
+      }
+
+      // TODO: Implement file upload restore
+      // For now, show a message that this feature is coming soon
+      setTimeout(function() {
+        restoreProgressModal.hide();
+        toastr.info('File upload restore will be available in the next update. Please use the restore buttons in the backup history table.');
+      }, 1500);
+    });
+
+    // Download Backup
+    $('.download-backup').on('click', function() {
+      const backupId = $(this).data('id');
+      const backupName = $(this).data('name');
+
+      // Create a temporary form to submit the download request
+      const form = $('<form></form>').attr({
+        method: 'GET',
+        action: '{% url "download_backup_ajax" backup_id=0 %}'.replace('0', backupId)
+      });
+
+      $('body').append(form);
+      form.submit();
+      form.remove();
+
+      toastr.success('Downloading backup: ' + backupName);
+    });
+
+    // Restore from Backup History
+    $('.restore-backup').on('click', function() {
+      const backupId = $(this).data('id');
+      const backupName = $(this).data('name');
+
+      if (confirm('Are you sure you want to restore from backup: ' + backupName + '? This will overwrite current data.')) {
+        // Show progress modal
+        restoreProgressModal.show();
+        updateRestoreProgress(5, 'Preparing to restore...');
+
+        // Prepare request data
+        const requestData = {
+          restore_type: 'full',
+          backup_before_restore: true
+        };
+
+        // Send AJAX request to restore backup
+        $.ajax({
+          url: '{% url "restore_backup_ajax" backup_id=0 %}'.replace('0', backupId),
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify(requestData),
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+          },
+          success: function(response) {
+            updateRestoreProgress(100, 'Restore completed successfully!');
+
+            // Hide modal after a delay
+            setTimeout(function() {
+              restoreProgressModal.hide();
+
+              // Show success message
+              toastr.success('Data restored successfully from ' + backupName);
+
+              // Reset progress bar for next time
+              setTimeout(function() {
+                $('#restoreProgressBar').css('width', '0%');
+
+                // Reload the page
+                window.location.reload();
+              }, 500);
+            }, 1000);
+          },
+          error: function(xhr, status, error) {
+            restoreProgressModal.hide();
+
+            // Show error message
+            let errorMessage = 'An error occurred while restoring the backup';
+            if (xhr.responseJSON && xhr.responseJSON.error) {
+              errorMessage = xhr.responseJSON.error;
+            }
+            toastr.error(errorMessage);
+          },
+          xhr: function() {
+            const xhr = new window.XMLHttpRequest();
+
+            // Upload progress
+            xhr.upload.addEventListener("progress", function(evt) {
+              if (evt.lengthComputable) {
+                const percentComplete = evt.loaded / evt.total * 100;
+
+                // Update progress based on the current stage
+                if (percentComplete < 20) {
+                  updateRestoreProgress(5 + percentComplete * 0.75, 'Preparing to restore...');
+                } else if (percentComplete < 40) {
+                  updateRestoreProgress(20 + (percentComplete - 20) * 1, 'Creating safety backup...');
+                } else if (percentComplete < 60) {
+                  updateRestoreProgress(40 + (percentComplete - 40) * 1.5, 'Restoring database...');
+                } else if (percentComplete < 80) {
+                  updateRestoreProgress(70 + (percentComplete - 60) * 1, 'Restoring media files...');
+                } else {
+                  updateRestoreProgress(90 + (percentComplete - 80) * 0.5, 'Finalizing restore...');
+                }
+              }
+            }, false);
+
+            return xhr;
+          }
+        });
+      }
+    });
+
+    // Delete Backup
+    $('.delete-backup').on('click', function() {
+      const backupId = $(this).data('id');
+      const backupName = $(this).data('name');
+
+      if (confirm('Are you sure you want to delete backup: ' + backupName + '? This cannot be undone.')) {
+        // Send AJAX request to delete backup
+        $.ajax({
+          url: '{% url "delete_backup_ajax" backup_id=0 %}'.replace('0', backupId),
+          type: 'POST',
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+          },
+          success: function(response) {
+            // Remove the row from the table
+            $('#backup-row-' + backupId).fadeOut(400, function() {
+              $(this).remove();
+              toastr.success('Backup deleted successfully');
+            });
+          },
+          error: function(xhr, status, error) {
+            // Show error message
+            let errorMessage = 'An error occurred while deleting the backup';
+            if (xhr.responseJSON && xhr.responseJSON.error) {
+              errorMessage = xhr.responseJSON.error;
+            }
+            toastr.error(errorMessage);
+          }
+        });
+      }
+    });
+
+    // Save Automated Backup Settings
+    $('#saveAutomatedSettingsBtn').on('click', function() {
+      $(this).html('<i class="fas fa-spinner fa-spin me-2"></i> Saving...');
+
+      // Get form data
+      const enabled = $('#enableAutomatedBackups').is(':checked');
+      const frequency = $('#backupFrequency').val();
+      const backupTime = $('#backupTime').val();
+      const dayOfWeek = $('#backupDay').val();
+      const retentionPolicy = $('#retentionPolicy').val();
+      const backupType = $('#automatedBackupType').val();
+      const notifyOnBackup = $('#notifyOnBackup').is(':checked');
+
+      // Prepare request data
+      const requestData = {
+        enabled: enabled,
+        frequency: frequency,
+        backup_time: backupTime,
+        day_of_week: dayOfWeek,
+        retention_policy: retentionPolicy,
+        backup_type: backupType,
+        notify_on_backup: notifyOnBackup
+      };
+
+      // Send AJAX request to save settings
+      $.ajax({
+        url: '{% url "save_automated_backup_settings" %}',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(requestData),
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}'
+        },
+        success: function(response) {
+          $('#saveAutomatedSettingsBtn').html('<i class="fas fa-save me-2"></i> Save Automated Backup Settings');
+          toastr.success('Automated backup settings saved successfully');
+
+          // Update next backup time if available
+          if (response.next_backup) {
+            $('#nextBackupTime').text(response.next_backup);
+          }
+        },
+        error: function(xhr, status, error) {
+          $('#saveAutomatedSettingsBtn').html('<i class="fas fa-save me-2"></i> Save Automated Backup Settings');
+
+          // Show error message
+          let errorMessage = 'An error occurred while saving settings';
+          if (xhr.responseJSON && xhr.responseJSON.error) {
+            errorMessage = xhr.responseJSON.error;
+          }
+          toastr.error(errorMessage);
+        }
+      });
+    });
+
+    // Initialize settings from server data
+    function initializeAutomatedSettings() {
+      {% if automated_settings %}
+      $('#enableAutomatedBackups').prop('checked', {{ automated_settings.enabled|lower }});
+      $('#backupFrequency').val('{{ automated_settings.frequency }}');
+      $('#backupTime').val('{{ automated_settings.backup_time|time:"H:i" }}');
+      $('#backupDay').val('{{ automated_settings.day_of_week }}');
+      $('#retentionPolicy').val('{{ automated_settings.retention_policy }}');
+      $('#automatedBackupType').val('{{ automated_settings.backup_type }}');
+      $('#notifyOnBackup').prop('checked', {{ automated_settings.notify_on_backup|lower }});
+
+      {% if automated_settings.next_backup %}
+      $('#nextBackupTime').text('{{ automated_settings.next_backup|date:"Y-m-d H:i:s" }}');
+      {% endif %}
+      {% endif %}
+    }
+
+    // Call initialization function
+    initializeAutomatedSettings();
+  });
+</script>
+{% endblock settings-js %}

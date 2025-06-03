@@ -1,0 +1,56 @@
+
+
+Add pin code and email section on form
+Registration No - Addmintion Year + class +  4 random number
+barcode generation for ID cards? 🚀
+
+Active manu show 
+
+Add secondrory color 
+#1E3C72 
+#6610f2
+
+
+
+### **Updated Sidebar Menu for ERP**
+- **Dashboard**  
+- **Students Management**  
+  - Student Admission  
+  - Student List  
+  - Attendance  
+  - Fees Management  
+  - Exam Results  
+- **Teachers Management**  
+  - Teacher List  
+  - Assign Subjects  
+  - Attendance  
+  - Payroll  
+- **Academics**  
+  - Sessions  
+  - Terms  
+  - Classes  
+  - Subjects  
+  - Timetable  
+- **Examinations**  
+  - Exam Schedule  
+  - Marks Entry  
+  - Report Cards  
+- **HR & Staff**  
+  - Staff List  
+  - Leaves  
+  - Payroll  
+- **Library**  
+  - Books Management  
+  - Issued Books  
+- **Transport**  
+  - Routes & Vehicles  
+  - Assign Students  
+- **Hostel**  
+  - Hostel Rooms  
+  - Assign Students  
+- **Settings**  
+
+
+
+Add mail, Blood group in student profile 
+

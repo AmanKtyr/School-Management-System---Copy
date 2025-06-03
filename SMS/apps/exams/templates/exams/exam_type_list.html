@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block breadcrumb-left %}
+<div class="breadcrumb-container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-chevron">
+      <li class="breadcrumb-item">
+        <a href="{% url 'home' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-home"></i> Home
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'exams:dashboard' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-graduation-cap"></i> Examination
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <i class="fas fa-list"></i> Exam Types
+      </li>
+    </ol>
+  </nav>
+</div>
+{% endblock breadcrumb-left %}
+
+{% block title-icon %}fas fa-list{% endblock title-icon %}
+
+{% block title %}Exam Types{% endblock title %}
+
+{% block subtitle %}Manage different types of examinations{% endblock subtitle %}
+
+{% block content %}
+<div class="container-fluid exams-container">
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0"><i class="fas fa-list me-2"></i>Exam Types</h5>
+          <a href="{% url 'exams:exam_type_create' %}" class="btn btn-light">
+            <i class="fas fa-plus me-1"></i> Add New Exam Type
+          </a>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover" id="examTypeTable">
+              <thead>
+                <tr>
+                  <th>S/N</th>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for exam_type in exam_types %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ exam_type.name }}</td>
+                  <td>{{ exam_type.description|default:"-" }}</td>
+                  <td>
+                    <div class="btn-group" role="group">
+                      <a href="{% url 'exams:exam_type_update' exam_type.id %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-edit"></i> Edit
+                      </a>
+                      <a href="{% url 'exams:exam_type_delete' exam_type.id %}" class="btn btn-sm btn-outline-danger">
+                        <i class="fas fa-trash"></i> Delete
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="4" class="text-center">No exam types found. <a href="{% url 'exams:exam_type_create' %}">Add one now</a>.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block morejs %}
+<script>
+  $(document).ready(function() {
+    $('#examTypeTable').DataTable({
+      "paging": true,
+      "lengthChange": true,
+      "searching": true,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false,
+      "responsive": true,
+    });
+  });
+</script>
+{% endblock morejs %}

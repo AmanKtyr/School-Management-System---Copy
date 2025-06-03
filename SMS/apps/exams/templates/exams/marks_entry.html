@@ -1,0 +1,647 @@
+{% extends 'exams/base_exams.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block exam-breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">
+  <i class="fas fa-clipboard-check"></i> Marks Entry
+</li>
+{% endblock exam-breadcrumb %}
+
+{% block title-icon %}fas fa-clipboard-check{% endblock title-icon %}
+
+{% block title %}Marks Entry{% endblock title %}
+
+{% block subtitle %}Record and manage student examination marks{% endblock subtitle %}
+
+{% block content %}
+<div class="container-fluid exams-container">
+  <!-- Filter Card -->
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card border-0 rounded-3 shadow-sm exam-card">
+        <div class="card-header bg-gradient-primary text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold"><i class="fas fa-filter me-2"></i>Select Exam and Class</h5>
+          <button type="button" class="btn btn-sm btn-light" id="toggleFilters" data-bs-toggle="tooltip" data-bs-placement="left" title="Toggle filter visibility">
+            <i class="fas fa-chevron-down"></i>
+          </button>
+        </div>
+        <div class="card-body p-4" id="filterBody">
+          <form method="get" id="filterForm" class="row g-3">
+            <div class="col-md-3">
+              <label for="exam" class="form-label">Exam <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-graduation-cap"></i></span>
+                <select name="exam" id="exam" class="form-select" required>
+                  <option value="">-- Select Exam --</option>
+                  {% for exam in exams %}
+                  <option value="{{ exam.id }}" {% if selected_exam == exam.id %}selected{% endif %}>
+                    {{ exam.name }} ({{ exam.session.name }} {{ exam.term.name }})
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <label for="subject" class="form-label">Subject <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-book"></i></span>
+                <select name="subject" id="subject" class="form-select" required>
+                  <option value="">-- Select Subject --</option>
+                  {% for subject in subjects %}
+                  <option value="{{ subject.id }}" {% if selected_subject == subject.id %}selected{% endif %}>
+                    {{ subject.name }}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <label for="student_class" class="form-label">Class <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-chalkboard"></i></span>
+                <select name="student_class" id="student_class" class="form-select" required>
+                  <option value="">-- Select Class --</option>
+                  {% for class in classes %}
+                  <option value="{{ class.id }}" {% if selected_class == class.id %}selected{% endif %}>
+                    {{ class.name }}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <label for="section" class="form-label">Section</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-users"></i></span>
+                <input type="text" name="section" id="section" class="form-control" value="{{ selected_section }}" placeholder="Enter section">
+              </div>
+            </div>
+            <div class="col-12 d-flex justify-content-end mt-4">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search me-1"></i> Load Students
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if show_marks_form %}
+  <!-- Marks Entry Form -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card border-0 rounded-3 shadow-sm exam-card">
+        <div class="card-header bg-gradient-primary text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold">
+            <i class="fas fa-clipboard-check me-2"></i>
+            Enter Marks: {{ selected_exam_name }} - {{ selected_subject_name }} - {{ selected_class_name }} {{ selected_section }}
+          </h5>
+          <div>
+            <button type="button" class="btn btn-light btn-sm" id="calculateBtn" data-bs-toggle="tooltip" title="Auto-calculate grades and pass/fail status">
+              <i class="fas fa-calculator me-1"></i> Auto Calculate
+            </button>
+            <button type="button" class="btn btn-light btn-sm ms-2" id="importBtn" data-bs-toggle="tooltip" title="Import marks from Excel file">
+              <i class="fas fa-file-import me-1"></i> Import
+            </button>
+          </div>
+        </div>
+        <div class="card-body p-4">
+          <form method="post" id="marksForm">
+            {% csrf_token %}
+            <input type="hidden" name="exam_id" value="{{ selected_exam }}">
+            <input type="hidden" name="subject_id" value="{{ selected_subject }}">
+            <input type="hidden" name="class_id" value="{{ selected_class }}">
+            <input type="hidden" name="section" value="{{ selected_section }}">
+
+            <div class="table-responsive">
+              <table class="table table-hover marks-table">
+                <thead class="table-light">
+                  <tr>
+                    <th width="5%">S/N</th>
+                    <th width="15%">Reg. Number</th>
+                    <th width="25%">Student Name</th>
+                    <th width="15%">Obtained Marks <span class="text-danger">*</span></th>
+                    <th width="10%">Pass/Fail</th>
+                    <th width="10%">Grade</th>
+                    <th width="20%">Remarks</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for student in students %}
+                  <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>
+                      <span class="badge bg-light text-dark">{{ student.registration_number }}</span>
+                    </td>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="avatar-circle bg-primary bg-opacity-10 me-2 sm">
+                          <span class="avatar-initials text-primary">{{ student.fullname|slice:":1" }}</span>
+                        </div>
+                        <span class="fw-bold">{{ student.fullname }}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="input-group input-group-sm">
+                        <input type="number" name="marks_{{ student.id }}" id="marks_{{ student.id }}"
+                               class="form-control marks-input" min="0" max="{{ max_marks }}"
+                               value="{{ student.marks|default:'' }}" required>
+                        <span class="input-group-text">/ {{ max_marks }}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <span id="pass_fail_{{ student.id }}" class="badge {% if student.is_pass %}badge-completed{% else %}badge-cancelled{% endif %}">
+                        {% if student.marks %}
+                          {% if student.is_pass %}
+                            <i class="fas fa-check-circle me-1"></i> Pass
+                          {% else %}
+                            <i class="fas fa-times-circle me-1"></i> Fail
+                          {% endif %}
+                        {% else %}
+                          -
+                        {% endif %}
+                      </span>
+                    </td>
+                    <td>
+                      <span id="grade_{{ student.id }}" class="badge bg-info">
+                        {{ student.grade|default:"-" }}
+                      </span>
+                    </td>
+                    <td>
+                      <input type="text" name="remarks_{{ student.id }}" id="remarks_{{ student.id }}"
+                             class="form-control form-control-sm" value="{{ student.remarks|default:'' }}"
+                             placeholder="Optional remarks">
+                    </td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                    <td colspan="7" class="text-center py-5">
+                      <div class="d-flex flex-column align-items-center">
+                        <div class="rounded-circle bg-light p-4 mb-3">
+                          <i class="fas fa-users fa-3x text-muted"></i>
+                        </div>
+                        <h5 class="text-muted mb-2">No students found</h5>
+                        <p class="text-muted mb-0">No students are enrolled in this class/section</p>
+                      </div>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+
+            <div class="row mt-4 g-4">
+              <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                  <div class="card-header bg-light">
+                    <h6 class="mb-0 fw-bold"><i class="fas fa-info-circle me-2 text-primary"></i>Marks Information</h6>
+                  </div>
+                  <div class="card-body">
+                    <div class="row g-3">
+                      <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-3">
+                          <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-3">
+                            <i class="fas fa-clipboard-list text-primary"></i>
+                          </div>
+                          <div>
+                            <div class="text-muted small">Total Marks</div>
+                            <div class="fw-bold">{{ max_marks }}</div>
+                          </div>
+                        </div>
+                        <div class="d-flex align-items-center">
+                          <div class="rounded-circle bg-success bg-opacity-10 p-2 me-3">
+                            <i class="fas fa-check-circle text-success"></i>
+                          </div>
+                          <div>
+                            <div class="text-muted small">Passing Marks</div>
+                            <div class="fw-bold">{{ passing_marks }}</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-3">
+                          <div class="rounded-circle bg-info bg-opacity-10 p-2 me-3">
+                            <i class="fas fa-info-circle text-info"></i>
+                          </div>
+                          <div>
+                            <div class="text-muted small">Status</div>
+                            <span class="badge {% if marks_status == 'draft' %}badge-pending{% elif marks_status == 'finalized' %}badge-completed{% else %}badge-ongoing{% endif %}">
+                              {% if marks_status == 'draft' %}
+                                <i class="fas fa-clock me-1"></i>
+                              {% elif marks_status == 'finalized' %}
+                                <i class="fas fa-check-circle me-1"></i>
+                              {% else %}
+                                <i class="fas fa-sync me-1"></i>
+                              {% endif %}
+                              {{ marks_status|title }}
+                            </span>
+                          </div>
+                        </div>
+                        <div class="d-flex align-items-center">
+                          <div class="rounded-circle bg-secondary bg-opacity-10 p-2 me-3">
+                            <i class="fas fa-clock text-secondary"></i>
+                          </div>
+                          <div>
+                            <div class="text-muted small">Last Updated</div>
+                            <div class="fw-bold">{{ last_updated|default:"Not updated yet" }}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                  <div class="card-header bg-light">
+                    <h6 class="mb-0 fw-bold"><i class="fas fa-save me-2 text-success"></i>Save Options</h6>
+                  </div>
+                  <div class="card-body">
+                    <div class="row g-3">
+                      <div class="col-md-6">
+                        <div class="card border h-100 hover-lift">
+                          <div class="card-body">
+                            <div class="form-check">
+                              <input class="form-check-input" type="radio" name="status" id="statusDraft" value="draft" {% if marks_status == 'draft' or not marks_status %}checked{% endif %}>
+                              <label class="form-check-label fw-bold" for="statusDraft">
+                                <i class="fas fa-edit me-1 text-warning"></i> Save as Draft
+                              </label>
+                            </div>
+                            <p class="text-muted small mt-2 mb-0">Marks can be edited later. Use this option if you need to make changes in the future.</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="card border h-100 hover-lift">
+                          <div class="card-body">
+                            <div class="form-check">
+                              <input class="form-check-input" type="radio" name="status" id="statusFinalized" value="finalized" {% if marks_status == 'finalized' %}checked{% endif %}>
+                              <label class="form-check-label fw-bold" for="statusFinalized">
+                                <i class="fas fa-lock me-1 text-danger"></i> Finalize Marks
+                              </label>
+                            </div>
+                            <p class="text-muted small mt-2 mb-0">Marks cannot be edited after finalization. Only use this when you're completely sure.</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="d-flex justify-content-end mt-4">
+                      <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> Save Marks
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics Card -->
+  <div class="row mt-4">
+    <div class="col-md-12">
+      <div class="card border-0 rounded-3 shadow-sm exam-card">
+        <div class="card-header bg-gradient-success text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold"><i class="fas fa-chart-bar me-2"></i>Class Statistics</h5>
+          <button type="button" class="btn btn-sm btn-light" id="toggleStats" data-bs-toggle="tooltip" data-bs-placement="left" title="Toggle statistics visibility">
+            <i class="fas fa-chevron-down"></i>
+          </button>
+        </div>
+        <div class="card-body p-4" id="statsBody">
+          <div class="row g-4">
+            <div class="col-md-3">
+              <div class="card border-0 shadow-sm h-100 hover-lift">
+                <div class="card-body text-center p-4">
+                  <div class="rounded-circle bg-primary bg-opacity-10 p-3 mx-auto mb-3" style="width: 60px; height: 60px;">
+                    <i class="fas fa-users fa-2x text-primary"></i>
+                  </div>
+                  <h6 class="text-muted mb-2">Total Students</h6>
+                  <h2 class="mb-0 display-5 fw-bold text-primary">{{ total_students }}</h2>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card border-0 shadow-sm h-100 hover-lift">
+                <div class="card-body text-center p-4">
+                  <div class="rounded-circle bg-success bg-opacity-10 p-3 mx-auto mb-3" style="width: 60px; height: 60px;">
+                    <i class="fas fa-percentage fa-2x text-success"></i>
+                  </div>
+                  <h6 class="text-muted mb-2">Pass Percentage</h6>
+                  <h2 class="mb-0 display-5 fw-bold text-success">{{ pass_percentage|default:"0" }}%</h2>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card border-0 shadow-sm h-100 hover-lift">
+                <div class="card-body text-center p-4">
+                  <div class="rounded-circle bg-info bg-opacity-10 p-3 mx-auto mb-3" style="width: 60px; height: 60px;">
+                    <i class="fas fa-trophy fa-2x text-info"></i>
+                  </div>
+                  <h6 class="text-muted mb-2">Highest Marks</h6>
+                  <h2 class="mb-0 display-5 fw-bold text-info">{{ highest_marks|default:"0" }}</h2>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card border-0 shadow-sm h-100 hover-lift">
+                <div class="card-body text-center p-4">
+                  <div class="rounded-circle bg-warning bg-opacity-10 p-3 mx-auto mb-3" style="width: 60px; height: 60px;">
+                    <i class="fas fa-calculator fa-2x text-warning"></i>
+                  </div>
+                  <h6 class="text-muted mb-2">Average Marks</h6>
+                  <h2 class="mb-0 display-5 fw-bold text-warning">{{ average_marks|default:"0" }}</h2>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row mt-4 g-4">
+            <div class="col-md-6">
+              <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-light">
+                  <h6 class="mb-0 fw-bold"><i class="fas fa-chart-bar me-2 text-primary"></i>Grade Distribution</h6>
+                </div>
+                <div class="card-body p-4" style="height: 300px;">
+                  <canvas id="gradeChart"></canvas>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-light">
+                  <h6 class="mb-0 fw-bold"><i class="fas fa-chart-pie me-2 text-success"></i>Pass/Fail Distribution</h6>
+                </div>
+                <div class="card-body p-4" style="height: 300px;">
+                  <canvas id="passFailChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Import Modal -->
+  <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-gradient-primary text-white">
+          <h5 class="modal-title fw-bold" id="importModalLabel"><i class="fas fa-file-import me-2"></i>Import Marks</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <form id="importForm" enctype="multipart/form-data">
+            <div class="alert alert-info">
+              <div class="d-flex">
+                <div class="me-3">
+                  <i class="fas fa-info-circle fa-2x text-info"></i>
+                </div>
+                <div>
+                  <h6 class="alert-heading fw-bold">Import Instructions</h6>
+                  <p class="mb-0 small">Upload an Excel file with student marks. The file should have columns for Registration Number and Marks. Make sure the data format matches the template.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label for="importFile" class="form-label fw-bold">Select Excel File</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-file-excel"></i></span>
+                <input type="file" class="form-control" id="importFile" name="importFile" accept=".xlsx, .xls, .csv" required>
+              </div>
+              <div class="form-text">Accepted formats: .xlsx, .xls, .csv</div>
+            </div>
+
+            <div class="d-flex align-items-center mb-3">
+              <div class="flex-grow-1">
+                <hr>
+              </div>
+              <div class="px-3 text-muted">OR</div>
+              <div class="flex-grow-1">
+                <hr>
+              </div>
+            </div>
+
+            <div class="text-center mb-3">
+              <a href="#" class="btn btn-outline-primary">
+                <i class="fas fa-download me-1"></i> Download Template
+              </a>
+              <div class="form-text mt-2">Download a template file to see the required format</div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            <i class="fas fa-times me-1"></i> Cancel
+          </button>
+          <button type="button" class="btn btn-primary" id="importSubmitBtn">
+            <i class="fas fa-file-import me-1"></i> Import Marks
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block exam-js %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  $(document).ready(function() {
+    // Toggle filters visibility
+    $('#toggleFilters').on('click', function() {
+      $('#filterBody').slideToggle(300);
+      $(this).find('i').toggleClass('fa-chevron-down fa-chevron-up');
+    });
+
+    // Toggle statistics visibility
+    $('#toggleStats').on('click', function() {
+      $('#statsBody').slideToggle(300);
+      $(this).find('i').toggleClass('fa-chevron-down fa-chevron-up');
+    });
+
+    // Auto-calculate pass/fail and grade when marks change
+    $('.marks-input').on('change', function() {
+      var studentId = $(this).attr('id').split('_')[1];
+      var marks = parseFloat($(this).val()) || 0;
+      var maxMarks = {{ max_marks|default:100 }};
+      var passingMarks = {{ passing_marks|default:40 }};
+
+      // Update pass/fail status
+      if (marks >= passingMarks) {
+        $('#pass_fail_' + studentId).html('<i class="fas fa-check-circle me-1"></i> Pass').removeClass('bg-danger badge-cancelled').addClass('bg-success badge-completed');
+      } else {
+        $('#pass_fail_' + studentId).html('<i class="fas fa-times-circle me-1"></i> Fail').removeClass('bg-success badge-completed').addClass('bg-danger badge-cancelled');
+      }
+
+      // Update grade
+      var grade = calculateGrade(marks, maxMarks);
+      $('#grade_' + studentId).text(grade);
+
+      // Add visual feedback
+      $(this).addClass('border-success');
+      setTimeout(function() {
+        $('.marks-input').removeClass('border-success');
+      }, 1000);
+    });
+
+    // Calculate button click
+    $('#calculateBtn').on('click', function() {
+      toastr.info('Calculating grades and pass/fail status for all students...');
+      $('.marks-input').trigger('change');
+      toastr.success('Grades and pass/fail status calculated successfully!');
+    });
+
+    // Import button click
+    $('#importBtn').on('click', function() {
+      $('#importModal').modal('show');
+    });
+
+    // Import submit button click
+    $('#importSubmitBtn').on('click', function() {
+      // This would be implemented with AJAX in a real application
+      toastr.info('Import functionality would be implemented with AJAX in a real application.');
+      $('#importModal').modal('hide');
+    });
+
+    // Function to calculate grade based on marks
+    function calculateGrade(marks, maxMarks) {
+      var percentage = (marks / maxMarks) * 100;
+
+      if (percentage >= 90) return 'A+';
+      else if (percentage >= 80) return 'A';
+      else if (percentage >= 70) return 'B+';
+      else if (percentage >= 60) return 'B';
+      else if (percentage >= 50) return 'C+';
+      else if (percentage >= 40) return 'C';
+      else return 'F';
+    }
+
+    // Add hover effects to action cards
+    $('.hover-lift').hover(
+      function() {
+        $(this).find('i').addClass('fa-beat-fade');
+      },
+      function() {
+        $(this).find('i').removeClass('fa-beat-fade');
+      }
+    );
+
+    {% if show_marks_form %}
+    // Initialize charts
+    var gradeCtx = document.getElementById('gradeChart').getContext('2d');
+    var passFailCtx = document.getElementById('passFailChart').getContext('2d');
+
+    var gradeChart = new Chart(gradeCtx, {
+      type: 'bar',
+      data: {
+        labels: ['A+', 'A', 'B+', 'B', 'C+', 'C', 'F'],
+        datasets: [{
+          label: 'Number of Students',
+          data: [
+            {{ grade_distribution.A_plus|default:0 }},
+            {{ grade_distribution.A|default:0 }},
+            {{ grade_distribution.B_plus|default:0 }},
+            {{ grade_distribution.B|default:0 }},
+            {{ grade_distribution.C_plus|default:0 }},
+            {{ grade_distribution.C|default:0 }},
+            {{ grade_distribution.F|default:0 }}
+          ],
+          backgroundColor: [
+            'rgba(75, 192, 192, 0.6)',
+            'rgba(54, 162, 235, 0.6)',
+            'rgba(153, 102, 255, 0.6)',
+            'rgba(255, 206, 86, 0.6)',
+            'rgba(255, 159, 64, 0.6)',
+            'rgba(255, 99, 132, 0.6)',
+            'rgba(231, 76, 60, 0.6)'
+          ],
+          borderColor: [
+            'rgba(75, 192, 192, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(255, 159, 64, 1)',
+            'rgba(255, 99, 132, 1)',
+            'rgba(231, 76, 60, 1)'
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              precision: 0
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return context.parsed.y + ' students';
+              }
+            }
+          }
+        }
+      }
+    });
+
+    var passFailChart = new Chart(passFailCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Pass', 'Fail'],
+        datasets: [{
+          data: [{{ pass_count|default:0 }}, {{ fail_count|default:0 }}],
+          backgroundColor: [
+            'rgba(46, 204, 113, 0.6)',
+            'rgba(231, 76, 60, 0.6)'
+          ],
+          borderColor: [
+            'rgba(46, 204, 113, 1)',
+            'rgba(231, 76, 60, 1)'
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                var label = context.label || '';
+                var value = context.parsed || 0;
+                var total = context.dataset.data.reduce((a, b) => a + b, 0);
+                var percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                return label + ': ' + value + ' students (' + percentage + '%)';
+              }
+            }
+          }
+        }
+      }
+    });
+    {% endif %}
+  });
+</script>
+{% endblock exam-js %}

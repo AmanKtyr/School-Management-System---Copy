@@ -1,0 +1,40 @@
+{% comment %}
+  Professional Reusable Breadcrumb Component
+
+  Usage:
+  {% include 'includes/breadcrumb.html' with
+    items=breadcrumb_items
+    current_page=current_page_name
+    current_icon=current_page_icon %}
+
+  Parameters:
+  - items: List of dictionaries with 'url', 'title', and 'icon' keys
+  - current_page: Title of the current page (last breadcrumb item)
+  - current_icon: Icon class for the current page (optional)
+{% endcomment %}
+
+<div class="breadcrumb-container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-chevron">
+      <li class="breadcrumb-item">
+        <a href="{% url 'home' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-home"></i> Home
+        </a>
+      </li>
+
+      {% if items %}
+        {% for item in items %}
+          <li class="breadcrumb-item">
+            <a href="{{ item.url }}" class="text-decoration-none fw-bold">
+              {% if item.icon %}<i class="{{ item.icon }}"></i>{% endif %} {{ item.title }}
+            </a>
+          </li>
+        {% endfor %}
+      {% endif %}
+
+      <li class="breadcrumb-item active" aria-current="page">
+        {% if current_icon %}<i class="{{ current_icon }}"></i>{% endif %} {{ current_page }}
+      </li>
+    </ol>
+  </nav>
+</div>

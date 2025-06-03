@@ -1,0 +1,386 @@
+{% extends 'exams/base_exams.html' %}
+{% load static %}
+
+{% block exam-breadcrumb %}
+<li class="breadcrumb-item">
+  <a href="{% url 'exams:document_management' %}"><i class="fas fa-file-archive"></i> Document Management</a>
+</li>
+<li class="breadcrumb-item active" aria-current="page">
+  <i class="fas fa-copy"></i> Bulk Generate
+</li>
+{% endblock exam-breadcrumb %}
+
+{% block title-icon %}fas fa-copy{% endblock title-icon %}
+
+{% block title %}Bulk Document Generation{% endblock title %}
+
+{% block subtitle %}Generate multiple documents at once for efficiency{% endblock subtitle %}
+
+{% block page-actions %}
+<div class="btn-group">
+  <a href="{% url 'exams:document_management' %}" class="btn btn-outline-primary">
+    <i class="fas fa-arrow-left me-2"></i> Back to Document Center
+  </a>
+  <a href="{% url 'exams:document_archive' %}" class="btn btn-outline-secondary">
+    <i class="fas fa-archive me-2"></i> Document Archive
+  </a>
+  <a href="{% url 'exams:document_generate' doc_type='templates' %}" class="btn btn-outline-success">
+    <i class="fas fa-download me-2"></i> Download Templates
+  </a>
+</div>
+{% endblock page-actions %}
+
+{% block content %}
+<div class="container-fluid exams-container">
+  <div class="row">
+    <!-- Bulk Generation Form -->
+    <div class="col-md-8">
+      <div class="card border-0 rounded-3 shadow-sm mb-4">
+        <div class="card-header bg-gradient-primary text-white rounded-top">
+          <h5 class="mb-0 fw-bold"><i class="fas fa-copy me-2"></i>Bulk Document Generation</h5>
+        </div>
+        <div class="card-body p-4">
+          <form method="post" action="{% url 'exams:document_generate' doc_type='bulk' %}" id="bulk-generate-form">
+            {% csrf_token %}
+            
+            <div class="mb-4">
+              <label class="form-label fw-bold">Document Type</label>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="form-check custom-radio">
+                    <input class="form-check-input" type="radio" name="doc_type" id="admit_cards" value="admit_cards" checked>
+                    <label class="form-check-label d-flex align-items-center" for="admit_cards">
+                      <div class="rounded-circle bg-warning bg-opacity-10 p-2 me-2">
+                        <i class="fas fa-id-card text-warning"></i>
+                      </div>
+                      <div>
+                        <span class="fw-bold d-block">Admit Cards</span>
+                        <small class="text-muted">Generate for all selected students</small>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-check custom-radio">
+                    <input class="form-check-input" type="radio" name="doc_type" id="report_cards" value="report_cards">
+                    <label class="form-check-label d-flex align-items-center" for="report_cards">
+                      <div class="rounded-circle bg-success bg-opacity-10 p-2 me-2">
+                        <i class="fas fa-file-pdf text-success"></i>
+                      </div>
+                      <div>
+                        <span class="fw-bold d-block">Report Cards</span>
+                        <small class="text-muted">Generate for all selected students</small>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="exam" class="form-label">Exam <span class="text-danger">*</span></label>
+                  <select class="form-select" id="exam" name="exam" required>
+                    <option value="">Select Exam</option>
+                    {% for exam in exams %}
+                    <option value="{{ exam.id }}">{{ exam.name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="class" class="form-label">Class <span class="text-danger">*</span></label>
+                  <select class="form-select" id="class" name="class" required>
+                    <option value="">Select Class</option>
+                    {% for class in classes %}
+                    <option value="{{ class.id }}">{{ class.name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row mb-4">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="section" class="form-label">Section</label>
+                  <select class="form-select" id="section" name="section">
+                    <option value="">All Sections</option>
+                    <!-- Sections will be populated via JavaScript -->
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-6 d-flex align-items-end">
+                <button type="button" id="preview-btn" class="btn btn-outline-primary w-100">
+                  <i class="fas fa-search me-2"></i> Preview Students
+                </button>
+              </div>
+            </div>
+            
+            <div id="student-preview" class="mb-4" style="display: none;">
+              <label class="form-label fw-bold">Student Preview</label>
+              <div class="table-responsive">
+                <table class="table table-sm table-hover table-striped border">
+                  <thead class="table-light">
+                    <tr>
+                      <th>S/N</th>
+                      <th>Name</th>
+                      <th>Registration Number</th>
+                      <th>Class</th>
+                      <th>Section</th>
+                    </tr>
+                  </thead>
+                  <tbody id="student-preview-body">
+                    <!-- Students will be populated via JavaScript -->
+                  </tbody>
+                </table>
+              </div>
+              <div class="text-muted small mt-2">
+                <i class="fas fa-info-circle me-1"></i> Documents will be generated for all students shown above.
+              </div>
+            </div>
+            
+            <div class="alert alert-info" role="alert">
+              <div class="d-flex">
+                <div class="me-3">
+                  <i class="fas fa-info-circle fa-2x"></i>
+                </div>
+                <div>
+                  <h5 class="alert-heading">Important Information</h5>
+                  <p class="mb-0">Bulk generation may take some time depending on the number of students. Please be patient after submitting the form.</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary btn-lg">
+                <i class="fas fa-copy me-2"></i> Generate Documents
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Bulk Generation Guide -->
+    <div class="col-md-4">
+      <div class="card border-0 rounded-3 shadow-sm mb-4">
+        <div class="card-header bg-gradient-info text-white rounded-top">
+          <h5 class="mb-0 fw-bold"><i class="fas fa-info-circle me-2"></i>Bulk Generation Guide</h5>
+        </div>
+        <div class="card-body p-4">
+          <div class="mb-4">
+            <h6 class="fw-bold"><i class="fas fa-id-card text-warning me-2"></i>Admit Cards</h6>
+            <p>Generate admit cards for multiple students at once. The system will:</p>
+            <ul>
+              <li>Create admit cards for all selected students</li>
+              <li>Generate unique roll numbers</li>
+              <li>Include exam schedule details</li>
+              <li>Add QR codes for verification</li>
+            </ul>
+            <p class="small text-muted">Note: Admit cards will only be generated for students who don't already have one for the selected exam.</p>
+          </div>
+          
+          <div class="mb-4">
+            <h6 class="fw-bold"><i class="fas fa-file-pdf text-success me-2"></i>Report Cards</h6>
+            <p>Generate report cards for multiple students at once. The system will:</p>
+            <ul>
+              <li>Include all subject marks</li>
+              <li>Calculate totals and percentages</li>
+              <li>Assign grades based on performance</li>
+              <li>Include attendance information</li>
+            </ul>
+            <p class="small text-muted">Note: Report cards can only be generated for students with marks entered for the selected exam.</p>
+          </div>
+          
+          <div class="alert alert-warning" role="alert">
+            <div class="d-flex">
+              <div class="me-2">
+                <i class="fas fa-exclamation-triangle"></i>
+              </div>
+              <div>
+                <strong>Important:</strong> Bulk generation may take some time. Please do not refresh the page during processing.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card border-0 rounded-3 shadow-sm">
+        <div class="card-header bg-gradient-success text-white rounded-top">
+          <h5 class="mb-0 fw-bold"><i class="fas fa-lightbulb me-2"></i>Tips</h5>
+        </div>
+        <div class="card-body p-4">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item px-0 border-0">
+              <div class="d-flex">
+                <div class="me-3 text-success">
+                  <i class="fas fa-check-circle fa-lg"></i>
+                </div>
+                <div>
+                  <strong>Preview First</strong>
+                  <p class="mb-0 small">Always preview the student list before generating documents to ensure you have the correct selection.</p>
+                </div>
+              </div>
+            </li>
+            <li class="list-group-item px-0 border-0">
+              <div class="d-flex">
+                <div class="me-3 text-success">
+                  <i class="fas fa-check-circle fa-lg"></i>
+                </div>
+                <div>
+                  <strong>Filter by Section</strong>
+                  <p class="mb-0 small">Use the section filter to generate documents for specific groups of students.</p>
+                </div>
+              </div>
+            </li>
+            <li class="list-group-item px-0 border-0">
+              <div class="d-flex">
+                <div class="me-3 text-success">
+                  <i class="fas fa-check-circle fa-lg"></i>
+                </div>
+                <div>
+                  <strong>Check Document Archive</strong>
+                  <p class="mb-0 small">After generation, check the document archive to access all generated documents.</p>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block morecss %}
+<style>
+  /* Custom radio button styles */
+  .custom-radio {
+    padding: 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+  }
+  
+  .custom-radio:hover {
+    background-color: rgba(30, 60, 114, 0.05);
+  }
+  
+  .form-check-input:checked ~ .form-check-label .rounded-circle {
+    transform: scale(1.1);
+  }
+  
+  .form-check-input:checked ~ .form-check-label {
+    font-weight: 600;
+  }
+  
+  .form-check-input:checked + .form-check-label .text-muted {
+    color: #1E3C72 !important;
+  }
+  
+  .custom-radio .rounded-circle {
+    transition: all 0.3s ease;
+  }
+</style>
+{% endblock morecss %}
+
+{% block exam-js %}
+<script>
+  $(document).ready(function() {
+    // Handle class change to load sections
+    $('#class').change(function() {
+      const classId = $(this).val();
+      if (classId) {
+        // Clear current options
+        $('#section').html('<option value="">All Sections</option>');
+        
+        // Get sections for this class
+        $.ajax({
+          url: `/api/classes/${classId}/sections/`,
+          type: 'GET',
+          success: function(data) {
+            if (data && data.length > 0) {
+              data.forEach(function(section) {
+                $('#section').append(`<option value="${section}">${section}</option>`);
+              });
+            }
+          },
+          error: function(xhr, status, error) {
+            console.error('Error fetching sections:', error);
+          }
+        });
+      }
+    });
+    
+    // Preview students button
+    $('#preview-btn').click(function() {
+      const classId = $('#class').val();
+      const section = $('#section').val();
+      
+      if (!classId) {
+        alert('Please select a class first.');
+        return;
+      }
+      
+      // Get students for this class/section
+      $.ajax({
+        url: `/exams/api/students/${classId}/${section || ''}`,
+        type: 'GET',
+        success: function(data) {
+          if (data && data.length > 0) {
+            // Clear current preview
+            $('#student-preview-body').empty();
+            
+            // Add students to preview
+            data.forEach(function(student, index) {
+              $('#student-preview-body').append(`
+                <tr>
+                  <td>${index + 1}</td>
+                  <td>${student.fullname}</td>
+                  <td>${student.registration_number}</td>
+                  <td>${$('#class option:selected').text()}</td>
+                  <td>${student.section || '-'}</td>
+                </tr>
+              `);
+            });
+            
+            // Show preview
+            $('#student-preview').show();
+          } else {
+            $('#student-preview-body').html(`
+              <tr>
+                <td colspan="5" class="text-center py-3">
+                  <i class="fas fa-exclamation-circle text-warning me-2"></i>
+                  No students found for the selected criteria.
+                </td>
+              </tr>
+            `);
+            $('#student-preview').show();
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('Error fetching students:', error);
+          alert('Error fetching students. Please try again.');
+        }
+      });
+    });
+    
+    // Form validation
+    $('#bulk-generate-form').submit(function(e) {
+      const exam = $('#exam').val();
+      const classId = $('#class').val();
+      
+      if (!exam || !classId) {
+        e.preventDefault();
+        alert('Please select both exam and class.');
+        return false;
+      }
+      
+      return true;
+    });
+  });
+</script>
+{% endblock exam-js %}

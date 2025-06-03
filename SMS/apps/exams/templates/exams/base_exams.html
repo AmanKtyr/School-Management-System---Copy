@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extracss %}
+<!-- Exam Module Specific CSS -->
+<link rel="stylesheet" href="{% static 'dist/css/exams.css' %}">
+{% endblock extracss %}
+
+{% block breadcrumb-left %}
+<div class="breadcrumb-container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-chevron">
+      <li class="breadcrumb-item">
+        <a href="{% url 'home' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-home"></i> Home
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'exams:dashboard' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-graduation-cap"></i> Examination
+        </a>
+      </li>
+      {% block exam-breadcrumb %}{% endblock exam-breadcrumb %}
+    </ol>
+  </nav>
+</div>
+{% endblock breadcrumb-left %}
+
+{% block title-icon %}fas fa-graduation-cap{% endblock title-icon %}
+
+{% block morejs %}
+<!-- Exam Module Specific JS -->
+<script>
+  $(document).ready(function() {
+    // Initialize tooltips
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+    
+    // Initialize popovers
+    const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+    const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
+    
+    // Add hover effects to action cards
+    $('.hover-lift').hover(
+      function() {
+        $(this).find('i').addClass('fa-beat-fade');
+      },
+      function() {
+        $(this).find('i').removeClass('fa-beat-fade');
+      }
+    );
+    
+    // Initialize DataTables with common settings
+    $('.datatable').each(function() {
+      $(this).DataTable({
+        "paging": true,
+        "lengthChange": true,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "autoWidth": false,
+        "responsive": true,
+        "language": {
+          "emptyTable": "No data available",
+          "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+          "infoEmpty": "Showing 0 to 0 of 0 entries",
+          "lengthMenu": "Show _MENU_ entries",
+          "search": "Search:",
+          "zeroRecords": "No matching records found"
+        }
+      });
+    });
+  });
+</script>
+{% block exam-js %}{% endblock exam-js %}
+{% endblock morejs %}
+

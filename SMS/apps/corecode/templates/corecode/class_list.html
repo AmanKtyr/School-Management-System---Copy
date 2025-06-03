@@ -1,0 +1,1384 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block breadcrumb-left %}
+<div class="breadcrumb-container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-chevron">
+      <li class="breadcrumb-item">
+        <a href="{% url 'home' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-home"></i> Home
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="#" class="text-decoration-none fw-bold">
+          <i class="fas fa-copy"></i> Management
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <i class="fas fa-school"></i> Classes
+      </li>
+    </ol>
+  </nav>
+</div>
+{% endblock breadcrumb-left %}
+
+{% block title-icon %}fas fa-school{% endblock title-icon %}
+
+{% block title %}Class Management{% endblock title %}
+
+{% block subtitle %}Create and manage academic classes for your institution{% endblock subtitle %}
+
+{% block page-actions %}
+<a class="btn btn-primary" href="#" id="addClassBtn">
+  <i class="fas fa-plus me-2"></i> Add New Class
+</a>
+{% endblock page-actions %}
+
+{% block breadcrumb %}
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="row mb-4">
+  <div class="col-md-6">
+    <div class="input-group">
+      <span class="input-group-text bg-primary text-white"><i class="fas fa-search"></i></span>
+      <input type="text" id="classSearchInput" class="form-control" placeholder="Search classes...">
+    </div>
+  </div>
+  <div class="col-md-6 text-end">
+    <div class="btn-group" role="group">
+      <button type="button" class="btn btn-outline-primary" id="refreshClassList">
+        <i class="fas fa-sync-alt"></i> Refresh
+      </button>
+      <div class="btn-group" role="group">
+        <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="fas fa-sort"></i> Sort
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item sort-option" data-sort="name-asc" href="#">Name (A-Z)</a></li>
+          <li><a class="dropdown-item sort-option" data-sort="name-desc" href="#">Name (Z-A)</a></li>
+          <li><a class="dropdown-item sort-option" data-sort="students-asc" href="#">Students (Low-High)</a></li>
+          <li><a class="dropdown-item sort-option" data-sort="students-desc" href="#">Students (High-Low)</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <div class="card shadow-sm">
+      <div class="card-header bg-light">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-list me-2"></i> Class List
+          <span class="badge bg-primary ms-2" id="totalClassCount">{{ object_list|length }}</span>
+        </h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover table-striped" id="classTable">
+            <thead class="table-light">
+              <tr>
+                <th width="5%" class="text-center">#</th>
+                <th width="30%">Class Name</th>
+                <th width="15%" class="text-center">Students</th>
+                <th width="20%" class="text-center">Sections</th>
+                <th width="15%" class="text-center">Class Teacher</th>
+                <th width="15%" class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for object in object_list %}
+              <tr class="class-row" data-class-id="{{ object.id }}" data-class-name="{{ object }}">
+                <td class="text-center">{{ forloop.counter }}</td>
+                <td>
+                  <span class="fw-medium">{{ object }}</span>
+                </td>
+                <td class="text-center">
+                  <span class="badge bg-info student-count" data-class-id="{{ object.id }}">Loading...</span>
+                </td>
+                <td class="text-center">
+                  <span class="section-list" data-class-id="{{ object.id }}">Loading...</span>
+                </td>
+                <td class="text-center">
+                  <span class="class-teacher" data-class-id="{{ object.id }}">Loading...</span>
+                </td>
+                <td class="text-center">
+                  <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-outline-primary edit-class-btn" data-class-id="{{ object.id }}" title="Edit Class">
+                      <i class="fa fa-edit"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-info view-class-details" data-class-id="{{ object.id }}" title="View Details">
+                      <i class="fa fa-eye"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-success assign-teacher-btn" data-class-id="{{ object.id }}" data-class-name="{{ object }}" title="Assign Class Teacher">
+                      <i class="fa fa-user-plus"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-primary manage-sections-btn" data-class-id="{{ object.id }}" data-class-name="{{ object }}" title="Manage Sections">
+                      <i class="fa fa-layer-group"></i>
+                    </button>
+                    <a href="{% url 'class-delete' object.id %}" class="btn btn-outline-danger" title="Delete Class">
+                      <i class="fa fa-trash-alt"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="6" class="text-center py-4">
+                  <div class="empty-state">
+                    <i class="fas fa-school fa-3x text-muted mb-3"></i>
+                    <h5>No Classes Found</h5>
+                    <p class="text-muted">Start by adding your first class using the 'Add New Class' button.</p>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card-footer bg-light">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <small class="text-muted">Showing {{ object_list|length }} classes</small>
+          </div>
+          <div>
+            <nav aria-label="Class navigation">
+              <ul class="pagination pagination-sm mb-0">
+                <li class="page-item disabled">
+                  <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                </li>
+                <li class="page-item active" aria-current="page">
+                  <a class="page-link" href="#">1</a>
+                </li>
+                <li class="page-item disabled">
+                  <a class="page-link" href="#">Next</a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Class Details Modal -->
+<div class="modal fade" id="classDetailsModal" tabindex="-1" aria-labelledby="classDetailsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header bg-gradient-info text-white">
+        <h5 class="modal-title" id="classDetailsModalLabel">
+          <i class="fas fa-info-circle me-2"></i> Class Details
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <!-- Basic Information Card -->
+        <div class="card mb-4 border-0 shadow-sm">
+          <div class="card-header bg-light">
+            <h6 class="mb-0"><i class="fas fa-school me-2 text-primary"></i>Basic Information</h6>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label fw-bold text-secondary">Class Name:</label>
+                  <p id="detailClassName" class="form-control-plaintext fs-5 fw-bold">-</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label fw-bold text-secondary">Total Students:</label>
+                  <p id="detailStudentCount" class="form-control-plaintext fs-5 fw-bold">-</p>
+                </div>
+              </div>
+              <div class="col-md-12">
+                <div class="mb-3">
+                  <label class="form-label fw-bold text-secondary">Class Teacher:</label>
+                  <div id="detailClassTeacher" class="form-control-plaintext d-flex align-items-center">
+                    <span class="me-2 fs-5 fw-bold">Loading...</span>
+                    <button type="button" id="assignTeacherFromDetailsBtn" class="btn btn-sm btn-outline-success">
+                      <i class="fas fa-user-plus me-1"></i> Assign Teacher
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sections Card -->
+        <div class="card mb-4 border-0 shadow-sm">
+          <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h6 class="mb-0"><i class="fas fa-layer-group me-2 text-success"></i>Sections</h6>
+            <button type="button" id="addSectionBtn" class="btn btn-sm btn-primary">
+              <i class="fas fa-plus me-1"></i> Add Section
+            </button>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover table-bordered mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th width="5%" class="text-center">#</th>
+                    <th width="25%">Name</th>
+                    <th width="50%">Description</th>
+                    <th width="20%" class="text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="sectionTableBody">
+                  <tr>
+                    <td colspan="4" class="text-center py-4">
+                      <div class="d-flex flex-column align-items-center">
+                        <div class="spinner-border text-primary mb-3" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="text-muted mb-0">Loading sections...</p>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subjects Card -->
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-light">
+            <h6 class="mb-0"><i class="fas fa-book me-2 text-warning"></i>Subjects</h6>
+          </div>
+          <div class="card-body">
+            <div id="detailSubjects" class="form-control-plaintext">
+              <div class="d-flex justify-content-center">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer bg-light">
+        <button type="button" id="editClassFromDetailsBtn" class="btn btn-primary">
+          <i class="fas fa-edit me-1"></i> Edit Class
+        </button>
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-1"></i> Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Class Modal -->
+<div class="modal fade" id="editClassModal" tabindex="-1" aria-labelledby="editClassModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <form id="editClassForm" class="needs-validation" novalidate>
+        <div class="modal-header bg-gradient-primary text-white">
+          <h5 class="modal-title" id="editClassModalLabel">
+            <i class="fas fa-edit me-2"></i> Edit Class
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          {% csrf_token %}
+          <input type="hidden" id="editClassId" name="class_id">
+
+          <div class="alert alert-info mb-4">
+            <i class="fas fa-info-circle me-2"></i> Update the class name below.
+          </div>
+
+          <div class="mb-3">
+            <label for="editClassName" class="form-label fw-bold">Class Name <span class="text-danger">*</span></label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-school"></i></span>
+              <input type="text" class="form-control" id="editClassName" name="name" required placeholder="Enter class name">
+            </div>
+            <div class="invalid-feedback">
+              <i class="fas fa-exclamation-circle me-1"></i>Please enter a class name.
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            <i class="fas fa-times me-1"></i> Cancel
+          </button>
+          <button type="submit" class="btn btn-primary" id="saveEditClassBtn">
+            <i class="fas fa-save me-1"></i> Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Section Modal -->
+<div class="modal fade" id="sectionModal" tabindex="-1" aria-labelledby="sectionModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header bg-gradient-primary text-white">
+        <h5 class="modal-title" id="sectionModalLabel">
+          <i class="fas fa-layer-group me-2"></i> <span id="sectionModalAction">Add</span> Section
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <form id="sectionForm" class="needs-validation" novalidate>
+          {% csrf_token %}
+          <input type="hidden" id="sectionClassId" name="class_id">
+          <input type="hidden" id="sectionId" name="section_id">
+
+          <div class="alert alert-info mb-4">
+            <i class="fas fa-info-circle me-2"></i> Sections help organize students within a class. Common examples include A, B, C or Morning, Evening, etc.
+          </div>
+
+          <div class="mb-3">
+            <label for="sectionClassName" class="form-label fw-bold">Class</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-school"></i></span>
+              <input type="text" class="form-control bg-light" id="sectionClassName" readonly>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="sectionName" class="form-label fw-bold">Section Name <span class="text-danger">*</span></label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-layer-group"></i></span>
+              <input type="text" class="form-control" id="sectionName" name="name" required placeholder="Enter section name (e.g., A, B, Morning)">
+            </div>
+            <div class="invalid-feedback">
+              <i class="fas fa-exclamation-circle me-1"></i>Please enter a section name.
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="sectionDescription" class="form-label fw-bold">Description</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-align-left"></i></span>
+              <textarea class="form-control" id="sectionDescription" name="description" rows="3" placeholder="Enter optional description for this section"></textarea>
+            </div>
+            <div class="form-text text-muted">
+              <i class="fas fa-info-circle me-1"></i>Provide additional details about this section (optional).
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-1"></i> Cancel
+        </button>
+        <button type="button" class="btn btn-primary" id="saveSectionBtn">
+          <i class="fas fa-save me-1"></i> Save Section
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Assign Class Teacher Modal -->
+<div class="modal fade" id="assignTeacherModal" tabindex="-1" aria-labelledby="assignTeacherModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header bg-gradient-success text-white">
+        <h5 class="modal-title" id="assignTeacherModalLabel">
+          <i class="fas fa-user-plus me-2"></i> Assign Class Teacher
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <form id="assignTeacherForm" class="needs-validation" novalidate>
+          {% csrf_token %}
+          <input type="hidden" id="assignTeacherClassId" name="class_id">
+
+          <div class="alert alert-info mb-4">
+            <i class="fas fa-info-circle me-2"></i> Assigning a class teacher helps in managing class-specific activities and communications.
+          </div>
+
+          <div class="mb-3">
+            <label for="assignTeacherClassName" class="form-label fw-bold">Class</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-school"></i></span>
+              <input type="text" class="form-control bg-light" id="assignTeacherClassName" readonly>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="assignTeacherSection" class="form-label fw-bold">Section</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-layer-group"></i></span>
+              <select class="form-select" id="assignTeacherSection" name="section">
+                <option value="">-- All Sections --</option>
+                <!-- Sections will be loaded dynamically -->
+              </select>
+            </div>
+            <div class="form-text text-muted">
+              <i class="fas fa-info-circle me-1"></i>Select a specific section or leave as "All Sections" to assign a teacher to the entire class.
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="assignTeacherTeacher" class="form-label fw-bold">Teacher <span class="text-danger">*</span></label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-user-tie"></i></span>
+              <select class="form-select" id="assignTeacherTeacher" name="teacher_id" required>
+                <option value="">-- Select Teacher --</option>
+                <!-- Teachers will be loaded dynamically -->
+              </select>
+            </div>
+            <div class="invalid-feedback">
+              <i class="fas fa-exclamation-circle me-1"></i>Please select a teacher.
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-1"></i> Cancel
+        </button>
+        <button type="button" class="btn btn-success" id="saveAssignTeacherBtn">
+          <i class="fas fa-save me-1"></i> Assign Teacher
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Manage Sections Modal -->
+<div class="modal fade" id="manageSectionsModal" tabindex="-1" aria-labelledby="manageSectionsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header bg-gradient-primary text-white">
+        <h5 class="modal-title" id="manageSectionsModalLabel">
+          <i class="fas fa-layer-group me-2"></i> Manage Sections for <span id="manageSectionsClassName">Class</span>
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="alert alert-info mb-4">
+          <i class="fas fa-info-circle me-2"></i> Sections added here will be available in student forms and all filters across the system.
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="mb-0 fw-bold"><i class="fas fa-list me-2 text-primary"></i>Class Sections</h6>
+          <button type="button" id="addSectionFromListBtn" class="btn btn-sm btn-primary">
+            <i class="fas fa-plus me-1"></i> Add New Section
+          </button>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-hover table-bordered">
+            <thead class="table-light">
+              <tr>
+                <th width="5%" class="text-center">#</th>
+                <th width="20%">Name</th>
+                <th width="50%">Description</th>
+                <th width="25%" class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="manageSectionsTableBody">
+              <tr>
+                <td colspan="4" class="text-center py-4">
+                  <div class="d-flex flex-column align-items-center">
+                    <div class="spinner-border text-primary mb-3" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="text-muted mb-0">Loading sections...</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="empty-sections-message d-none mt-4">
+          <div class="text-center py-4">
+            <i class="fas fa-layer-group fa-3x text-muted mb-3"></i>
+            <h5>No Sections Found</h5>
+            <p class="text-muted">This class doesn't have any sections yet. Add your first section using the 'Add New Section' button.</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-1"></i> Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add New Class Modal -->
+<div class="modal fade" id="modal1" tabindex="-1" aria-labelledby="addClassModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <form action="{% url 'class-create' %}" method="POST" id="addClassForm" class="needs-validation" novalidate>
+        <div class="modal-header bg-gradient-primary text-white">
+          <h5 class="modal-title" id="addClassModalLabel">
+            <i class="fas fa-plus-circle me-2"></i> Add New Class
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          {% csrf_token %}
+          <div class="alert alert-info mb-4">
+            <i class="fas fa-info-circle me-2"></i> Enter the class name (e.g., "Class 1", "Grade 10", "First Year").
+          </div>
+          {% for field in form %}
+          <div class="mb-3">
+            <label for="{{ field.id_for_label }}" class="form-label fw-bold">
+              {{ field.label }}
+              {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+            </label>
+            {{ field|add_class:"form-control"|add_error_class:"is-invalid"|attr:"placeholder:Enter class name" }}
+            {% if field.errors %}
+              <div class="invalid-feedback d-block">
+                {% for error in field.errors %}
+                  <i class="fas fa-exclamation-circle me-1"></i>{{ error }}{% if not forloop.last %}<br>{% endif %}
+                {% endfor %}
+              </div>
+            {% endif %}
+            {% if field.help_text %}
+              <div class="form-text text-muted">
+                <i class="fas fa-info-circle me-1"></i>{{ field.help_text }}
+              </div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            <i class="fas fa-times me-1"></i> Cancel
+          </button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save me-1"></i> Save Class
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block morejs %}
+<script>
+  $(document).ready(function() {
+    // Handle the Add Class button click
+    $('#addClassBtn').on('click', function(e) {
+      e.preventDefault();
+      var modal = new bootstrap.Modal(document.getElementById('modal1'));
+      modal.show();
+    });
+
+    // Search functionality
+    $('#classSearchInput').on('keyup', function() {
+      var value = $(this).val().toLowerCase();
+      $('#classTable tbody tr').filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+      });
+      updateEmptyState();
+    });
+
+    // Refresh button
+    $('#refreshClassList').on('click', function() {
+      location.reload();
+    });
+
+    // Sort functionality
+    $('.sort-option').on('click', function(e) {
+      e.preventDefault();
+      var sortType = $(this).data('sort');
+      sortTable(sortType);
+    });
+
+    // Edit class button click
+    $('.edit-class-btn').on('click', function() {
+      var classId = $(this).data('class-id');
+      var className = $(this).closest('tr').data('class-name');
+
+      // Populate the edit form
+      $('#editClassId').val(classId);
+      $('#editClassName').val(className);
+
+      // Show the edit modal
+      var editModal = new bootstrap.Modal(document.getElementById('editClassModal'));
+      editModal.show();
+    });
+
+    // View class details
+    $('.view-class-details').on('click', function() {
+      var classId = $(this).data('class-id');
+      var className = $(this).closest('tr').data('class-name');
+      var studentCount = $(this).closest('tr').find('.student-count').text();
+      var sections = $(this).closest('tr').find('.section-list').html(); // Use HTML to preserve badges
+      var classTeacher = $(this).closest('tr').find('.class-teacher').html(); // Use HTML to preserve badges
+
+      $('#detailClassName').text(className);
+      $('#detailStudentCount').text(studentCount);
+      $('#detailClassTeacher').find('span').first().replaceWith(classTeacher);
+
+      // Store class ID for edit and assign teacher buttons
+      $('#editClassFromDetailsBtn').data('class-id', classId);
+      $('#editClassFromDetailsBtn').data('class-name', className);
+      $('#assignTeacherFromDetailsBtn').data('class-id', classId);
+      $('#assignTeacherFromDetailsBtn').data('class-name', className);
+      $('#addSectionBtn').data('class-id', classId);
+      $('#addSectionBtn').data('class-name', className);
+
+      // Load subjects for this class
+      loadSubjectsForClass(classId);
+
+      // Load sections for this class
+      loadSectionsForClass(classId);
+
+      var detailsModal = new bootstrap.Modal(document.getElementById('classDetailsModal'));
+      detailsModal.show();
+    });
+
+    // Edit class from details modal
+    $('#editClassFromDetailsBtn').on('click', function() {
+      var classId = $(this).data('class-id');
+      var className = $(this).data('class-name');
+
+      // Close the details modal
+      var detailsModal = bootstrap.Modal.getInstance(document.getElementById('classDetailsModal'));
+      detailsModal.hide();
+
+      // Populate the edit form
+      $('#editClassId').val(classId);
+      $('#editClassName').val(className);
+
+      // Show the edit modal
+      var editModal = new bootstrap.Modal(document.getElementById('editClassModal'));
+      editModal.show();
+    });
+
+    // Handle edit class form submission
+    $('#editClassForm').on('submit', function(e) {
+      e.preventDefault();
+
+      var classId = $('#editClassId').val();
+      var className = $('#editClassName').val();
+
+      if (!className.trim()) {
+        $('#editClassName').addClass('is-invalid');
+        return false;
+      }
+
+      // Show loading state
+      var $btn = $('#saveEditClassBtn');
+      var originalHtml = $btn.html();
+      $btn.html('<i class="fas fa-spinner fa-spin me-1"></i> Saving...');
+      $btn.prop('disabled', true);
+
+      // Make AJAX call to update class
+      $.ajax({
+        url: '/api/class/' + classId + '/update/',
+        type: 'POST',
+        data: {
+          name: className,
+          csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val()
+        },
+        success: function(response) {
+          // Close modal
+          var editModal = bootstrap.Modal.getInstance(document.getElementById('editClassModal'));
+          editModal.hide();
+
+          // Show success message
+          alert('Class updated successfully!');
+
+          // Update the UI
+          var row = $('.class-row[data-class-id="' + classId + '"]');
+          row.data('class-name', className);
+          row.find('td:nth-child(2) span').text(className);
+
+          // Reset button
+          $btn.html(originalHtml);
+          $btn.prop('disabled', false);
+        },
+        error: function(xhr) {
+          var errorMsg = 'Failed to update class';
+          if (xhr.responseJSON && xhr.responseJSON.error) {
+            errorMsg = xhr.responseJSON.error;
+          }
+          alert(errorMsg);
+
+          // Reset button
+          $btn.html(originalHtml);
+          $btn.prop('disabled', false);
+        }
+      });
+    });
+
+    // Load student counts, sections, and class teachers for each class
+    loadClassData();
+
+    // Assign Teacher button click
+    $('.assign-teacher-btn').on('click', function() {
+      var classId = $(this).data('class-id');
+      var className = $(this).data('class-name');
+
+      // Set class ID and name in the form
+      $('#assignTeacherClassId').val(classId);
+      $('#assignTeacherClassName').val(className);
+
+      // Load sections for this class
+      loadSectionsForAssignTeacher(classId);
+
+      // Load teachers
+      loadTeachersForAssignTeacher();
+
+      // Show the modal
+      var assignTeacherModal = new bootstrap.Modal(document.getElementById('assignTeacherModal'));
+      assignTeacherModal.show();
+    });
+
+    // Manage Sections button click
+    $('.manage-sections-btn').on('click', function() {
+      var classId = $(this).data('class-id');
+      var className = $(this).data('class-name');
+
+      // Set class name in the modal title
+      $('#manageSectionsClassName').text(className);
+
+      // Store class ID and name for later use
+      $('#addSectionFromListBtn').data('class-id', classId);
+      $('#addSectionFromListBtn').data('class-name', className);
+
+      // Load sections for this class
+      loadSectionsForManage(classId);
+
+      // Show the modal
+      var manageSectionsModal = new bootstrap.Modal(document.getElementById('manageSectionsModal'));
+      manageSectionsModal.show();
+    });
+
+    // Add Section from list button click
+    $('#addSectionFromListBtn').on('click', function() {
+      var classId = $(this).data('class-id');
+      var className = $(this).data('class-name');
+
+      // Close the manage sections modal
+      var manageSectionsModal = bootstrap.Modal.getInstance(document.getElementById('manageSectionsModal'));
+      manageSectionsModal.hide();
+
+      // Reset form
+      $('#sectionForm')[0].reset();
+      $('#sectionName').removeClass('is-invalid');
+
+      // Set class ID and name in the form
+      $('#sectionClassId').val(classId);
+      $('#sectionClassName').val(className);
+      $('#sectionId').val('');
+
+      // Set modal title
+      $('#sectionModalAction').text('Add');
+
+      // Show the section modal
+      var sectionModal = new bootstrap.Modal(document.getElementById('sectionModal'));
+      sectionModal.show();
+    });
+
+    // Assign Teacher from details modal
+    $('#assignTeacherFromDetailsBtn').on('click', function() {
+      var classId = $(this).data('class-id');
+      var className = $(this).data('class-name');
+      var section = $(this).data('section') || '';
+
+      // Close the details modal
+      var detailsModal = bootstrap.Modal.getInstance(document.getElementById('classDetailsModal'));
+      detailsModal.hide();
+
+      // Set class ID and name in the form
+      $('#assignTeacherClassId').val(classId);
+      $('#assignTeacherClassName').val(className);
+
+      // Load sections for this class
+      loadSectionsForAssignTeacher(classId, section);
+
+      // Load teachers
+      loadTeachersForAssignTeacher();
+
+      // Show the modal
+      var assignTeacherModal = new bootstrap.Modal(document.getElementById('assignTeacherModal'));
+      assignTeacherModal.show();
+    });
+
+    // Save Assign Teacher button click
+    $('#saveAssignTeacherBtn').on('click', function() {
+      var classId = $('#assignTeacherClassId').val();
+      var section = $('#assignTeacherSection').val();
+      var teacherId = $('#assignTeacherTeacher').val();
+
+      if (!teacherId) {
+        $('#assignTeacherTeacher').addClass('is-invalid');
+        return false;
+      }
+
+      // Show loading state
+      var $btn = $('#saveAssignTeacherBtn');
+      var originalHtml = $btn.html();
+      $btn.html('<i class="fas fa-spinner fa-spin me-1"></i> Saving...');
+      $btn.prop('disabled', true);
+
+      // Make AJAX call to assign teacher
+      $.ajax({
+        url: '/api/assign-class-teacher/',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+          class_id: classId,
+          section: section,
+          teacher_id: teacherId
+        }),
+        headers: {
+          'X-CSRFToken': $('input[name="csrfmiddlewaretoken"]').val()
+        },
+        success: function(response) {
+          // Close modal
+          var assignTeacherModal = bootstrap.Modal.getInstance(document.getElementById('assignTeacherModal'));
+          assignTeacherModal.hide();
+
+          // Show success message
+          alert(response.message);
+
+          // Refresh the data
+          loadClassData();
+
+          // Reset button
+          $btn.html(originalHtml);
+          $btn.prop('disabled', false);
+        },
+        error: function(xhr) {
+          var errorMsg = 'Failed to assign class teacher';
+          if (xhr.responseJSON && xhr.responseJSON.error) {
+            errorMsg = xhr.responseJSON.error;
+          }
+          alert(errorMsg);
+
+          // Reset button
+          $btn.html(originalHtml);
+          $btn.prop('disabled', false);
+        }
+      });
+    });
+
+    // Function to load sections for assign teacher modal
+    function loadSectionsForAssignTeacher(classId, selectedSection) {
+      // Clear existing options except the default one
+      $('#assignTeacherSection option:not(:first)').remove();
+
+      // Make AJAX call to get sections
+      $.ajax({
+        url: '/api/get-sections/' + classId + '/',
+        type: 'GET',
+        success: function(data) {
+          if (data.sections && data.sections.length > 0) {
+            // Add sections to dropdown
+            data.sections.forEach(function(section) {
+              var option = $('<option></option>').attr('value', section.id).text(section.name);
+              if (selectedSection && section.id === selectedSection) {
+                option.attr('selected', 'selected');
+              }
+              $('#assignTeacherSection').append(option);
+            });
+          }
+        }
+      });
+    }
+
+    // Function to load teachers for assign teacher modal
+    function loadTeachersForAssignTeacher() {
+      // Clear existing options except the default one
+      $('#assignTeacherTeacher option:not(:first)').remove();
+
+      // Make AJAX call to get teachers
+      $.ajax({
+        url: '/api/teachers/',
+        type: 'GET',
+        success: function(data) {
+          if (data && data.length > 0) {
+            // Add teachers to dropdown
+            data.forEach(function(teacher) {
+              var option = $('<option></option>').attr('value', teacher.id).text(teacher.name);
+              $('#assignTeacherTeacher').append(option);
+            });
+          }
+        }
+      });
+    }
+
+    // Function to load student counts, sections, and class teachers
+    function loadClassData() {
+      $('.class-row').each(function() {
+        var row = $(this);
+        var classId = row.data('class-id');
+
+        // Make AJAX call to get student count and sections
+        $.ajax({
+          url: '/class/' + classId + '/data/',
+          type: 'GET',
+          success: function(data) {
+            // Update student count
+            row.find('.student-count').text(data.student_count || 0);
+
+            // Update sections
+            if (data.sections && data.sections.length > 0) {
+              var sectionHtml = '';
+              data.sections.forEach(function(section, index) {
+                sectionHtml += '<span class="badge bg-secondary me-1">' + section + '</span>';
+              });
+              row.find('.section-list').html(sectionHtml);
+            } else {
+              row.find('.section-list').html('<span class="text-muted">No sections</span>');
+            }
+
+            // Load class teacher
+            loadClassTeacher(classId, row);
+          },
+          error: function() {
+            row.find('.student-count').text('0');
+            row.find('.section-list').html('<span class="text-muted">No sections</span>');
+            row.find('.class-teacher').html('<span class="text-muted">Not assigned</span>');
+          }
+        });
+      });
+    }
+
+    // Function to load class teacher
+    function loadClassTeacher(classId, row) {
+      $.ajax({
+        url: '/api/class/' + classId + '/teacher/',
+        type: 'GET',
+        success: function(data) {
+          if (data.class_teacher) {
+            var teacherHtml = '<span class="badge bg-success">' + data.class_teacher.teacher_name + '</span>';
+            if (data.class_teacher.section) {
+              teacherHtml += ' <span class="badge bg-secondary">Section ' + data.class_teacher.section + '</span>';
+            }
+            row.find('.class-teacher').html(teacherHtml);
+          } else {
+            row.find('.class-teacher').html('<span class="text-muted">Not assigned</span>');
+          }
+        },
+        error: function() {
+          row.find('.class-teacher').html('<span class="text-muted">Not assigned</span>');
+        }
+      });
+    }
+
+    // Add Section button click
+    $('#addSectionBtn').on('click', function() {
+      var classId = $(this).data('class-id');
+      var className = $(this).data('class-name');
+
+      // Reset form
+      $('#sectionForm')[0].reset();
+      $('#sectionName').removeClass('is-invalid');
+
+      // Set class ID and name in the form
+      $('#sectionClassId').val(classId);
+      $('#sectionClassName').val(className);
+      $('#sectionId').val('');
+
+      // Set modal title
+      $('#sectionModalAction').text('Add');
+
+      // Show the modal
+      var sectionModal = new bootstrap.Modal(document.getElementById('sectionModal'));
+      sectionModal.show();
+    });
+
+    // Edit Section button click from details modal (delegated event for dynamically created buttons)
+    $(document).on('click', '.edit-section-btn', function() {
+      var sectionId = $(this).data('section-id');
+      var sectionName = $(this).data('section-name');
+      var sectionDescription = $(this).data('section-description') || '';
+      var classId = $('#addSectionBtn').data('class-id');
+      var className = $('#addSectionBtn').data('class-name');
+
+      // Reset form
+      $('#sectionForm')[0].reset();
+      $('#sectionName').removeClass('is-invalid');
+
+      // Set values in the form
+      $('#sectionClassId').val(classId);
+      $('#sectionClassName').val(className);
+      $('#sectionId').val(sectionId);
+      $('#sectionName').val(sectionName);
+      $('#sectionDescription').val(sectionDescription);
+
+      // Set modal title
+      $('#sectionModalAction').text('Edit');
+
+      // Show the modal
+      var sectionModal = new bootstrap.Modal(document.getElementById('sectionModal'));
+      sectionModal.show();
+    });
+
+    // Edit Section button click from manage sections modal (delegated event for dynamically created buttons)
+    $(document).on('click', '.edit-section-from-list-btn', function() {
+      var sectionId = $(this).data('section-id');
+      var sectionName = $(this).data('section-name');
+      var sectionDescription = $(this).data('section-description') || '';
+      var classId = $('#addSectionFromListBtn').data('class-id');
+      var className = $('#addSectionFromListBtn').data('class-name');
+
+      // Close the manage sections modal
+      var manageSectionsModal = bootstrap.Modal.getInstance(document.getElementById('manageSectionsModal'));
+      manageSectionsModal.hide();
+
+      // Reset form
+      $('#sectionForm')[0].reset();
+      $('#sectionName').removeClass('is-invalid');
+
+      // Set values in the form
+      $('#sectionClassId').val(classId);
+      $('#sectionClassName').val(className);
+      $('#sectionId').val(sectionId);
+      $('#sectionName').val(sectionName);
+      $('#sectionDescription').val(sectionDescription);
+
+      // Set modal title
+      $('#sectionModalAction').text('Edit');
+
+      // Show the modal
+      var sectionModal = new bootstrap.Modal(document.getElementById('sectionModal'));
+      sectionModal.show();
+    });
+
+    // Delete Section button click from details modal (delegated event for dynamically created buttons)
+    $(document).on('click', '.delete-section-btn', function() {
+      if (!confirm('Are you sure you want to delete this section?')) {
+        return;
+      }
+
+      var sectionId = $(this).data('section-id');
+      var classId = $('#addSectionBtn').data('class-id');
+
+      // Make AJAX call to delete section
+      $.ajax({
+        url: '/api/delete-section/' + sectionId + '/',
+        type: 'POST',
+        headers: {
+          'X-CSRFToken': $('input[name="csrfmiddlewaretoken"]').val()
+        },
+        success: function(response) {
+          // Show success message
+          alert(response.message);
+
+          // Reload sections
+          loadSectionsForClass(classId);
+
+          // Refresh the class data
+          loadClassData();
+        },
+        error: function(xhr) {
+          var errorMsg = 'Failed to delete section';
+          if (xhr.responseJSON && xhr.responseJSON.error) {
+            errorMsg = xhr.responseJSON.error;
+          }
+          alert(errorMsg);
+        }
+      });
+    });
+
+    // Delete Section button click from manage sections modal (delegated event for dynamically created buttons)
+    $(document).on('click', '.delete-section-from-list-btn', function() {
+      if (!confirm('Are you sure you want to delete this section?')) {
+        return;
+      }
+
+      var sectionId = $(this).data('section-id');
+      var classId = $('#addSectionFromListBtn').data('class-id');
+
+      // Make AJAX call to delete section
+      $.ajax({
+        url: '/api/delete-section/' + sectionId + '/',
+        type: 'POST',
+        headers: {
+          'X-CSRFToken': $('input[name="csrfmiddlewaretoken"]').val()
+        },
+        success: function(response) {
+          // Show success message
+          alert(response.message);
+
+          // Reload sections
+          loadSectionsForManage(classId);
+
+          // Refresh the class data
+          loadClassData();
+        },
+        error: function(xhr) {
+          var errorMsg = 'Failed to delete section';
+          if (xhr.responseJSON && xhr.responseJSON.error) {
+            errorMsg = xhr.responseJSON.error;
+          }
+          alert(errorMsg);
+        }
+      });
+    });
+
+    // Save Section button click
+    $('#saveSectionBtn').on('click', function() {
+      var classId = $('#sectionClassId').val();
+      var sectionId = $('#sectionId').val();
+      var sectionName = $('#sectionName').val();
+      var sectionDescription = $('#sectionDescription').val();
+      var fromManageModal = $('#addSectionFromListBtn').data('class-id') === parseInt(classId);
+
+      if (!sectionName.trim()) {
+        $('#sectionName').addClass('is-invalid');
+        return false;
+      }
+
+      // Show loading state
+      var $btn = $('#saveSectionBtn');
+      var originalHtml = $btn.html();
+      $btn.html('<i class="fas fa-spinner fa-spin me-1"></i> Saving...');
+      $btn.prop('disabled', true);
+
+      // Determine if this is an add or update operation
+      var url = sectionId ? '/api/update-section/' + sectionId + '/' : '/api/add-section/';
+
+      // Make AJAX call to save section
+      $.ajax({
+        url: url,
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+          class_id: classId,
+          name: sectionName,
+          description: sectionDescription
+        }),
+        headers: {
+          'X-CSRFToken': $('input[name="csrfmiddlewaretoken"]').val()
+        },
+        success: function(response) {
+          // Close section modal
+          var sectionModal = bootstrap.Modal.getInstance(document.getElementById('sectionModal'));
+          sectionModal.hide();
+
+          // Show success message
+          alert(response.message);
+
+          // Reload sections in the class details modal
+          loadSectionsForClass(classId);
+
+          // If we came from the manage sections modal, reopen it and reload its sections
+          if (fromManageModal) {
+            // Reload sections in the manage sections modal
+            loadSectionsForManage(classId);
+
+            // Reopen the manage sections modal
+            setTimeout(function() {
+              var manageSectionsModal = new bootstrap.Modal(document.getElementById('manageSectionsModal'));
+              manageSectionsModal.show();
+            }, 500);
+          }
+
+          // Refresh the class data
+          loadClassData();
+
+          // Reset button
+          $btn.html(originalHtml);
+          $btn.prop('disabled', false);
+        },
+        error: function(xhr) {
+          var errorMsg = 'Failed to save section';
+          if (xhr.responseJSON && xhr.responseJSON.error) {
+            errorMsg = xhr.responseJSON.error;
+          }
+          alert(errorMsg);
+
+          // Reset button
+          $btn.html(originalHtml);
+          $btn.prop('disabled', false);
+        }
+      });
+    });
+
+    // Function to load sections for a class in the details modal
+    function loadSectionsForClass(classId) {
+      $('#sectionTableBody').html('<tr><td colspan="4" class="text-center"><i class="fas fa-spinner fa-spin me-2"></i> Loading sections...</td></tr>');
+
+      // Make AJAX call to get sections
+      $.ajax({
+        url: '/api/class/' + classId + '/sections/',
+        type: 'GET',
+        success: function(data) {
+          if (data.sections && data.sections.length > 0) {
+            var sectionHtml = '';
+            data.sections.forEach(function(section, index) {
+              sectionHtml += '<tr>';
+              sectionHtml += '<td>' + (index + 1) + '</td>';
+              sectionHtml += '<td>' + section.name + '</td>';
+              sectionHtml += '<td>' + (section.description || '-') + '</td>';
+              sectionHtml += '<td class="text-center">';
+              sectionHtml += '<div class="btn-group btn-group-sm">';
+              sectionHtml += '<button type="button" class="btn btn-outline-primary edit-section-btn" data-section-id="' + section.id + '" data-section-name="' + section.name + '" data-section-description="' + (section.description || '') + '" title="Edit Section"><i class="fa fa-edit"></i></button>';
+              sectionHtml += '<button type="button" class="btn btn-outline-danger delete-section-btn" data-section-id="' + section.id + '" title="Delete Section"><i class="fa fa-trash-alt"></i></button>';
+              sectionHtml += '</div>';
+              sectionHtml += '</td>';
+              sectionHtml += '</tr>';
+            });
+            $('#sectionTableBody').html(sectionHtml);
+          } else {
+            $('#sectionTableBody').html('<tr><td colspan="4" class="text-center">No sections found. Click "Add Section" to create one.</td></tr>');
+          }
+        },
+        error: function() {
+          $('#sectionTableBody').html('<tr><td colspan="4" class="text-center text-danger">Error loading sections. Please try again.</td></tr>');
+        }
+      });
+    }
+
+    // Function to load sections for the manage sections modal
+    function loadSectionsForManage(classId) {
+      $('#manageSectionsTableBody').html('<tr><td colspan="4" class="text-center py-3"><i class="fas fa-spinner fa-spin me-2"></i> Loading sections...</td></tr>');
+
+      // Make AJAX call to get sections
+      $.ajax({
+        url: '/api/class/' + classId + '/sections/',
+        type: 'GET',
+        success: function(data) {
+          if (data.sections && data.sections.length > 0) {
+            var sectionHtml = '';
+            data.sections.forEach(function(section, index) {
+              sectionHtml += '<tr>';
+              sectionHtml += '<td>' + (index + 1) + '</td>';
+              sectionHtml += '<td>' + section.name + '</td>';
+              sectionHtml += '<td>' + (section.description || '-') + '</td>';
+              sectionHtml += '<td class="text-center">';
+              sectionHtml += '<div class="btn-group btn-group-sm">';
+              sectionHtml += '<button type="button" class="btn btn-outline-primary edit-section-from-list-btn" data-section-id="' + section.id + '" data-section-name="' + section.name + '" data-section-description="' + (section.description || '') + '" title="Edit Section"><i class="fa fa-edit"></i></button>';
+              sectionHtml += '<button type="button" class="btn btn-outline-danger delete-section-from-list-btn" data-section-id="' + section.id + '" title="Delete Section"><i class="fa fa-trash-alt"></i></button>';
+              sectionHtml += '</div>';
+              sectionHtml += '</td>';
+              sectionHtml += '</tr>';
+            });
+            $('#manageSectionsTableBody').html(sectionHtml);
+          } else {
+            $('#manageSectionsTableBody').html('<tr><td colspan="4" class="text-center py-3">No sections found. Click "Add New Section" to create one.</td></tr>');
+          }
+        },
+        error: function() {
+          $('#manageSectionsTableBody').html('<tr><td colspan="4" class="text-center py-3 text-danger">Error loading sections. Please try again.</td></tr>');
+        }
+      });
+    }
+
+    // Function to load subjects for a class
+    function loadSubjectsForClass(classId) {
+      $('#detailSubjects').html('<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading subjects...</div>');
+
+      // Make AJAX call to get subjects
+      $.ajax({
+        url: '/class/' + classId + '/data/',
+        type: 'GET',
+        success: function(data) {
+          var subjectsHtml = '<div class="row">';
+
+          if (data.subjects && data.subjects.length > 0) {
+            data.subjects.forEach(function(subject) {
+              subjectsHtml += '<div class="col-md-4 mb-2"><span class="badge bg-light text-dark p-2 d-block text-start"><i class="fas fa-book me-1"></i> ' + subject + '</span></div>';
+            });
+          } else {
+            subjectsHtml += '<div class="col-12"><p class="text-muted">No subjects assigned to this class yet.</p></div>';
+          }
+
+          subjectsHtml += '</div>';
+          $('#detailSubjects').html(subjectsHtml);
+        },
+        error: function() {
+          $('#detailSubjects').html('<div class="alert alert-warning"><i class="fas fa-exclamation-triangle me-2"></i> Unable to load subjects for this class.</div>');
+        }
+      });
+    }
+
+    // Function to sort the table
+    function sortTable(sortType) {
+      var rows = $('#classTable tbody tr').get();
+
+      rows.sort(function(a, b) {
+        var keyA, keyB;
+
+        switch(sortType) {
+          case 'name-asc':
+          case 'name-desc':
+            keyA = $(a).find('td:nth-child(2)').text().toUpperCase();
+            keyB = $(b).find('td:nth-child(2)').text().toUpperCase();
+            break;
+          case 'students-asc':
+          case 'students-desc':
+            keyA = parseInt($(a).find('.student-count').text()) || 0;
+            keyB = parseInt($(b).find('.student-count').text()) || 0;
+            break;
+          default:
+            return 0;
+        }
+
+        if (sortType.endsWith('-asc')) {
+          return keyA > keyB ? 1 : keyA < keyB ? -1 : 0;
+        } else {
+          return keyA < keyB ? 1 : keyA > keyB ? -1 : 0;
+        }
+      });
+
+      // Reorder the table
+      $.each(rows, function(index, row) {
+        $('#classTable tbody').append(row);
+        // Update the counter column
+        $(row).find('td:first').text(index + 1);
+      });
+
+      // Update sort indicator
+      $('.sort-option').removeClass('active');
+      $(`[data-sort="${sortType}"]`).addClass('active');
+    }
+
+    // Function to update empty state when filtering
+    function updateEmptyState() {
+      var visibleRows = $('#classTable tbody tr:visible').length;
+      if (visibleRows === 0) {
+        if ($('#classTable tbody .empty-filtered-state').length === 0) {
+          $('#classTable tbody').append('<tr class="empty-filtered-state"><td colspan="5" class="text-center py-4"><div class="empty-state"><i class="fas fa-filter fa-3x text-muted mb-3"></i><h5>No Matching Classes</h5><p class="text-muted">No classes match your search criteria.</p></div></td></tr>');
+        }
+      } else {
+        $('#classTable tbody .empty-filtered-state').remove();
+      }
+    }
+
+    // Form validation
+    $('#addClassForm').on('submit', function(e) {
+      var form = $(this);
+      var nameField = form.find('input[name="name"]');
+      var isValid = true;
+
+      if (!nameField.val().trim()) {
+        nameField.addClass('is-invalid');
+        nameField.siblings('.invalid-feedback').text('Class name is required');
+        isValid = false;
+      } else {
+        nameField.removeClass('is-invalid');
+      }
+
+      return isValid;
+    });
+
+    // Function to handle AJAX errors
+    $(document).ajaxError(function(event, jqXHR, settings, thrownError) {
+      if (settings.url.includes('/class/') && settings.url.includes('/data/')) {
+        var row = $('.class-row[data-class-id="' + settings.url.split('/')[2] + '"]');
+        row.find('.student-count').text('0');
+        row.find('.section-list').html('<span class="text-muted">No sections</span>');
+        console.error('Error loading class data:', thrownError);
+      }
+    });
+  });
+</script>
+{% endblock morejs %}

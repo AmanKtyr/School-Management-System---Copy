@@ -1,0 +1,420 @@
+{% extends 'exams/base_exams.html' %}
+{% load static %}
+
+{% block exam-breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">
+  <i class="fas fa-file-archive"></i> Document Management
+</li>
+{% endblock exam-breadcrumb %}
+
+{% block title-icon %}fas fa-file-archive{% endblock title-icon %}
+
+{% block title %}Document Management Center{% endblock title %}
+
+{% block subtitle %}Centralized system for managing all examination documents{% endblock subtitle %}
+
+{% block page-actions %}
+<div class="btn-group">
+  <a href="{% url 'exams:document_archive' %}" class="btn btn-outline-primary">
+    <i class="fas fa-archive me-2"></i> Document Archive
+  </a>
+  <a href="{% url 'exams:document_generate' doc_type='templates' %}" class="btn btn-outline-success">
+    <i class="fas fa-download me-2"></i> Download Templates
+  </a>
+  <a href="{% url 'exams:document_generate' doc_type='bulk' %}" class="btn btn-primary">
+    <i class="fas fa-copy me-2"></i> Bulk Generate
+  </a>
+</div>
+{% endblock page-actions %}
+
+{% block content %}
+<div class="container-fluid exams-container">
+  <!-- Document Statistics -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card border-0 rounded-3 shadow-sm mb-4">
+        <div class="card-body bg-gradient-primary text-white rounded-top">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h5 class="card-title mb-0 fw-bold">Total Documents</h5>
+              <h2 class="mt-2 mb-0 display-5 fw-bold">{{ document_stats.total_documents }}</h2>
+            </div>
+            <div class="rounded-circle bg-white bg-opacity-25 p-3">
+              <i class="fas fa-file-alt fa-2x text-white"></i>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer bg-white border-0 rounded-bottom">
+          <a class="btn btn-primary btn-sm w-100" href="{% url 'exams:document_archive' %}">
+            <i class="fas fa-eye me-1"></i> View All Documents
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 rounded-3 shadow-sm mb-4">
+        <div class="card-body bg-gradient-warning text-white rounded-top">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h5 class="card-title mb-0 fw-bold">Admit Cards</h5>
+              <h2 class="mt-2 mb-0 display-5 fw-bold">{{ admit_cards_count }}</h2>
+            </div>
+            <div class="rounded-circle bg-white bg-opacity-25 p-3">
+              <i class="fas fa-id-card fa-2x text-white"></i>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer bg-white border-0 rounded-bottom">
+          <a class="btn btn-warning btn-sm w-100 text-white" href="{% url 'exams:admit_card_list' %}">
+            <i class="fas fa-eye me-1"></i> View Admit Cards
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 rounded-3 shadow-sm mb-4">
+        <div class="card-body bg-gradient-danger text-white rounded-top">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h5 class="card-title mb-0 fw-bold">Question Papers</h5>
+              <h2 class="mt-2 mb-0 display-5 fw-bold">{{ question_papers_count }}</h2>
+            </div>
+            <div class="rounded-circle bg-white bg-opacity-25 p-3">
+              <i class="fas fa-file-alt fa-2x text-white"></i>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer bg-white border-0 rounded-bottom">
+          <a class="btn btn-danger btn-sm w-100" href="{% url 'exams:question_paper_list' %}">
+            <i class="fas fa-eye me-1"></i> View Question Papers
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 rounded-3 shadow-sm mb-4">
+        <div class="card-body bg-gradient-success text-white rounded-top">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h5 class="card-title mb-0 fw-bold">Report Cards</h5>
+              <h2 class="mt-2 mb-0 display-5 fw-bold">{{ report_cards_count }}</h2>
+            </div>
+            <div class="rounded-circle bg-white bg-opacity-25 p-3">
+              <i class="fas fa-file-pdf fa-2x text-white"></i>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer bg-white border-0 rounded-bottom">
+          <a class="btn btn-success btn-sm w-100" href="{% url 'exams:results' %}">
+            <i class="fas fa-eye me-1"></i> View Results
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Document Categories -->
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card border-0 rounded-3 shadow-sm">
+        <div class="card-header bg-gradient-primary text-white rounded-top d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold"><i class="fas fa-folder-open me-2"></i>Document Categories</h5>
+          <div>
+            <button type="button" class="btn btn-sm btn-light" data-bs-toggle="tooltip" data-bs-placement="left" title="These are the main document categories in the examination system">
+              <i class="fas fa-question-circle"></i> Help
+            </button>
+          </div>
+        </div>
+        <div class="card-body py-4">
+          <div class="row g-3">
+            <div class="col-md-3 col-sm-6">
+              <div class="document-card h-100">
+                <div class="card-body text-center p-4">
+                  <div class="document-icon text-warning">
+                    <i class="fas fa-id-card"></i>
+                  </div>
+                  <h5 class="document-title">Admit Cards</h5>
+                  <p class="document-meta">Student examination entry permits</p>
+                  <div class="document-actions">
+                    <a href="{% url 'exams:admit_card_list' %}" class="btn btn-sm btn-warning text-white">
+                      <i class="fas fa-eye me-1"></i> View
+                    </a>
+                    <a href="{% url 'exams:admit_card_generate' %}" class="btn btn-sm btn-outline-warning">
+                      <i class="fas fa-plus me-1"></i> Generate
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <div class="document-card h-100">
+                <div class="card-body text-center p-4">
+                  <div class="document-icon text-danger">
+                    <i class="fas fa-file-alt"></i>
+                  </div>
+                  <h5 class="document-title">Question Papers</h5>
+                  <p class="document-meta">Examination question papers</p>
+                  <div class="document-actions">
+                    <a href="{% url 'exams:question_paper_list' %}" class="btn btn-sm btn-danger">
+                      <i class="fas fa-eye me-1"></i> View
+                    </a>
+                    <a href="{% url 'exams:question_paper_create' %}" class="btn btn-sm btn-outline-danger">
+                      <i class="fas fa-upload me-1"></i> Upload
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <div class="document-card h-100">
+                <div class="card-body text-center p-4">
+                  <div class="document-icon text-success">
+                    <i class="fas fa-file-pdf"></i>
+                  </div>
+                  <h5 class="document-title">Report Cards</h5>
+                  <p class="document-meta">Student performance reports</p>
+                  <div class="document-actions">
+                    <a href="{% url 'exams:results' %}" class="btn btn-sm btn-success">
+                      <i class="fas fa-eye me-1"></i> View
+                    </a>
+                    <a href="{% url 'exams:marks_entry' %}" class="btn btn-sm btn-outline-success">
+                      <i class="fas fa-edit me-1"></i> Enter Marks
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <div class="document-card h-100">
+                <div class="card-body text-center p-4">
+                  <div class="document-icon text-info">
+                    <i class="fas fa-file-download"></i>
+                  </div>
+                  <h5 class="document-title">Templates</h5>
+                  <p class="document-meta">Standard document templates</p>
+                  <div class="document-actions">
+                    <a href="{% url 'exams:document_generate' doc_type='templates' %}" class="btn btn-sm btn-info text-white">
+                      <i class="fas fa-download me-1"></i> Download
+                    </a>
+                    <a href="{% url 'exams:document_generate' doc_type='bulk' %}" class="btn btn-sm btn-outline-info">
+                      <i class="fas fa-copy me-1"></i> Bulk Generate
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Documents -->
+  <div class="row">
+    <!-- Recent Admit Cards -->
+    <div class="col-md-6">
+      <div class="card border-0 rounded-3 shadow-sm mb-4">
+        <div class="card-header bg-gradient-warning text-white rounded-top d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold"><i class="fas fa-id-card me-2"></i>Recent Admit Cards</h5>
+          <a href="{% url 'exams:admit_card_list' %}" class="btn btn-sm btn-light">
+            <i class="fas fa-external-link-alt me-1"></i> View All
+          </a>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th class="ps-3">S/N</th>
+                  <th>Student</th>
+                  <th>Exam</th>
+                  <th>Generated On</th>
+                  <th class="pe-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for card in recent_admit_cards %}
+                <tr>
+                  <td class="ps-3">{{ forloop.counter }}</td>
+                  <td>
+                    <span class="fw-bold">{{ card.student.fullname }}</span><br>
+                    <small class="text-muted">{{ card.student.current_class.name }} {{ card.student.section }}</small>
+                  </td>
+                  <td>{{ card.exam.name }}</td>
+                  <td>{{ card.generated_on|date:"d M, Y" }}</td>
+                  <td class="pe-3">
+                    <div class="btn-group" role="group">
+                      <a href="{% url 'exams:admit_card_view' card.id %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-eye"></i>
+                      </a>
+                      <a href="{% url 'exams:document_download' 'admit_card' card.id %}" class="btn btn-sm btn-outline-success">
+                        <i class="fas fa-download"></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="5" class="text-center py-4">
+                    <div class="d-flex flex-column align-items-center py-3">
+                      <i class="fas fa-id-card fa-3x text-muted mb-3"></i>
+                      <p class="text-muted mb-0">No admit cards generated yet</p>
+                      <a href="{% url 'exams:admit_card_generate' %}" class="btn btn-sm btn-warning mt-2 text-white">
+                        <i class="fas fa-plus me-1"></i> Generate Admit Cards
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Question Papers -->
+    <div class="col-md-6">
+      <div class="card border-0 rounded-3 shadow-sm mb-4">
+        <div class="card-header bg-gradient-danger text-white rounded-top d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold"><i class="fas fa-file-alt me-2"></i>Recent Question Papers</h5>
+          <a href="{% url 'exams:question_paper_list' %}" class="btn btn-sm btn-light">
+            <i class="fas fa-external-link-alt me-1"></i> View All
+          </a>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th class="ps-3">S/N</th>
+                  <th>Subject</th>
+                  <th>Class</th>
+                  <th>Exam</th>
+                  <th class="pe-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for paper in recent_question_papers %}
+                <tr>
+                  <td class="ps-3">{{ forloop.counter }}</td>
+                  <td>{{ paper.subject.name }}</td>
+                  <td>{{ paper.student_class.name }} {{ paper.section|default:"" }}</td>
+                  <td>{{ paper.exam.name }}</td>
+                  <td class="pe-3">
+                    <div class="btn-group" role="group">
+                      {% if paper.file %}
+                      <a href="{% url 'exams:document_download' 'question_paper' paper.id %}" class="btn btn-sm btn-outline-success">
+                        <i class="fas fa-download"></i>
+                      </a>
+                      {% else %}
+                      <button class="btn btn-sm btn-outline-secondary" disabled>
+                        <i class="fas fa-download"></i>
+                      </button>
+                      {% endif %}
+                      <a href="{% url 'exams:question_paper_update' paper.id %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="5" class="text-center py-4">
+                    <div class="d-flex flex-column align-items-center py-3">
+                      <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                      <p class="text-muted mb-0">No question papers uploaded yet</p>
+                      <a href="{% url 'exams:question_paper_create' %}" class="btn btn-sm btn-danger mt-2">
+                        <i class="fas fa-upload me-1"></i> Upload Question Paper
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block morecss %}
+<style>
+  /* Custom styles for document cards */
+  .document-card {
+    transition: all 0.3s ease;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(33, 40, 50, 0.15);
+  }
+  
+  .document-card:hover {
+    transform: translateY(-7px);
+    box-shadow: 0 0.5rem 2rem 0 rgba(33, 40, 50, 0.2);
+  }
+  
+  .document-icon {
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+  }
+  
+  .document-card:hover .document-icon {
+    transform: scale(1.1);
+  }
+  
+  .document-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+  }
+  
+  .document-meta {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-bottom: 1.5rem;
+  }
+  
+  .document-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+</style>
+{% endblock morecss %}
+
+{% block exam-js %}
+<script>
+  $(document).ready(function() {
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+    
+    // Add counter animation for statistics
+    $('.display-5').each(function() {
+      const finalValue = $(this).text() || '0';
+      $(this).prop('Counter', 0).animate(
+        {
+          Counter: parseFloat(finalValue)
+        },
+        {
+          duration: 2000,
+          easing: 'swing',
+          step: function(now) {
+            $(this).text(Math.ceil(now));
+          },
+          complete: function() {
+            // Ensure the final value is displayed correctly
+            $(this).text(finalValue);
+          }
+        }
+      );
+    });
+  });
+</script>
+{% endblock exam-js %}

@@ -1,0 +1,576 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block breadcrumb-left %}
+<div class="breadcrumb-container no-print">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-chevron">
+      <li class="breadcrumb-item">
+        <a href="{% url 'home' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-home"></i> Home
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'student-list' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-user-graduate"></i> Students
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'student-list' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-list"></i> List
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <i class="fas fa-info-circle"></i> Details
+      </li>
+    </ol>
+  </nav>
+</div>
+{% endblock breadcrumb-left %}
+
+<!-- Print Header - Only visible when printing -->
+<div class="print-only print-header">
+  <h1>School Management System</h1>
+  <p>Student Information Sheet</p>
+  <p>Generated on: {% now "F j, Y" %}</p>
+  <hr>
+</div>
+
+{% block content-header %}
+<div class="card-header shadow rounded no-print" style="background: linear-gradient(135deg, #1E3C72, #2a5298); color: white;">
+  <div class="d-flex justify-content-between align-items-center">
+    <h3 class="mb-0"><i class="fas fa-user-graduate"></i> Student Profile</h3>
+    <div>
+      <a href="{% url 'upload-student-documents' object.id %}" class="action-btn btn btn-success shadow-sm me-1" title="Upload Documents">
+        <i class="fas fa-file-upload"></i> Upload Documents
+      </a>
+      <button id="printButton" class="action-btn btn btn-light shadow-sm me-1" title="Print Student Details">
+        <i class="fas fa-print"></i> Print
+      </button>
+      {% if needs_migration %}
+      <!-- Show migration message button -->
+      <button type="button" class="action-btn btn btn-warning shadow-sm me-1" data-bs-toggle="modal" data-bs-target="#migrationModal" title="Database Migration Required">
+        <i class="fas fa-database"></i> Migration Required
+      </button>
+      {% elif udise_info %}
+      <button type="button" class="action-btn btn btn-info shadow-sm me-1" data-bs-toggle="modal" data-bs-target="#udiseInfoModal" title="View UDISE+ Information">
+        <i class="fas fa-info-circle"></i> Student UDISE+ Info
+      </button>
+      {% else %}
+      <button type="button" class="action-btn btn btn-outline-info shadow-sm me-1" data-bs-toggle="modal" data-bs-target="#createUdiseModal" title="Create UDISE+ Information">
+        <i class="fas fa-plus-circle"></i> Create UDISE+ Info
+      </button>
+      {% endif %}
+      <div class="dropdown d-inline-block me-1">
+        <button class="action-btn btn btn-warning shadow-sm text-white dropdown-toggle" type="button" id="editDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Edit Student Details">
+          <i class="fas fa-edit"></i> Edit
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="editDropdown">
+          <li><a class="dropdown-item" href="{% url 'student-update' object.id %}"><i class="fas fa-file-alt me-2"></i>Standard Form</a></li>
+          <li><a class="dropdown-item" href="{% url 'student-update-udise' object.id %}"><i class="fas fa-id-card me-2"></i>UDISE+ Format</a></li>
+        </ul>
+      </div>
+      <a href="{% url 'student-delete' object.id %}" class="action-btn btn btn-danger shadow-sm" title="Delete Student Details">
+        <i class="fas fa-trash-alt"></i> Delete
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock content-header %}
+
+<!-- Document title for print view -->
+<div class="print-only document-title">
+  Student Information: {{ object.fullname }}
+</div>
+
+{% block content %}
+<!-- Document Upload Reminder Modal - Only shown for first-time login -->
+{% if not documents %}
+<div class="modal fade" id="documentUploadModal" tabindex="-1" aria-labelledby="documentUploadModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="documentUploadModalLabel"><i class="fas fa-file-upload me-2"></i>Welcome to Your Student Profile!</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="text-center mb-3">
+          <i class="fas fa-exclamation-circle text-warning" style="font-size: 3rem;"></i>
+        </div>
+        <h5 class="text-center mb-3">Please Upload Your Documents</h5>
+        <p class="mb-4">To complete your registration, please upload your important documents like Aadhar Card, Previous Marksheet, etc. This will help us maintain your complete student record.</p>
+        <div class="alert alert-info">
+          <i class="fas fa-info-circle me-2"></i> You can upload your documents now or later from your profile page.
+        </div>
+      </div>
+      <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Remind Me Later</button>
+        <a href="{% url 'upload-student-documents' object.id %}" class="btn btn-primary">
+          <i class="fas fa-file-upload me-2"></i>Upload Documents Now
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- First Row - Student Profile, Personal Info, Family Info -->
+<div class="container-fluid px-0 py-3">
+  <div class="row g-4">
+    <!-- Left Column - Student Profile Card -->
+    <div class="col-md-4">
+      <div class="profile-section card shadow-lg p-0 mb-4 border-0 rounded-4 overflow-hidden">
+        <!-- Profile Header -->
+        <div class="card-header text-white p-3" style="background: linear-gradient(135deg, #3498db, #2980b9);">
+          <h4 class="mb-0"><i class="fas fa-user-circle me-2"></i>Student Profile</h4>
+        </div>
+
+        <!-- Profile Content -->
+        <div class="card-body p-4 text-center" style="background: linear-gradient(to bottom, #f9f9f9, #ffffff);">
+          <!-- Student Photo with Status Badge -->
+          <div class="position-relative mb-4">
+            <div class="student-photo-container p-2 rounded-circle mx-auto" style="background: linear-gradient(135deg, #3498db, #2980b9); width: 190px; height: 190px;">
+              {% if object.passport %}
+                <img src="{{ object.passport.url }}" class="student-photo shadow mx-auto"
+                     alt="{{ object.fullname }}"
+                     style="width: 170px; height: 170px; object-fit: cover; border-radius: 50%;">
+              {% else %}
+                <img src="{% static 'dist/img/avatar.png' %}" class="student-photo shadow mx-auto"
+                     alt="{{ object.fullname }}"
+                     style="width: 170px; height: 170px; object-fit: cover; border-radius: 50%;"
+                     onerror="this.src='{% static 'dist/img/avatar.png' %}'">
+              {% endif %}
+            </div>
+            <div class="position-absolute bottom-0 end-0 translate-middle">
+              {% with status=object.get_current_status_display|lower %}
+                <span class="badge rounded-pill bg-{% if status == 'active' %}success{% else %}danger{% endif %} p-2 shadow">
+                  <i class="fas fa-{% if status == 'active' %}check-circle{% else %}times-circle{% endif %}"></i> {{ object.get_current_status_display }}
+                </span>
+              {% endwith %}
+            </div>
+          </div>
+
+          <!-- Student Basic Info -->
+          <h3 class="student-name text-bold mb-2">{{ object.fullname }}</h3>
+          <div class="d-flex justify-content-center align-items-center mb-3">
+            <span class="badge bg-light text-bold  border me-2 px-3 py-2">
+              <i class="fas fa-id-card text-primary me-1"></i> {{ object.registration_number }}
+            </span>
+            <span class="student-class badge bg-gradient-info text-bold  text-white shadow px-3 py-2">
+              <i class="fas fa-graduation-cap me-1"></i> {{ object.current_class }} {{ object.section }}
+            </span>
+          </div>
+
+          <!-- Quick Stats -->
+          <div class="row g-2 mt-3">
+            <div class="col-6">
+              <div class="p-3 rounded-3 bg-light border">
+                <h6 class="text-muted mb-1">Admission Date</h6>
+                <p class="mb-0 fw-bold">{{ object.date_of_admission }}</p>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-3 rounded-3 bg-light border">
+                <h6 class="text-muted mb-1">Category</h6>
+                <p class="mb-0 fw-bold">{{ object.category }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <!-- Right Column - Student Details -->
+    <div class="col-md-8">
+      <div class="row g-4">
+        <!-- Personal Information Card -->
+        <div class="col-md-6">
+          <div class="profile-section card shadow-lg border-0 rounded-4 h-100 overflow-hidden">
+            <div class="card-header text-white p-3" style="background: linear-gradient(135deg, #3498db, #2980b9);">
+              <h4 class="mb-0"><i class="fas fa-user me-2"></i>Personal Information</h4>
+            </div>
+            <div class="card-body p-0">
+              <ul class="info-list list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                  <div><i class="fas fa-birthday-cake text-primary me-2"></i> <strong>Date of Birth</strong></div>
+                  <span class="badge bg-light text-dark border px-3 py-2 fs-6 fw-bold">{{ object.date_of_birth }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                  <div><i class="fas fa-venus-mars text-primary me-2"></i> <strong>Gender</strong></div>
+                  <span class="badge bg-light text-dark border px-3 py-2 fs-6 fw-bold">{{ object.get_gender_display }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                  <div><i class="fas fa-id-card text-primary me-2"></i> <strong>Aadhar Number</strong></div>
+                  <span class="badge bg-light text-dark border px-3 py-2 fs-6 fw-bold">{{ object.aadhar }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                  <div><i class="fas fa-phone text-primary me-2"></i> <strong>Mobile Number</strong></div>
+                  <span class="badge bg-light text-dark border px-3 py-2 fs-6 fw-bold">{{ object.mobile_number }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                  <div><i class="fas fa-phone text-primary me-2"></i> <strong>Email Id</strong></div>
+                  <span class="badge bg-light text-dark border px-3 py-2 fs-6 fw-bold">{{ object.email_id }}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Family Information Card -->
+        <div class="col-md-6">
+          <div class="profile-section card shadow-lg border-0 rounded-4 h-100 overflow-hidden">
+            <div class="card-header text-white p-3" style="background: linear-gradient(135deg, #2ecc71, #27ae60);">
+              <h4 class="mb-0"><i class="fas fa-home me-2"></i>Family Information</h4>
+            </div>
+            <div class="card-body p-0">
+              <ul class="info-list list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                  <div><i class="fas fa-user-friends text-primary me-2"></i> <strong>Parent Name</strong></div>
+                  <span class="badge bg-light text-dark border px-3 py-2 fs-6 fw-bold">{{ object.Father_name }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                  <div><i class="fas fa-mobile-alt text-primary me-2"></i> <strong>Father Mobile</strong></div>
+                  <span class="badge bg-light text-dark border px-3 py-2 fs-6 fw-bold">{{ object.Father_mobile_number }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                  <div><i class="fas fa-id-card-alt text-primary me-2"></i> <strong>Father Aadhar</strong></div>
+                  <span class="badge bg-light text-dark border px-3 py-2 fs-6 fw-bold">{{ object.Father_aadhar }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                  <div><i class="fas fa-map-marker-alt text-primary me-2"></i> <strong>Address</strong></div>
+                  <span class="badge bg-light text-dark border px-3 py-2 fs-6 fw-bold">{{ object.address }}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Second Row - Documents, Payment History, Additional Information -->
+<div class="container-fluid px-0 py-3">
+  <div class="row g-4">
+    <!-- Left Column - Student Documents -->
+    <div class="col-md-7">
+      {% if documents %}
+      <div class="profile-section card shadow-lg border-0 rounded-4 overflow-hidden">
+        <div class="card-header text-white p-3" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+          <h4 class="mb-0"><i class="fas fa-file-alt me-2"></i>Student Documents</h4>
+        </div>
+        <div class="card-body p-3">
+          <div class="alert alert-info border-1 shadow-sm">
+            <p class="mb-0"><i class="fas fa-info-circle text-info me-2"></i> The following documents have been uploaded for this student.</p>
+          </div>
+
+          <div class="table-responsive">
+            <table class="doc-table table table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th><i class="fas fa-file-alt me-2"></i>Document Type</th>
+                  <th><i class="fas fa-hashtag me-2"></i>Document Number</th>
+                  <th><i class="fas fa-info-circle me-2"></i>Status</th>
+                  <th><i class="fas fa-cogs me-2"></i>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><i class="fas fa-id-card"></i> Aadhar Card</td>
+                  <td>{{ documents.aadhar_card_number|default:"Not provided" }}</td>
+                  <td>{% if documents.aadhar_card %}<span class="badge bg-success">Uploaded</span>{% else %}<span class="badge bg-warning text-dark">Not Uploaded</span>{% endif %}</td>
+                  <td>{% if documents.aadhar_card %}<a href="{{ documents.aadhar_card.url }}" class="btn btn-sm btn-info rounded-pill" target="_blank"><i class="fas fa-eye"></i> View</a>{% else %}<button class="btn btn-sm btn-secondary rounded-pill" disabled><i class="fas fa-eye-slash"></i> Not Available</button>{% endif %}</td>
+                </tr>
+                <tr>
+                  <td><i class="fas fa-user"></i> Parent Photo</td>
+                  <td>{{ documents.parent_photo_number|default:"Not provided" }}</td>
+                  <td>{% if documents.parent_photo %}<span class="badge bg-success">Uploaded</span>{% else %}<span class="badge bg-warning text-dark">Not Uploaded</span>{% endif %}</td>
+                  <td>{% if documents.parent_photo %}<a href="{{ documents.parent_photo.url }}" class="btn btn-sm btn-info rounded-pill" target="_blank"><i class="fas fa-eye"></i> View</a>{% else %}<button class="btn btn-sm btn-secondary rounded-pill" disabled><i class="fas fa-eye-slash"></i> Not Available</button>{% endif %}</td>
+                </tr>
+                <tr>
+                  <td><i class="fas fa-id-badge"></i> Parent ID Proof</td>
+                  <td>{{ documents.parent_id_proof_number|default:"Not provided" }}</td>
+                  <td>{% if documents.parent_id_proof %}<span class="badge bg-success">Uploaded</span>{% else %}<span class="badge bg-warning text-dark">Not Uploaded</span>{% endif %}</td>
+                  <td>{% if documents.parent_id_proof %}<a href="{{ documents.parent_id_proof.url }}" class="btn btn-sm btn-info rounded-pill" target="_blank"><i class="fas fa-eye"></i> View</a>{% else %}<button class="btn btn-sm btn-secondary rounded-pill" disabled><i class="fas fa-eye-slash"></i> Not Available</button>{% endif %}</td>
+                </tr>
+                <tr>
+                  <td><i class="fas fa-file-alt"></i> Previous Marksheet</td>
+                  <td>{{ documents.previous_marksheet_number|default:"Not provided" }}</td>
+                  <td>{% if documents.previous_marksheet %}<span class="badge bg-success">Uploaded</span>{% else %}<span class="badge bg-warning text-dark">Not Uploaded</span>{% endif %}</td>
+                  <td>{% if documents.previous_marksheet %}<a href="{{ documents.previous_marksheet.url }}" class="btn btn-sm btn-info rounded-pill" target="_blank"><i class="fas fa-eye"></i> View</a>{% else %}<button class="btn btn-sm btn-secondary rounded-pill" disabled><i class="fas fa-eye-slash"></i> Not Available</button>{% endif %}</td>
+                </tr>
+                <tr>
+                  <td><i class="fas fa-certificate"></i> Transfer Certificate</td>
+                  <td>{{ documents.transfer_certificate_number|default:"Not provided" }}</td>
+                  <td>{% if documents.transfer_certificate %}<span class="badge bg-success">Uploaded</span>{% else %}<span class="badge bg-warning text-dark">Not Uploaded</span>{% endif %}</td>
+                  <td>{% if documents.transfer_certificate %}<a href="{{ documents.transfer_certificate.url }}" class="btn btn-sm btn-info rounded-pill" target="_blank"><i class="fas fa-eye"></i> View</a>{% else %}<button class="btn btn-sm btn-secondary rounded-pill" disabled><i class="fas fa-eye-slash"></i> Not Available</button>{% endif %}</td>
+                </tr>
+                <tr>
+                  <td><i class="fas fa-award"></i> Character Certificate</td>
+                  <td>{{ documents.character_certificate_number|default:"Not provided" }}</td>
+                  <td>{% if documents.character_certificate %}<span class="badge bg-success">Uploaded</span>{% else %}<span class="badge bg-warning text-dark">Not Uploaded</span>{% endif %}</td>
+                  <td>{% if documents.character_certificate %}<a href="{{ documents.character_certificate.url }}" class="btn btn-sm btn-info rounded-pill" target="_blank"><i class="fas fa-eye"></i> View</a>{% else %}<button class="btn btn-sm btn-secondary rounded-pill" disabled><i class="fas fa-eye-slash"></i> Not Available</button>{% endif %}</td>
+                </tr>
+                <tr>
+                  <td><i class="fas fa-file-contract"></i> Caste Certificate</td>
+                  <td>{{ documents.caste_certificate_number|default:"Not provided" }}</td>
+                  <td>{% if documents.caste_certificate %}<span class="badge bg-success">Uploaded</span>{% else %}<span class="badge bg-warning text-dark">Not Uploaded</span>{% endif %}</td>
+                  <td>{% if documents.caste_certificate %}<a href="{{ documents.caste_certificate.url }}" class="btn btn-sm btn-info rounded-pill" target="_blank"><i class="fas fa-eye"></i> View</a>{% else %}<button class="btn btn-sm btn-secondary rounded-pill" disabled><i class="fas fa-eye-slash"></i> Not Available</button>{% endif %}</td>
+                </tr>
+                <tr>
+                  <td><i class="fas fa-notes-medical"></i> Medical Certificate</td>
+                  <td>{{ documents.medical_certificate_number|default:"Not provided" }}</td>
+                  <td>{% if documents.medical_certificate %}<span class="badge bg-success">Uploaded</span>{% else %}<span class="badge bg-warning text-dark">Not Uploaded</span>{% endif %}</td>
+                  <td>{% if documents.medical_certificate %}<a href="{{ documents.medical_certificate.url }}" class="btn btn-sm btn-info rounded-pill" target="_blank"><i class="fas fa-eye"></i> View</a>{% else %}<button class="btn btn-sm btn-secondary rounded-pill" disabled><i class="fas fa-eye-slash"></i> Not Available</button>{% endif %}</td>
+                </tr>
+                <tr>
+                  <td><i class="fas fa-file"></i> Other Document</td>
+                  <td>{{ documents.other_document_number|default:"Not provided" }}</td>
+                  <td>{% if documents.other_document %}<span class="badge bg-success">Uploaded</span>{% else %}<span class="badge bg-warning text-dark">Not Uploaded</span>{% endif %}</td>
+                  <td>{% if documents.other_document %}<a href="{{ documents.other_document.url }}" class="btn btn-sm btn-info rounded-pill" target="_blank"><i class="fas fa-eye"></i> View</a>{% else %}<button class="btn btn-sm btn-secondary rounded-pill" disabled><i class="fas fa-eye-slash"></i> Not Available</button>{% endif %}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Right Column - Fee Information and Additional Info -->
+    <div class="col-md-5">
+      <!-- Pending Fees Card -->
+      <div class="profile-section card shadow-lg border-0 rounded-4 overflow-hidden mb-4">
+        <div class="card-header text-white p-3" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+          <div class="d-flex justify-content-between align-items-center">
+            <h4 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i>Pending Fees</h4>
+            <span class="badge bg-light text-danger fs-5 fw-bold">₹{{ total_pending_amount|floatformat:2 }}</span>
+          </div>
+        </div>
+        <div class="card-body p-3">
+          {% if pending_fees %}
+          <div class="table-responsive">
+            <table class="table table-hover table-bordered">
+              <thead class="table-light">
+                <tr>
+                  <th>Fee Type</th>
+                  <th>Amount (₹)</th>
+                  <th>Due Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for fee in pending_fees %}
+                <tr>
+                  <td>{{ fee.fee_type }}</td>
+                  <td>{{ fee.get_discounted_amount|floatformat:2 }}</td>
+                  <td>{{ fee.due_date|date:"d M Y" }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <div class="text-center mt-3">
+            <a href="{% url 'fees:add_fee_payment' object.id %}" class="btn btn-success">
+              <i class="fas fa-credit-card me-2"></i>Pay Fees
+            </a>
+          </div>
+          {% else %}
+          <div class="alert alert-success">
+            <i class="fas fa-check-circle me-2"></i> No pending fees at this time.
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Payment History Card -->
+      <div class="profile-section card shadow-lg border-0 rounded-4 overflow-hidden mb-4">
+        <div class="card-header text-white p-3" style="background: linear-gradient(135deg, #2ecc71, #27ae60);">
+          <div class="d-flex justify-content-between align-items-center">
+            <h4 class="mb-0"><i class="fas fa-history me-2"></i>Payment History</h4>
+            <span class="badge bg-light text-success fs-5 fw-bold">₹{{ total_paid_amount|floatformat:2 }}</span>
+          </div>
+        </div>
+        <div class="card-body p-3">
+          {% if payment_history %}
+          <div class="table-responsive">
+            <table class="table table-hover table-bordered">
+              <thead class="table-light">
+                <tr>
+                  <th>Date</th>
+                  <th>Amount (₹)</th>
+                  <th>Method</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for payment in payment_history %}
+                <tr>
+                  <td>{{ payment.date|date:"d M Y" }}</td>
+                  <td>{{ payment.amount|floatformat:2 }}</td>
+                  <td>{{ payment.payment_method }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <div class="text-center mt-3">
+            <a href="{% url 'fees:student_fee_history' object.id %}" class="btn btn-info">
+              <i class="fas fa-list-alt me-2"></i>View Full History
+            </a>
+          </div>
+          {% else %}
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i> No payment history available.
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Additional Information Card -->
+      <div class="profile-section card shadow-lg border-0 rounded-4 overflow-hidden">
+        <div class="card-header text-white p-3" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">
+          <h4 class="mb-0"><i class="fas fa-comment-alt me-2"></i>Additional Information</h4>
+        </div>
+        <div class="card-body p-3">
+          <div class="p-3 rounded-3 bg-light border">
+            <h6 class="text-muted mb-2"><i class="fas fa-comment-dots me-2"></i>Comments</h6>
+            <p class="mb-0">{{ object.others|default:"No additional comments available." }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Print footer -->
+<div class="print-only mt-5">
+  <div class="row">
+    <div class="col-4 text-center">
+      <p class="fw-bold">Student Signature</p>
+      <div style="border-top: 1px solid #000; margin-top: 50px;"></div>
+    </div>
+    <div class="col-4 text-center">
+      <p class="fw-bold">Parent Signature</p>
+      <div style="border-top: 1px solid #000; margin-top: 50px;"></div>
+    </div>
+    <div class="col-4 text-center">
+      <p class="fw-bold">Principal Signature</p>
+      <div style="border-top: 1px solid #000; margin-top: 50px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Add some JavaScript for animations and custom PDF filename -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Add fade-in animation to profile sections
+    const sections = document.querySelectorAll('.profile-section');
+    sections.forEach((section, index) => {
+      section.style.opacity = '0';
+      section.style.transform = 'translateY(20px)';
+      section.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+
+      setTimeout(() => {
+        section.style.opacity = '1';
+        section.style.transform = 'translateY(0)';
+      }, 100 * (index + 1));
+    });
+
+    // Show document upload modal for first-time login
+    {% if not documents %}
+    const documentModal = new bootstrap.Modal(document.getElementById('documentUploadModal'));
+    documentModal.show();
+    {% endif %}
+
+    // Set custom filename for PDF when printing
+    const studentName = "{{ object.fullname|default:'Student' }}";
+    const studentClass = "{{ object.current_class|default:'' }}";
+    const studentSection = "{{ object.section|default:'' }}";
+    const filename = studentName + "_" + studentClass + "_" + studentSection + "_Profile";
+
+    // Create a custom print function
+    function printStudentProfile() {
+      // Set the document title which will be used as the PDF filename
+      document.title = filename;
+      // Call the print function
+      window.print();
+      // Reset the document title after printing
+      setTimeout(() => {
+        document.title = "Student Profile - School Management System";
+      }, 1000);
+    }
+
+    // No need for special handling of the edit dropdown
+    // The Bootstrap dropdown will work automatically
+
+    // Add click event to print button
+    const printButton = document.getElementById('printButton');
+    if (printButton) {
+      printButton.addEventListener('click', printStudentProfile);
+    }
+  });
+</script>
+
+{% if needs_migration %}
+<!-- Migration Required Modal -->
+<div class="modal fade" id="migrationModal" tabindex="-1" aria-labelledby="migrationModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-warning text-dark">
+        <h5 class="modal-title" id="migrationModalLabel">
+          <i class="fas fa-database me-2"></i> Database Migration Required
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="text-center mb-4">
+          <i class="fas fa-exclamation-triangle text-warning" style="font-size: 3rem;"></i>
+        </div>
+        <h5 class="text-center mb-3">Database Migration Required</h5>
+        <p>The UDISE+ feature requires a database migration to be applied. Please run the following command in your terminal:</p>
+        <div class="bg-dark text-light p-3 rounded">
+          <code>python manage.py migrate</code>
+        </div>
+        <p class="mt-3">After running the migration, refresh this page to use the UDISE+ features.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% elif udise_info %}
+  {% include 'students/udise_info_modal.html' %}
+{% else %}
+<!-- Create UDISE Info Confirmation Modal -->
+<div class="modal fade" id="createUdiseModal" tabindex="-1" aria-labelledby="createUdiseModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="createUdiseModalLabel">
+          <i class="fas fa-plus-circle me-2"></i> Create UDISE+ Information
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="text-center mb-4">
+          <i class="fas fa-info-circle text-primary" style="font-size: 3rem;"></i>
+        </div>
+        <p class="mb-0">Are you sure you want to create UDISE+ information for <strong>{{ object.fullname }}</strong>?</p>
+        <p class="text-muted small mt-2">This will create a basic UDISE+ profile for the student. You can update the details later using the UDISE+ form.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <form action="{% url 'create-udise-info' object.id %}" method="post">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-check me-2"></i> Create UDISE+ Info
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% endblock content %}

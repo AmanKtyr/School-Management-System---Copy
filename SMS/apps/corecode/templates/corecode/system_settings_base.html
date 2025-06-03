@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block breadcrumb-left %}
+<div class="breadcrumb-container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-chevron">
+      <li class="breadcrumb-item">
+        <a href="{% url 'home' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-home"></i> Home
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'system_settings_dashboard' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-cogs"></i> System Settings
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <i class="{% block settings-icon %}fas fa-cog{% endblock settings-icon %}"></i> {% block settings-title %}Settings{% endblock settings-title %}
+      </li>
+    </ol>
+  </nav>
+</div>
+{% endblock breadcrumb-left %}
+
+{% block title-icon %}{% block settings-icon-title %}fas fa-cog{% endblock settings-icon-title %}{% endblock title-icon %}
+{% block title %}{% block settings-page-title %}System Settings{% endblock settings-page-title %}{% endblock title %}
+{% block subtitle %}{% block settings-subtitle %}Manage system configuration{% endblock settings-subtitle %}{% endblock subtitle %}
+
+{% block content %}
+<div class="settings-container">
+  <div class="row">
+    <!-- Settings Navigation Sidebar -->
+    <div class="col-md-3 mb-4">
+      <div class="card settings-nav shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="fas fa-cogs"></i> Settings Menu</h5>
+        </div>
+        <div class="list-group list-group-flush">
+          <a href="{% url 'system_settings_dashboard' %}" class="list-group-item list-group-item-action d-flex align-items-center {% if active_tab == 'dashboard' %}active{% endif %}">
+            <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+          </a>
+          <a href="{% url 'general_settings' %}" class="list-group-item list-group-item-action d-flex align-items-center {% if active_tab == 'general' %}active{% endif %}">
+            <i class="fas fa-server me-2"></i> General Settings
+          </a>
+          <a href="{% url 'academic_settings' %}" class="list-group-item list-group-item-action d-flex align-items-center {% if active_tab == 'academic' %}active{% endif %}">
+            <i class="fas fa-calendar-alt me-2"></i> Academic Settings
+          </a>
+          <a href="{% url 'database_management' %}" class="list-group-item list-group-item-action d-flex align-items-center {% if active_tab == 'database' %}active{% endif %}">
+            <i class="fas fa-database me-2"></i> Database Management
+          </a>
+          <a href="{% url 'backup_restore' %}" class="list-group-item list-group-item-action d-flex align-items-center {% if active_tab == 'backup' %}active{% endif %}">
+            <i class="fas fa-file-export me-2"></i> Backup & Restore
+          </a>
+          <a href="{% url 'user_permissions' %}" class="list-group-item list-group-item-action d-flex align-items-center {% if active_tab == 'permissions' %}active{% endif %}">
+            <i class="fas fa-users-cog me-2"></i> User Permissions
+          </a>
+          <a href="{% url 'security_logs' %}" class="list-group-item list-group-item-action d-flex align-items-center {% if active_tab == 'security' %}active{% endif %}">
+            <i class="fas fa-shield-alt me-2"></i> Security & Logs
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Settings Content Area -->
+    <div class="col-md-9">
+      <div class="card shadow-sm">
+        <div class="card-header bg-light">
+          <h5 class="mb-0">
+            <i class="{% block content-icon %}fas fa-cog{% endblock content-icon %}"></i>
+            {% block content-title %}Settings Content{% endblock content-title %}
+          </h5>
+        </div>
+        <div class="card-body">
+          {% block settings-content %}
+          <!-- Content will be inserted here by child templates -->
+          {% endblock settings-content %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block morejs %}
+<!-- Additional JavaScript for settings pages -->
+<script>
+  $(document).ready(function() {
+    // Initialize tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+    
+    // Add animation to settings cards
+    $('.settings-card').hover(
+      function() {
+        $(this).addClass('shadow-lg').css('transform', 'translateY(-5px)');
+      },
+      function() {
+        $(this).removeClass('shadow-lg').css('transform', 'translateY(0)');
+      }
+    );
+  });
+</script>
+{% block settings-js %}{% endblock settings-js %}
+{% endblock morejs %}

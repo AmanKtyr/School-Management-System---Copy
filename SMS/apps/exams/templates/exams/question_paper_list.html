@@ -1,0 +1,259 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block breadcrumb-left %}
+<div class="breadcrumb-container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-chevron">
+      <li class="breadcrumb-item">
+        <a href="{% url 'home' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-home"></i> Home
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'exams:dashboard' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-graduation-cap"></i> Examination
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <i class="fas fa-file-alt"></i> Question Papers
+      </li>
+    </ol>
+  </nav>
+</div>
+{% endblock breadcrumb-left %}
+
+{% block title-icon %}fas fa-file-alt{% endblock title-icon %}
+
+{% block title %}Question Papers{% endblock title %}
+
+{% block subtitle %}Manage examination question papers{% endblock subtitle %}
+
+{% block content %}
+<div class="container-fluid exams-container">
+  <!-- Filter Card -->
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filter Question Papers</h5>
+        </div>
+        <div class="card-body">
+          <form method="get" class="row g-3">
+            <div class="col-md-3">
+              <label for="exam" class="form-label">Exam</label>
+              <select name="exam" id="exam" class="form-select">
+                <option value="">-- All Exams --</option>
+                <!-- Options would be populated dynamically -->
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label for="subject" class="form-label">Subject</label>
+              <select name="subject" id="subject" class="form-select">
+                <option value="">-- All Subjects --</option>
+                <!-- Options would be populated dynamically -->
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label for="class" class="form-label">Class</label>
+              <select name="class" id="class" class="form-select">
+                <option value="">-- All Classes --</option>
+                <!-- Options would be populated dynamically -->
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label for="type" class="form-label">Generation Type</label>
+              <select name="type" id="type" class="form-select">
+                <option value="">-- All Types --</option>
+                <option value="auto">Auto-Generated</option>
+                <option value="manual">Manually Uploaded</option>
+              </select>
+            </div>
+            <div class="col-md-12 d-flex justify-content-end">
+              <button type="submit" class="btn btn-primary me-2">
+                <i class="fas fa-filter me-1"></i> Apply Filter
+              </button>
+              <a href="{% url 'exams:question_paper_list' %}" class="btn btn-secondary me-2">
+                <i class="fas fa-redo me-1"></i> Reset
+              </a>
+              <a href="{% url 'exams:question_paper_create' %}" class="btn btn-success">
+                <i class="fas fa-plus me-1"></i> Upload New Paper
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Question Papers List -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>Question Papers</h5>
+          <div>
+            <a href="{% url 'exams:question_paper_create' %}" class="btn btn-light btn-sm">
+              <i class="fas fa-plus me-1"></i> Upload New Paper
+            </a>
+            <a href="#" class="btn btn-light btn-sm ms-2">
+              <i class="fas fa-download me-1"></i> Export List
+            </a>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover table-striped" id="paperTable">
+              <thead class="table-light">
+                <tr>
+                  <th>S/N</th>
+                  <th>Exam</th>
+                  <th>Subject</th>
+                  <th>Class</th>
+                  <th>Section</th>
+                  <th>Total Marks</th>
+                  <th>Passing Marks</th>
+                  <th>Type</th>
+                  <th>Created By</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for paper in question_papers %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ paper.exam.name }}</td>
+                  <td>{{ paper.subject.name }}</td>
+                  <td>{{ paper.student_class.name }}</td>
+                  <td>{{ paper.section|default:"-" }}</td>
+                  <td>{{ paper.total_marks }}</td>
+                  <td>{{ paper.passing_marks }}</td>
+                  <td>
+                    {% if paper.generation_type == 'auto' %}
+                      <span class="badge bg-success">Auto-Generated</span>
+                    {% else %}
+                      <span class="badge bg-primary">Manually Uploaded</span>
+                    {% endif %}
+                  </td>
+                  <td>{{ paper.created_by.fullname|default:"-" }}</td>
+                  <td>
+                    <div class="btn-group" role="group">
+                      {% if paper.file %}
+                      <a href="{{ paper.file.url }}" class="btn btn-sm btn-outline-info" target="_blank">
+                        <i class="fas fa-download"></i>
+                      </a>
+                      {% endif %}
+                      <a href="{% url 'exams:question_paper_update' paper.id %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                      <a href="{% url 'exams:question_paper_delete' paper.id %}" class="btn btn-sm btn-outline-danger">
+                        <i class="fas fa-trash"></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="10" class="text-center py-4">
+                    <div class="d-flex flex-column align-items-center">
+                      <i class="fas fa-file-excel fa-3x text-muted mb-3"></i>
+                      <h5 class="text-muted">No question papers found</h5>
+                      <p class="text-muted">Upload a new question paper to get started</p>
+                      <a href="{% url 'exams:question_paper_create' %}" class="btn btn-primary mt-2">
+                        <i class="fas fa-plus me-1"></i> Upload New Paper
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Question Paper Templates -->
+  <div class="row mt-4">
+    <div class="col-md-12">
+      <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0"><i class="fas fa-file-download me-2"></i>Question Paper Templates</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                  <i class="fas fa-file-word fa-4x text-primary mb-3"></i>
+                  <h5>Word Template</h5>
+                  <p class="text-muted">Standard question paper template in Word format</p>
+                  <a href="#" class="btn btn-outline-primary">
+                    <i class="fas fa-download me-1"></i> Download
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                  <i class="fas fa-file-pdf fa-4x text-danger mb-3"></i>
+                  <h5>PDF Template</h5>
+                  <p class="text-muted">Standard question paper template in PDF format</p>
+                  <a href="#" class="btn btn-outline-danger">
+                    <i class="fas fa-download me-1"></i> Download
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                  <i class="fas fa-file-excel fa-4x text-success mb-3"></i>
+                  <h5>Excel Template</h5>
+                  <p class="text-muted">Question bank template for auto-generation</p>
+                  <a href="#" class="btn btn-outline-success">
+                    <i class="fas fa-download me-1"></i> Download
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block morejs %}
+<script>
+  $(document).ready(function() {
+    $('#paperTable').DataTable({
+      "paging": true,
+      "lengthChange": true,
+      "searching": true,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false,
+      "responsive": true,
+      "language": {
+        "emptyTable": "No question papers found",
+        "zeroRecords": "No matching records found",
+        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+        "infoEmpty": "Showing 0 to 0 of 0 entries",
+        "infoFiltered": "(filtered from _MAX_ total entries)",
+        "search": "Search:",
+        "paginate": {
+          "first": "First",
+          "last": "Last",
+          "next": "Next",
+          "previous": "Previous"
+        }
+      }
+    });
+  });
+</script>
+{% endblock morejs %}

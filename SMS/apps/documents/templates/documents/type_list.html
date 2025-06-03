@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Document Types{% endblock title %}
+
+{% block breadcrumb %}
+<div class="breadcrumb-bar">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'documents:dashboard' %}">Document Management</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Document Types</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="card-title">Document Types</h2>
+            <a href="{% url 'documents:type_create' %}" class="btn btn-primary">
+              <i class="fas fa-plus me-2"></i> Add Document Type
+            </a>
+          </div>
+          
+          <!-- Document Types Table -->
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>S/N</th>
+                  <th>Type Name</th>
+                  <th>Entity Type</th>
+                  <th>Category</th>
+                  <th>Required</th>
+                  <th>Documents</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for doc_type in document_types %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ doc_type.name }}</td>
+                  <td>
+                    {% if doc_type.entity_type == 'student' %}
+                    <span class="badge bg-primary">Student</span>
+                    {% elif doc_type.entity_type == 'staff' %}
+                    <span class="badge bg-success">Staff</span>
+                    {% elif doc_type.entity_type == 'exam' %}
+                    <span class="badge bg-warning">Exam</span>
+                    {% else %}
+                    <span class="badge bg-secondary">General</span>
+                    {% endif %}
+                  </td>
+                  <td>{{ doc_type.category.name }}</td>
+                  <td>
+                    {% if doc_type.required %}
+                    <span class="badge bg-danger">Required</span>
+                    {% else %}
+                    <span class="badge bg-secondary">Optional</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <span class="badge bg-primary">{{ doc_type.documents.count }}</span>
+                  </td>
+                  <td>
+                    <div class="btn-group" role="group">
+                      <a href="{% url 'documents:type_update' doc_type.id %}" class="btn btn-sm btn-outline-warning" title="Edit">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                      <a href="{% url 'documents:type_delete' doc_type.id %}" class="btn btn-sm btn-outline-danger" title="Delete">
+                        <i class="fas fa-trash"></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="7" class="text-center">No document types found</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

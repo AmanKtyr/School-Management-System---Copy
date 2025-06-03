@@ -1,0 +1,362 @@
+{% extends 'exams/base_exams.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block exam-breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">
+  <i class="fas fa-id-card"></i> Admit Cards
+</li>
+{% endblock exam-breadcrumb %}
+
+{% block title-icon %}fas fa-id-card{% endblock title-icon %}
+
+{% block title %}Admit Cards{% endblock title %}
+
+{% block subtitle %}Generate and manage student admit cards{% endblock subtitle %}
+
+{% block content %}
+<div class="container-fluid exams-container">
+  <!-- Filter Card -->
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card border-0 rounded-3 shadow-sm exam-card">
+        <div class="card-header bg-gradient-primary text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold"><i class="fas fa-filter me-2"></i>Filter Admit Cards</h5>
+          <button type="button" class="btn btn-sm btn-light" id="toggleFilters" data-bs-toggle="tooltip" data-bs-placement="left" title="Toggle filter visibility">
+            <i class="fas fa-chevron-down"></i>
+          </button>
+        </div>
+        <div class="card-body p-4" id="filterBody">
+          <form method="get" class="row g-3" id="filterForm">
+            <div class="col-md-3">
+              <label for="exam" class="form-label">Exam</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-graduation-cap"></i></span>
+                <select name="exam" id="exam" class="form-select">
+                  <option value="">-- All Exams --</option>
+                  {% for exam in exams %}
+                  <option value="{{ exam.id }}" {% if selected_exam == exam.id|stringformat:"i" %}selected{% endif %}>{{ exam.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <label for="class" class="form-label">Class</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-chalkboard"></i></span>
+                <select name="class" id="class" class="form-select">
+                  <option value="">-- All Classes --</option>
+                  {% for class in classes %}
+                  <option value="{{ class.id }}" {% if selected_class == class.id|stringformat:"i" %}selected{% endif %}>{{ class.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <label for="section" class="form-label">Section</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-users"></i></span>
+                <select name="section" id="section" class="form-select">
+                  <option value="">-- All Sections --</option>
+                  <!-- Will be populated dynamically -->
+                </select>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <label for="printed" class="form-label">Print Status</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-print"></i></span>
+                <select name="printed" id="printed" class="form-select">
+                  <option value="">-- All --</option>
+                  <option value="1" {% if selected_printed == '1' %}selected{% endif %}>Printed</option>
+                  <option value="0" {% if selected_printed == '0' %}selected{% endif %}>Not Printed</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-12 d-flex justify-content-end mt-4">
+              <button type="button" class="btn btn-outline-secondary me-2" id="resetFilters">
+                <i class="fas fa-undo me-1"></i> Reset
+              </button>
+              <button type="submit" class="btn btn-primary me-2">
+                <i class="fas fa-search me-1"></i> Apply Filters
+              </button>
+              <a href="{% url 'exams:admit_card_generate' %}" class="btn btn-success">
+                <i class="fas fa-plus-circle me-1"></i> Generate Admit Cards
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bulk Actions -->
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card border-0 rounded-3 shadow-sm exam-card">
+        <div class="card-header bg-gradient-success text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold"><i class="fas fa-tasks me-2"></i>Bulk Actions</h5>
+          <button type="button" class="btn btn-sm btn-light" id="toggleBulkActions" data-bs-toggle="tooltip" data-bs-placement="left" title="Toggle bulk actions visibility">
+            <i class="fas fa-chevron-down"></i>
+          </button>
+        </div>
+        <div class="card-body p-4" id="bulkActionsBody">
+          <form method="post" action="{% url 'exams:admit_card_bulk_action' %}" class="row g-3">
+            {% csrf_token %}
+            <div class="col-md-4">
+              <label for="bulk_exam" class="form-label">Select Exam</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-graduation-cap"></i></span>
+                <select name="bulk_exam" id="bulk_exam" class="form-select" required>
+                  <option value="">-- Select Exam --</option>
+                  {% for exam in exams %}
+                  <option value="{{ exam.id }}">{{ exam.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label for="bulk_class" class="form-label">Select Class</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-chalkboard"></i></span>
+                <select name="bulk_class" id="bulk_class" class="form-select">
+                  <option value="">-- All Classes --</option>
+                  {% for class in classes %}
+                  <option value="{{ class.id }}">{{ class.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label for="bulk_action" class="form-label">Action</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-cogs"></i></span>
+                <select name="bulk_action" id="bulk_action" class="form-select" required>
+                  <option value="">-- Select Action --</option>
+                  <option value="generate">Generate Admit Cards</option>
+                  <option value="print">Print Selected</option>
+                  <option value="delete">Delete Selected</option>
+                </select>
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-play me-1"></i> Execute
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admit Cards List -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card border-0 rounded-3 shadow-sm exam-card">
+        <div class="card-header bg-gradient-primary text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold"><i class="fas fa-id-card me-2"></i>Admit Cards</h5>
+          <div>
+            <a href="{% url 'exams:admit_card_generate' %}" class="btn btn-light btn-sm" data-bs-toggle="tooltip" title="Generate new admit cards">
+              <i class="fas fa-plus-circle me-1"></i> Generate
+            </a>
+            <a href="#" class="btn btn-light btn-sm ms-2" id="printSelectedBtn" data-bs-toggle="tooltip" title="Print selected admit cards">
+              <i class="fas fa-print me-1"></i> Print Selected
+            </a>
+          </div>
+        </div>
+        <div class="card-body p-4">
+          <div class="table-responsive">
+            <table class="table table-hover" id="admitCardTable">
+              <thead class="table-light">
+                <tr>
+                  <th width="5%">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="selectAll">
+                      <label class="form-check-label" for="selectAll"></label>
+                    </div>
+                  </th>
+                  <th width="5%">S/N</th>
+                  <th width="15%">Student</th>
+                  <th width="10%">Class</th>
+                  <th width="10%">Roll Number</th>
+                  <th width="15%">Exam</th>
+                  <th width="10%">Generated On</th>
+                  <th width="10%">Print Status</th>
+                  <th width="20%">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for card in admit_cards %}
+                <tr>
+                  <td>
+                    <div class="form-check">
+                      <input class="form-check-input card-checkbox" type="checkbox" value="{{ card.id }}" id="card{{ card.id }}">
+                      <label class="form-check-label" for="card{{ card.id }}"></label>
+                    </div>
+                  </td>
+                  <td>{{ forloop.counter }}</td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div class="avatar-circle bg-primary bg-opacity-10 me-2">
+                        <span class="avatar-initials text-primary">{{ card.student.fullname|slice:":1" }}</span>
+                      </div>
+                      <span class="fw-bold">{{ card.student.fullname }}</span>
+                    </div>
+                  </td>
+                  <td>{{ card.student.current_class.name }} {{ card.student.current_section|default:"" }}</td>
+                  <td><span class="badge bg-light text-dark">{{ card.roll_number }}</span></td>
+                  <td>{{ card.exam.name }}</td>
+                  <td><span class="badge bg-light text-dark">{{ card.generated_on|date:"d M, Y" }}</span></td>
+                  <td>
+                    {% if card.is_printed %}
+                      <span class="badge badge-completed">
+                        <i class="fas fa-check-circle me-1"></i> Printed
+                      </span>
+                    {% else %}
+                      <span class="badge badge-pending">
+                        <i class="fas fa-clock me-1"></i> Not Printed
+                      </span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div class="btn-group" role="group">
+                      <a href="{% url 'exams:admit_card_view' card.id %}" class="btn btn-sm btn-outline-info" target="_blank" data-bs-toggle="tooltip" title="View admit card">
+                        <i class="fas fa-eye"></i>
+                      </a>
+                      <a href="{% url 'exams:admit_card_print' card.id %}" class="btn btn-sm btn-outline-primary" target="_blank" data-bs-toggle="tooltip" title="Print admit card">
+                        <i class="fas fa-print"></i>
+                      </a>
+                      <a href="{% url 'exams:admit_card_delete' card.id %}" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Delete admit card">
+                        <i class="fas fa-trash"></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="9" class="text-center py-5">
+                    <div class="d-flex flex-column align-items-center">
+                      <div class="rounded-circle bg-light p-4 mb-3">
+                        <i class="fas fa-id-card fa-3x text-muted"></i>
+                      </div>
+                      <h5 class="text-muted mb-2">No admit cards found</h5>
+                      <p class="text-muted mb-4">Generate admit cards for students to get started</p>
+                      <a href="{% url 'exams:admit_card_generate' %}" class="btn btn-primary">
+                        <i class="fas fa-plus-circle me-1"></i> Generate Admit Cards
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block exam-js %}
+<script>
+  $(document).ready(function() {
+    $('#admitCardTable').DataTable({
+      "paging": true,
+      "lengthChange": true,
+      "searching": true,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false,
+      "responsive": true,
+      "columnDefs": [
+        { "orderable": false, "targets": [0, 8] }
+      ],
+      "language": {
+        "emptyTable": "No admit cards found",
+        "zeroRecords": "No matching records found",
+        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+        "infoEmpty": "Showing 0 to 0 of 0 entries",
+        "infoFiltered": "(filtered from _MAX_ total entries)",
+        "search": "<i class='fas fa-search'></i> Search:",
+        "paginate": {
+          "first": "First",
+          "last": "Last",
+          "next": "Next",
+          "previous": "Previous"
+        }
+      },
+      "dom": '<"d-flex justify-content-between align-items-center mb-3"<"d-flex align-items-center"l><"d-flex"f>>t<"d-flex justify-content-between align-items-center mt-3"<"text-muted"i><"d-flex"p>>',
+      "drawCallback": function() {
+        // Add animation to rows
+        $(this).find('tbody tr').addClass('fade-in');
+
+        // Add tooltips to action buttons
+        $(this).find('[data-bs-toggle="tooltip"]').tooltip();
+      }
+    });
+
+    // Toggle filters visibility
+    $('#toggleFilters').on('click', function() {
+      $('#filterBody').slideToggle(300);
+      $(this).find('i').toggleClass('fa-chevron-down fa-chevron-up');
+    });
+
+    // Toggle bulk actions visibility
+    $('#toggleBulkActions').on('click', function() {
+      $('#bulkActionsBody').slideToggle(300);
+      $(this).find('i').toggleClass('fa-chevron-down fa-chevron-up');
+    });
+
+    // Select all checkbox
+    $('#selectAll').on('change', function() {
+      $('.card-checkbox').prop('checked', $(this).prop('checked'));
+    });
+
+    // Print selected button
+    $('#printSelectedBtn').on('click', function(e) {
+      e.preventDefault();
+
+      var selectedIds = [];
+      $('.card-checkbox:checked').each(function() {
+        selectedIds.push($(this).val());
+      });
+
+      if (selectedIds.length === 0) {
+        toastr.warning('Please select at least one admit card to print.');
+        return;
+      }
+
+      // Open print page with selected IDs
+      var url = "{% url 'exams:admit_card_print_bulk' %}?ids=" + selectedIds.join(',');
+      window.open(url, '_blank');
+    });
+
+    // Class-section filter functionality
+    $('#class').on('change', function() {
+      var classId = $(this).val();
+      if (classId) {
+        // Fetch sections for this class
+        $.ajax({
+          url: '/exams/api/get-sections/' + classId + '/',
+          type: 'GET',
+          success: function(data) {
+            var options = '<option value="">-- All Sections --</option>';
+            $.each(data, function(index, section) {
+              options += '<option value="' + section.id + '">' + section.name + '</option>';
+            });
+            $('#section').html(options);
+          },
+          error: function(xhr, status, error) {
+            console.error('Error fetching sections:', error);
+          }
+        });
+      } else {
+        $('#section').html('<option value="">-- All Sections --</option>');
+      }
+    });
+
+    // Add tooltips to action buttons
+    $('[data-bs-toggle="tooltip"]').tooltip();
+  });
+</script>
+{% endblock exam-js %}

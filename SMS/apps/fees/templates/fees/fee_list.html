@@ -1,0 +1,469 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block breadcrumb-left %}
+<div class="breadcrumb-container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-chevron">
+      <li class="breadcrumb-item">
+        <a href="{% url 'home' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-home"></i> Home
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <i class="fas fa-money-bill-wave"></i> Fee Management
+      </li>
+    </ol>
+  </nav>
+</div>
+{% endblock breadcrumb-left %}
+
+{% block title-icon %}fas fa-money-bill-wave{% endblock title-icon %}
+
+{% block title %}Fee Management{% endblock title %}
+
+{% block subtitle %}Manage student fees and payment records{% endblock subtitle %}
+
+{% block page-actions %}
+<a href="{% url 'fees:fee_list' %}" class="btn btn-outline-primary me-2">
+  <i class="fas fa-sync-alt me-1"></i> Refresh
+</a>
+<a href="{% url 'fees:all_transactions' %}" class="btn btn-outline-success me-2">
+  <i class="fas fa-exchange-alt me-1"></i> All Transactions
+</a>
+<button type="button" class="btn btn-primary" onclick="window.print();">
+  <i class="fas fa-print me-1"></i> Print Report
+</button>
+{% endblock page-actions %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="h3 mb-4">
+        <i class="fas fa-money-bill-wave text-primary me-2"></i>
+        Fee Submit
+    </h2>
+
+    <div class="row g-4">
+        <!-- Total Students -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 h-100" style="background: linear-gradient(135deg, #f8f9fa, #e9ecef);">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3">
+                            <div class="rounded-circle p-3 d-flex align-items-center justify-content-center"
+                                 style="width: 48px; height: 48px; background: linear-gradient(135deg, #1E3C72, #2A5298);">
+                                <i class="fas fa-users text-white"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="text-muted mb-1">Total Students</h6>
+                            <h2 class="mb-0" style="color: #1E3C72;">{{ students|length }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Payments -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 h-100" style="background: linear-gradient(135deg, #f8f9fa, #e9ecef);">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3">
+                            <div class="rounded-circle p-3 d-flex align-items-center justify-content-center"
+                                 style="width: 48px; height: 48px; background: linear-gradient(135deg, #2ecc71, #27ae60);">
+                                <i class="fas fa-check-circle text-white"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="text-muted mb-1">Recent Payments</h6>
+                            <h2 class="mb-0" style="color: #27ae60;">{{ recent_payments|length }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Fees -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 h-100" style="background: linear-gradient(135deg, #f8f9fa, #e9ecef);">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3">
+                            <div class="rounded-circle p-3 d-flex align-items-center justify-content-center"
+                                 style="width: 48px; height: 48px; background: linear-gradient(135deg, #f1c40f, #f39c12);">
+                                <i class="fas fa-exclamation-circle text-white"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="text-muted mb-1">Pending Fees</h6>
+                            <h2 class="mb-0" style="color: #f39c12;">{{ students|length }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Today's Date -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 h-100" style="background: linear-gradient(135deg, #f8f9fa, #e9ecef);">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3">
+                            <div class="rounded-circle p-3 d-flex align-items-center justify-content-center"
+                                 style="width: 48px; height: 48px; background: linear-gradient(135deg, #3498db, #2980b9);">
+                                <i class="fas fa-calendar-alt text-white"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="text-muted mb-1">Today's Date</h6>
+                            <h2 class="mb-0" style="color: #2980b9;">{{ today|date:"d M" }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filter Students</h5>
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="true">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body collapse show" id="filterCollapse">
+            {% include 'includes/class_section_filter.html' with filter_form=filter_form show_search=True %}
+        </div>
+    </div>
+
+    <!-- Students Table - Only show when filter is applied -->
+    {% if request.GET.class_name or request.GET.section or request.GET.search %}
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="mb-0"><i class="fas fa-users me-2"></i>Student Fee Records</h5>
+                <p class="text-muted mb-0 small">Showing filtered results based on your search criteria</p>
+            </div>
+            <div class="d-flex align-items-center">
+                <span class="badge bg-primary rounded-pill me-2 px-3 py-2">{{ students|length }} Students</span>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="studentListDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="studentListDropdown">
+                        <li><a class="dropdown-item" href="#" onclick="window.print();"><i class="fas fa-print me-2"></i>Print List</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'fees:fee_list' %}"><i class="fas fa-sync-alt me-2"></i>Refresh Data</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped mb-0">
+                    <thead class="table-primary">
+                        <tr>
+                            <th width="5%"><i class="fas fa-hashtag me-1"></i> S/N</th>
+                            <th width="20%"><i class="fas fa-user-graduate me-1"></i> Student Details</th>
+                            <th width="10%"><i class="fas fa-school me-1"></i> Class</th>
+                            <th width="15%"><i class="fas fa-money-check-alt me-1"></i> Fee Summary</th>
+                            <th width="15%"><i class="fas fa-chart-pie me-1"></i> Payment Status</th>
+                            <th width="20%"><i class="fas fa-cogs me-1"></i> Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                        <tr class="{% if student.total_pending > 0 %}table-warning{% endif %}">
+                            <td class="text-center">{{ forloop.counter }}</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-primary text-white me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-size: 16px;">
+                                        {{ student.fullname|slice:":1" }}
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0">{{ student.fullname }}</h6>
+                                        <small class="text-muted">{{ student.registration_number }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    <span class="badge bg-light text-dark border">Class {{ student.current_class }}</span>
+                                    <span class="badge bg-light text-dark border">Section {{ student.section }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex flex-column">
+                                    <div class="mb-1"><span class="text-muted">Total:</span> <span class="fw-bold">₹{{ student.total_fee|default:"0.00" }}</span></div>
+                                    <div class="mb-1"><span class="text-muted">Paid:</span> <span class="text-success fw-bold">₹{{ student.paid_fee|default:"0.00" }}</span></div>
+                                    <div><span class="text-muted">Due:</span> <span class="{% if student.total_pending > 0 %}text-danger{% else %}text-success{% endif %} fw-bold">₹{{ student.total_pending|default:"0.00" }}</span></div>
+                                </div>
+                            </td>
+                            <td>
+                                {% if student.total_pending > 0 %}
+                                <div class="d-flex align-items-center">
+                                    <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                        {% with paid=student.paid_fee|default:0 %}
+                                        {% with total=student.total_fee|default:1 %}
+                                        {% if total > 0 %}
+                                        {% widthratio paid total 100 as percentage %}
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ percentage }}%" aria-valuenow="{{ percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                        {% endif %}
+                                        {% endwith %}
+                                        {% endwith %}
+                                    </div>
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                </div>
+                                {% else %}
+                                <div class="d-flex align-items-center">
+                                    <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <span class="badge bg-success">Paid</span>
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex">
+                                    <a href="{% url 'fees:add_fee_payment' student.id %}" class="btn btn-sm btn-success me-2" title="Add Payment">
+                                        <i class="fas fa-credit-card me-1"></i> Pay
+                                    </a>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="actionDropdown{{ student.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-h"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="actionDropdown{{ student.id }}">
+                                            <li><a class="dropdown-item" href="{% url 'fees:student_fee_history' student.id %}"><i class="fas fa-history me-2"></i>Payment History</a></li>
+                                            <li><a class="dropdown-item" href="{% url 'student-detail' pk=student.id %}"><i class="fas fa-user me-2"></i>View Profile</a></li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item" href="{% url 'fees:generate_receipt' student.id %}"><i class="fas fa-file-invoice me-2"></i>Generate Receipt</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <div class="py-5">
+                                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                                    <h5>No Students Found</h5>
+                                    <p class="text-muted">No students match your search criteria. Try adjusting your filters.</p>
+                                    <button class="btn btn-outline-primary mt-2" onclick="document.getElementById('filter-form').reset(); document.getElementById('filter-form').submit();">Clear Filters</button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Recent Payments Section - Always visible -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Fee Transactions</h5>
+                <p class="text-muted text-success mb-0 small">Latest fee payments across all classes</p>
+            </div>
+            <div class="d-flex align-items-center">
+                <span class="badge bg-success rounded-pill me-2 px-3 py-2">{{ recent_payments|length }} Transactions</span>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="recentTransactionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="recentTransactionsDropdown">
+                        <li><a class="dropdown-item" href="#" onclick="window.print();"><i class="fas fa-print me-2"></i>Print Report</a></li>
+                        <li><a class="dropdown-item" href="{% url 'fees:all_transactions' %}"><i class="fas fa-exchange-alt me-2"></i>View All Transactions</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'fees:fee_list' %}"><i class="fas fa-sync-alt me-2"></i>Refresh Data</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped mb-0">
+                    <thead class="table-primary">
+                        <tr>
+                            <th width="5%"><i class="fas fa-hashtag me-1"></i> ID</th>
+                            <th width="20%"><i class="fas fa-user-graduate me-1"></i> Student</th>
+                            <th width="15%"><i class="fas fa-tag me-1"></i> Transaction Details</th>
+                            <th width="15%"><i class="fas fa-money-bill-wave me-1"></i> Amount</th>
+                            <th width="15%"><i class="fas fa-calendar-alt me-1"></i> Date & Method</th>
+                            <th width="10%"><i class="fas fa-check-circle me-1"></i> Status</th>
+                            <th width="20%"><i class="fas fa-cogs me-1"></i> Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in recent_payments %}
+                        <tr>
+                            <td class="text-center">{{ forloop.counter }}</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-{% if payment.status == 'Paid' %}success{% else %}warning{% endif %} text-white me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-size: 16px;">
+                                        {{ payment.student.fullname|slice:":1" }}
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0">{{ payment.student.fullname }}</h6>
+                                        <div class="d-flex align-items-center">
+                                            <small class="text-muted me-2">{{ payment.student.registration_number }}</small>
+                                            <span class="badge bg-light text-dark border">{{ payment.student.current_class }} {{ payment.student.section }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex flex-column">
+                                    <span class="badge bg-info mb-1">{{ payment.fee_category }}</span>
+                                    <small class="text-muted">Transaction #{{ payment.id }}</small>
+                                </div>
+                            </td>
+                            <td>
+                                <h5 class="mb-0 fw-bold">₹{{ payment.amount }}</h5>
+                                <small class="text-{% if payment.status == 'Paid' %}success{% else %}warning{% endif %}">
+                                    {% if payment.status == 'Paid' %}Payment Complete{% else %}Pending Confirmation{% endif %}
+                                </small>
+                            </td>
+                            <td>
+                                <div class="d-flex flex-column">
+                                    <span>{{ payment.date|date:"d M Y" }}</span>
+                                    <span class="badge {% if payment.payment_method == 'Cash' %}bg-success{% elif payment.payment_method == 'Online' %}bg-primary{% else %}bg-info{% endif %} mt-1">
+                                        <i class="fas {% if payment.payment_method == 'Cash' %}fa-money-bill-wave{% elif payment.payment_method == 'Online' %}fa-globe{% else %}fa-university{% endif %} me-1"></i>
+                                        {{ payment.payment_method }}
+                                    </span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge {% if payment.status == 'Paid' %}bg-success{% else %}bg-warning{% endif %} px-3 py-2">
+                                    {% if payment.status == 'Paid' %}<i class="fas fa-check-circle me-1"></i>{% else %}<i class="fas fa-clock me-1"></i>{% endif %}
+                                    {{ payment.status }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="d-flex">
+                                    <a href="{% url 'fees:generate_receipt' payment.id %}" class="btn btn-sm btn-primary me-2" target="_blank" title="View Receipt">
+                                        <i class="fas fa-file-invoice me-1"></i> Receipt
+                                    </a>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="paymentDropdown{{ payment.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-h"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="paymentDropdown{{ payment.id }}">
+                                            <li><a class="dropdown-item" href="{% url 'fees:student_fee_history' payment.student.id %}"><i class="fas fa-history me-2"></i>Payment History</a></li>
+                                            <li><a class="dropdown-item" href="{% url 'student-detail' pk=payment.student.id %}"><i class="fas fa-user me-2"></i>Student Profile</a></li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item" href="{% url 'fees:generate_receipt' payment.id %}?format=html" target="_blank"><i class="fas fa-print me-2"></i>Preview Receipt</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5">
+                                <div class="py-5">
+                                    <i class="fas fa-receipt fa-3x text-muted mb-3"></i>
+                                    <h5>No Payment Records Found</h5>
+                                    <p class="text-muted">There are no recent fee payment transactions to display.</p>
+                                    <a href="#" class="btn btn-primary mt-2"><i class="fas fa-plus me-2"></i>Add New Payment</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-light text-center">
+            <a href="{% url 'fees:all_transactions' %}" class="btn btn-primary">
+                <i class="fas fa-exchange-alt me-2"></i>View All Transactions
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Add extra JS for the page -->
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // No auto-submit, form will be submitted when Apply Filter button is clicked
+    const form = document.getElementById('filter-form');
+    const classSelect = document.getElementById('class-filter');
+    const sectionSelect = document.getElementById('section-filter');
+
+    // Update sections when class changes
+    classSelect.addEventListener('change', function() {
+        const classId = this.value;
+        // Clear section selection when class changes
+        sectionSelect.innerHTML = '<option value="">-- All Sections --</option>';
+
+        if(classId) {
+            fetch(`/api/get-sections/${classId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    data.sections.forEach(section => {
+                        const option = new Option(section.name, section.id);
+                        sectionSelect.add(option);
+                    });
+                });
+        }
+    });
+
+    // Add animation effects
+    const cards = document.querySelectorAll('.card');
+    cards.forEach((card, index) => {
+        setTimeout(() => {
+            card.classList.add('shadow');
+        }, 100 * index);
+    });
+
+    // Fix for dropdowns
+    // Ensure all dropdowns are properly initialized
+    const dropdownToggleList = document.querySelectorAll('[data-bs-toggle="dropdown"]');
+    dropdownToggleList.forEach(function (dropdownToggle) {
+        // Make sure the dropdown is properly initialized
+        dropdownToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const dropdownMenu = this.nextElementSibling;
+            if (dropdownMenu.classList.contains('show')) {
+                dropdownMenu.classList.remove('show');
+                this.setAttribute('aria-expanded', 'false');
+            } else {
+                // Close all other dropdowns first
+                document.querySelectorAll('.dropdown-menu.show').forEach(function(menu) {
+                    menu.classList.remove('show');
+                    if (menu.previousElementSibling) {
+                        menu.previousElementSibling.setAttribute('aria-expanded', 'false');
+                    }
+                });
+
+                // Open this dropdown
+                dropdownMenu.classList.add('show');
+                this.setAttribute('aria-expanded', 'true');
+            }
+        });
+    });
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.dropdown')) {
+            document.querySelectorAll('.dropdown-menu.show').forEach(function(menu) {
+                menu.classList.remove('show');
+                if (menu.previousElementSibling) {
+                    menu.previousElementSibling.setAttribute('aria-expanded', 'false');
+                }
+            });
+        }
+    });
+});
+</script>
+{% endblock %}
+
+{% endblock %}

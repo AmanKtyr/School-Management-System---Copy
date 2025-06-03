@@ -1,0 +1,221 @@
+{% extends 'exams/base_exams.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block exam-breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">
+  <i class="fas fa-calendar-alt"></i> Exams
+</li>
+{% endblock exam-breadcrumb %}
+
+{% block title-icon %}fas fa-calendar-alt{% endblock title-icon %}
+
+{% block title %}Exams{% endblock title %}
+
+{% block subtitle %}Manage examinations{% endblock subtitle %}
+
+{% block content %}
+<div class="container-fluid exams-container">
+  <!-- Filter Card -->
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card border-0 rounded-3 shadow-sm exam-card">
+        <div class="card-header bg-gradient-primary text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold"><i class="fas fa-filter me-2"></i>Filter Exams</h5>
+          <button type="button" class="btn btn-sm btn-light" id="toggleFilters" data-bs-toggle="tooltip" data-bs-placement="left" title="Toggle filter visibility">
+            <i class="fas fa-chevron-down"></i>
+          </button>
+        </div>
+        <div class="card-body p-4" id="filterBody">
+          <form method="get" class="row g-3" id="filterForm">
+            <div class="col-md-3">
+              <label for="{{ filter_form.session.id_for_label }}" class="form-label">Academic Session</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-school"></i></span>
+                {{ filter_form.session|add_class:"form-select" }}
+              </div>
+            </div>
+            <div class="col-md-3">
+              <label for="{{ filter_form.term.id_for_label }}" class="form-label">Term</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-calendar-check"></i></span>
+                {{ filter_form.term|add_class:"form-select" }}
+              </div>
+            </div>
+            <div class="col-md-3">
+              <label for="{{ filter_form.exam_type.id_for_label }}" class="form-label">Exam Type</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-tags"></i></span>
+                {{ filter_form.exam_type|add_class:"form-select" }}
+              </div>
+            </div>
+            <div class="col-md-3">
+              <label for="{{ filter_form.status.id_for_label }}" class="form-label">Status</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-info-circle"></i></span>
+                {{ filter_form.status|add_class:"form-select" }}
+              </div>
+            </div>
+            <div class="col-12 d-flex justify-content-end mt-4">
+              <button type="button" class="btn btn-outline-secondary me-2" id="resetFilters">
+                <i class="fas fa-undo me-1"></i> Reset
+              </button>
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search me-1"></i> Apply Filters
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Exams List -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card border-0 rounded-3 shadow-sm exam-card">
+        <div class="card-header bg-gradient-primary text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold"><i class="fas fa-calendar-alt me-2"></i>Exams</h5>
+          <a href="{% url 'exams:exam_create' %}" class="btn btn-light" data-bs-toggle="tooltip" data-bs-placement="left" title="Create a new examination">
+            <i class="fas fa-plus-circle me-1"></i> Create New Exam
+          </a>
+        </div>
+        <div class="card-body p-4">
+          <div class="table-responsive">
+            <table class="table table-hover" id="examTable">
+              <thead class="table-light">
+                <tr>
+                  <th width="5%">S/N</th>
+                  <th width="15%">Name</th>
+                  <th width="10%">Type</th>
+                  <th width="10%">Session</th>
+                  <th width="10%">Term</th>
+                  <th width="10%">Start Date</th>
+                  <th width="10%">End Date</th>
+                  <th width="10%">Status</th>
+                  <th width="20%">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for exam in exams %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>
+                    <a href="{% url 'exams:exam_detail' exam.id %}" class="fw-bold text-decoration-none text-primary">
+                      {{ exam.name }}
+                    </a>
+                  </td>
+                  <td>{{ exam.exam_type.name }}</td>
+                  <td>{{ exam.session.name }}</td>
+                  <td>{{ exam.term.name }}</td>
+                  <td><span class="badge bg-light text-dark">{{ exam.start_date|date:"d M, Y" }}</span></td>
+                  <td><span class="badge bg-light text-dark">{{ exam.end_date|date:"d M, Y" }}</span></td>
+                  <td>
+                    {% if exam.status == 'pending' %}
+                      <span class="badge badge-pending">
+                        <i class="fas fa-clock me-1"></i> Pending
+                      </span>
+                    {% elif exam.status == 'ongoing' %}
+                      <span class="badge badge-ongoing">
+                        <i class="fas fa-play-circle me-1"></i> Ongoing
+                      </span>
+                    {% elif exam.status == 'completed' %}
+                      <span class="badge badge-completed">
+                        <i class="fas fa-check-circle me-1"></i> Completed
+                      </span>
+                    {% elif exam.status == 'cancelled' %}
+                      <span class="badge badge-cancelled">
+                        <i class="fas fa-times-circle me-1"></i> Cancelled
+                      </span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div class="btn-group" role="group">
+                      <a href="{% url 'exams:exam_detail' exam.id %}" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="View exam details">
+                        <i class="fas fa-eye"></i>
+                      </a>
+                      <a href="{% url 'exams:exam_update' exam.id %}" class="btn btn-sm btn-outline-success" data-bs-toggle="tooltip" title="Edit exam">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                      <a href="{% url 'exams:exam_delete' exam.id %}" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Delete exam">
+                        <i class="fas fa-trash"></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="9" class="text-center py-4">
+                    <div class="d-flex flex-column align-items-center">
+                      <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                      <h5 class="text-muted">No exams found</h5>
+                      <p class="text-muted mb-3">There are no exams matching your filter criteria</p>
+                      <a href="{% url 'exams:exam_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus-circle me-1"></i> Create New Exam
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block exam-js %}
+<script>
+  $(document).ready(function() {
+    $('#examTable').DataTable({
+      "paging": true,
+      "lengthChange": true,
+      "searching": true,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false,
+      "responsive": true,
+      "language": {
+        "emptyTable": "No exams found",
+        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+        "infoEmpty": "Showing 0 to 0 of 0 entries",
+        "lengthMenu": "Show _MENU_ entries",
+        "search": "<i class='fas fa-search'></i> Search:",
+        "zeroRecords": "No matching records found"
+      },
+      "dom": '<"d-flex justify-content-between align-items-center mb-3"<"d-flex align-items-center"l><"d-flex"f>>t<"d-flex justify-content-between align-items-center mt-3"<"text-muted"i><"d-flex"p>>',
+      "drawCallback": function() {
+        // Add animation to rows
+        $(this).find('tbody tr').addClass('fade-in');
+
+        // Add tooltips to action buttons
+        $(this).find('[data-bs-toggle="tooltip"]').tooltip();
+      }
+    });
+
+    // Filter form submission
+    $('#filterForm').on('submit', function(e) {
+      e.preventDefault();
+      var url = $(this).attr('action') + '?' + $(this).serialize();
+      window.location = url;
+    });
+
+    // Toggle filters visibility
+    $('#toggleFilters').on('click', function() {
+      $('#filterBody').slideToggle(300);
+      $(this).find('i').toggleClass('fa-chevron-down fa-chevron-up');
+    });
+
+    // Reset filters
+    $('#resetFilters').on('click', function() {
+      window.location = '{% url "exams:exam_list" %}';
+    });
+
+    // Add tooltips to action buttons
+    $('[data-bs-toggle="tooltip"]').tooltip();
+  });
+</script>
+{% endblock exam-js %}

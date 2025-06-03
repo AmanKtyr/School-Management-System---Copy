@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Student Documents{% endblock title %}
+
+{% block breadcrumb %}
+<div class="breadcrumb-bar">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'documents:dashboard' %}">Document Management</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Student Documents</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="card-title">Student Documents</h2>
+            <a href="{% url 'documents:document_upload' %}" class="btn btn-primary">
+              <i class="fas fa-upload me-2"></i> Upload Document
+            </a>
+          </div>
+          
+          <!-- Search and Filter -->
+          <div class="row mb-4">
+            <div class="col-md-12">
+              <div class="card bg-light">
+                <div class="card-body">
+                  <form method="get" class="row g-3">
+                    <div class="col-md-4">
+                      <input type="text" class="form-control" name="search" placeholder="Search by name or registration number" value="{{ request.GET.search|default:'' }}">
+                    </div>
+                    <div class="col-md-3">
+                      <select class="form-select" name="class">
+                        <option value="">All Classes</option>
+                        <!-- Add class options here -->
+                      </select>
+                    </div>
+                    <div class="col-md-3">
+                      <select class="form-select" name="section">
+                        <option value="">All Sections</option>
+                        <!-- Add section options here -->
+                      </select>
+                    </div>
+                    <div class="col-md-2">
+                      <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-2"></i> Filter
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Students Table -->
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>S/N</th>
+                  <th>Registration No.</th>
+                  <th>Student Name</th>
+                  <th>Class</th>
+                  <th>Documents</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in students_with_docs %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ item.student.registration_number }}</td>
+                  <td>{{ item.student.fullname }}</td>
+                  <td>{{ item.student.current_class.name }} {{ item.student.section }}</td>
+                  <td>
+                    <span class="badge bg-primary">{{ item.document_count }}</span>
+                  </td>
+                  <td>
+                    <div class="btn-group" role="group">
+                      <a href="{% url 'documents:student_documents_detail' item.student.id %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-folder-open me-1"></i> View Documents
+                      </a>
+                      <a href="{% url 'student-detail' item.student.id %}" class="btn btn-sm btn-outline-info">
+                        <i class="fas fa-user me-1"></i> Student Profile
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="6" class="text-center">No students found</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block extrascripts %}
+<script>
+  $(document).ready(function() {
+    // Any student documents-specific JavaScript can go here
+  });
+</script>
+{% endblock extrascripts %}

@@ -1,0 +1,471 @@
+{% extends 'exams/base_exams.html' %}
+{% load static %}
+
+{% block exam-breadcrumb %}
+<li class="breadcrumb-item">
+  <a href="{% url 'exams:exam_list' %}" class="text-decoration-none fw-bold">
+    <i class="fas fa-calendar-alt"></i> Exams
+  </a>
+</li>
+<li class="breadcrumb-item active" aria-current="page">
+  <i class="fas fa-eye"></i> {{ exam.name }}
+</li>
+{% endblock exam-breadcrumb %}
+
+{% block title-icon %}fas fa-eye{% endblock title-icon %}
+
+{% block title %}{{ exam.name }}{% endblock title %}
+
+{% block subtitle %}{{ exam.exam_type.name }} - {{ exam.session.name }} {{ exam.term.name }}{% endblock subtitle %}
+
+{% block content %}
+<div class="container-fluid">
+  <!-- Exam Details Card -->
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card border-0 rounded-3 shadow-sm exam-card">
+        <div class="card-header bg-gradient-primary text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold"><i class="fas fa-info-circle me-2"></i>Exam Details</h5>
+          <div>
+            <a href="{% url 'exams:exam_update' exam.id %}" class="btn btn-light btn-sm me-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit exam details">
+              <i class="fas fa-edit me-1"></i> Edit
+            </a>
+            <a href="{% url 'exams:exam_delete' exam.id %}" class="btn btn-danger btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete this exam">
+              <i class="fas fa-trash me-1"></i> Delete
+            </a>
+          </div>
+        </div>
+        <div class="card-body p-4">
+          <div class="row g-4">
+            <!-- Left Column -->
+            <div class="col-md-6">
+              <div class="card h-100 border-0 shadow-sm">
+                <div class="card-header bg-light">
+                  <h6 class="mb-0 fw-bold"><i class="fas fa-clipboard-list me-2 text-primary"></i>Basic Information</h6>
+                </div>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label class="form-label text-muted small">Exam Name</label>
+                    <p class="fw-bold fs-5 mb-1">{{ exam.name }}</p>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label text-muted small">Exam Type</label>
+                    <p class="fw-bold mb-1">{{ exam.exam_type.name }}</p>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label text-muted small">Academic Session</label>
+                    <p class="fw-bold mb-1">{{ exam.session.name }}</p>
+                  </div>
+                  <div class="mb-0">
+                    <label class="form-label text-muted small">Term</label>
+                    <p class="fw-bold mb-0">{{ exam.term.name }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="col-md-6">
+              <div class="card h-100 border-0 shadow-sm">
+                <div class="card-header bg-light">
+                  <h6 class="mb-0 fw-bold"><i class="fas fa-calendar-day me-2 text-success"></i>Schedule & Status</h6>
+                </div>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label class="form-label text-muted small">Exam Period</label>
+                    <div class="d-flex align-items-center">
+                      <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-3">
+                        <i class="fas fa-calendar-alt text-primary"></i>
+                      </div>
+                      <p class="fw-bold mb-0">{{ exam.start_date|date:"d M, Y" }} - {{ exam.end_date|date:"d M, Y" }}</p>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label text-muted small">Status</label>
+                    <div class="d-flex align-items-center">
+                      <div class="rounded-circle bg-opacity-10 p-2 me-3
+                        {% if exam.status == 'pending' %}bg-warning{% elif exam.status == 'ongoing' %}bg-success
+                        {% elif exam.status == 'completed' %}bg-info{% elif exam.status == 'cancelled' %}bg-danger{% endif %}">
+                        <i class="fas
+                          {% if exam.status == 'pending' %}fa-clock text-warning
+                          {% elif exam.status == 'ongoing' %}fa-play-circle text-success
+                          {% elif exam.status == 'completed' %}fa-check-circle text-info
+                          {% elif exam.status == 'cancelled' %}fa-times-circle text-danger{% endif %}"></i>
+                      </div>
+                      {% if exam.status == 'pending' %}
+                        <span class="badge badge-pending">Pending</span>
+                      {% elif exam.status == 'ongoing' %}
+                        <span class="badge badge-ongoing">Ongoing</span>
+                      {% elif exam.status == 'completed' %}
+                        <span class="badge badge-completed">Completed</span>
+                      {% elif exam.status == 'cancelled' %}
+                        <span class="badge badge-cancelled">Cancelled</span>
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="mb-0">
+                    <label class="form-label text-muted small">Description</label>
+                    <div class="p-3 bg-light rounded">
+                      <p class="mb-0">{{ exam.description|default:"No description provided" }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card border-0 rounded-3 shadow-sm exam-card">
+        <div class="card-header bg-gradient-success text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+          <div>
+            <button type="button" class="btn btn-sm btn-light" data-bs-toggle="tooltip" data-bs-placement="left" title="These actions help you manage this specific exam">
+              <i class="fas fa-question-circle"></i> Help
+            </button>
+          </div>
+        </div>
+        <div class="card-body p-4">
+          <div class="row g-3">
+            <div class="col-md-3 col-sm-6">
+              <a href="#" class="card h-100 border-0 shadow-sm text-decoration-none hover-lift" data-bs-toggle="tooltip" data-bs-placement="top" title="Create a schedule for this exam">
+                <div class="card-body text-center p-4">
+                  <div class="rounded-circle bg-primary bg-opacity-10 p-3 d-inline-block mb-3">
+                    <i class="fas fa-calendar-plus fa-2x text-primary"></i>
+                  </div>
+                  <h6 class="fw-bold text-primary">Add Schedule</h6>
+                  <p class="text-muted small mb-0">Create exam timetable</p>
+                </div>
+              </a>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <a href="#" class="card h-100 border-0 shadow-sm text-decoration-none hover-lift" data-bs-toggle="tooltip" data-bs-placement="top" title="Upload question papers for this exam">
+                <div class="card-body text-center p-4">
+                  <div class="rounded-circle bg-success bg-opacity-10 p-3 d-inline-block mb-3">
+                    <i class="fas fa-file-upload fa-2x text-success"></i>
+                  </div>
+                  <h6 class="fw-bold text-success">Question Papers</h6>
+                  <p class="text-muted small mb-0">Upload exam papers</p>
+                </div>
+              </a>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <a href="#" class="card h-100 border-0 shadow-sm text-decoration-none hover-lift" data-bs-toggle="tooltip" data-bs-placement="top" title="Generate admit cards for students">
+                <div class="card-body text-center p-4">
+                  <div class="rounded-circle bg-warning bg-opacity-10 p-3 d-inline-block mb-3">
+                    <i class="fas fa-id-card fa-2x text-warning"></i>
+                  </div>
+                  <h6 class="fw-bold text-warning">Admit Cards</h6>
+                  <p class="text-muted small mb-0">Generate for students</p>
+                </div>
+              </a>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <a href="#" class="card h-100 border-0 shadow-sm text-decoration-none hover-lift" data-bs-toggle="tooltip" data-bs-placement="top" title="Enter marks for this exam">
+                <div class="card-body text-center p-4">
+                  <div class="rounded-circle bg-info bg-opacity-10 p-3 d-inline-block mb-3">
+                    <i class="fas fa-clipboard-check fa-2x text-info"></i>
+                  </div>
+                  <h6 class="fw-bold text-info">Enter Marks</h6>
+                  <p class="text-muted small mb-0">Record exam scores</p>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Exam Schedule -->
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card shadow">
+        <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Exam Schedule</h5>
+          <a href="#" class="btn btn-light btn-sm">
+            <i class="fas fa-plus me-1"></i> Add Schedule
+          </a>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover" id="scheduleTable">
+              <thead>
+                <tr>
+                  <th>S/N</th>
+                  <th>Subject</th>
+                  <th>Class</th>
+                  <th>Section</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Duration</th>
+                  <th>Venue</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for schedule in schedules %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ schedule.subject.name }}</td>
+                  <td>{{ schedule.student_class.name }}</td>
+                  <td>{{ schedule.section|default:"-" }}</td>
+                  <td>{{ schedule.date|date:"d M, Y" }}</td>
+                  <td>{{ schedule.start_time|time:"h:i A" }} - {{ schedule.end_time|time:"h:i A" }}</td>
+                  <td>{{ schedule.duration_minutes }} mins</td>
+                  <td>{{ schedule.venue|default:"-" }}</td>
+                  <td>
+                    <div class="btn-group" role="group">
+                      <a href="#" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                      <a href="#" class="btn btn-sm btn-outline-danger">
+                        <i class="fas fa-trash"></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="9" class="text-center">No schedules found. <a href="#">Add one now</a>.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Question Papers -->
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card shadow">
+        <div class="card-header bg-warning text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>Question Papers</h5>
+          <a href="#" class="btn btn-light btn-sm">
+            <i class="fas fa-plus me-1"></i> Add Question Paper
+          </a>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover" id="paperTable">
+              <thead>
+                <tr>
+                  <th>S/N</th>
+                  <th>Subject</th>
+                  <th>Class</th>
+                  <th>Section</th>
+                  <th>Total Marks</th>
+                  <th>Passing Marks</th>
+                  <th>Type</th>
+                  <th>Created By</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for paper in question_papers %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ paper.subject.name }}</td>
+                  <td>{{ paper.student_class.name }}</td>
+                  <td>{{ paper.section|default:"-" }}</td>
+                  <td>{{ paper.total_marks }}</td>
+                  <td>{{ paper.passing_marks }}</td>
+                  <td>
+                    {% if paper.generation_type == 'auto' %}
+                      <span class="badge bg-success">Auto-Generated</span>
+                    {% else %}
+                      <span class="badge bg-primary">Manually Uploaded</span>
+                    {% endif %}
+                  </td>
+                  <td>{{ paper.created_by.fullname|default:"-" }}</td>
+                  <td>
+                    <div class="btn-group" role="group">
+                      {% if paper.file %}
+                      <a href="{{ paper.file.url }}" class="btn btn-sm btn-outline-info" target="_blank">
+                        <i class="fas fa-download"></i>
+                      </a>
+                      {% endif %}
+                      <a href="#" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                      <a href="#" class="btn btn-sm btn-outline-danger">
+                        <i class="fas fa-trash"></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="9" class="text-center">No question papers found. <a href="#">Add one now</a>.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics -->
+  <div class="row">
+    <div class="col-md-12 mb-4">
+      <div class="card border-0 rounded-3 shadow-sm">
+        <div class="card-header bg-gradient-info text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold"><i class="fas fa-chart-pie me-2"></i>Exam Statistics</h5>
+          <div>
+            <button type="button" class="btn btn-sm btn-light" data-bs-toggle="tooltip" data-bs-placement="left" title="View detailed statistics for this exam">
+              <i class="fas fa-chart-line me-1"></i> Detailed Analytics
+            </button>
+          </div>
+        </div>
+        <div class="card-body p-4">
+          <div class="row g-4">
+            <div class="col-md-3 col-sm-6">
+              <div class="card h-100 border-0 shadow-sm hover-lift">
+                <div class="card-body p-4">
+                  <div class="d-flex align-items-center mb-3">
+                    <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                      <i class="fas fa-chair fa-2x text-primary"></i>
+                    </div>
+                    <div>
+                      <h6 class="text-muted mb-0 small">Seat Allocations</h6>
+                      <h2 class="fw-bold mb-0 counter">{{ seat_allocations|default:"0" }}</h2>
+                    </div>
+                  </div>
+                  <div class="progress mb-2" style="height: 5px;">
+                    <div class="progress-bar bg-primary" role="progressbar" style="width: {{ seat_allocations|default:0|mul:100|div:100 }}%;" aria-valuenow="{{ seat_allocations|default:0 }}" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-muted small">Total Capacity</span>
+                    <a href="#" class="text-primary text-decoration-none small fw-bold">Details <i class="fas fa-angle-right ms-1"></i></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <div class="card h-100 border-0 shadow-sm hover-lift">
+                <div class="card-body p-4">
+                  <div class="d-flex align-items-center mb-3">
+                    <div class="rounded-circle bg-success bg-opacity-10 p-3 me-3">
+                      <i class="fas fa-user-tie fa-2x text-success"></i>
+                    </div>
+                    <div>
+                      <h6 class="text-muted mb-0 small">Invigilators</h6>
+                      <h2 class="fw-bold mb-0 counter">{{ invigilator_assignments|default:"0" }}</h2>
+                    </div>
+                  </div>
+                  <div class="progress mb-2" style="height: 5px;">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ invigilator_assignments|default:0|mul:100|div:20 }}%;" aria-valuenow="{{ invigilator_assignments|default:0 }}" aria-valuemin="0" aria-valuemax="20"></div>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-muted small">Assigned / Required</span>
+                    <a href="#" class="text-success text-decoration-none small fw-bold">Details <i class="fas fa-angle-right ms-1"></i></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <div class="card h-100 border-0 shadow-sm hover-lift">
+                <div class="card-body p-4">
+                  <div class="d-flex align-items-center mb-3">
+                    <div class="rounded-circle bg-warning bg-opacity-10 p-3 me-3">
+                      <i class="fas fa-id-card fa-2x text-warning"></i>
+                    </div>
+                    <div>
+                      <h6 class="text-muted mb-0 small">Admit Cards</h6>
+                      <h2 class="fw-bold mb-0 counter">{{ admit_cards|default:"0" }}</h2>
+                    </div>
+                  </div>
+                  <div class="progress mb-2" style="height: 5px;">
+                    <div class="progress-bar bg-warning" role="progressbar" style="width: {{ admit_cards|default:0|mul:100|div:100 }}%;" aria-valuenow="{{ admit_cards|default:0 }}" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-muted small">Generated / Total</span>
+                    <a href="#" class="text-warning text-decoration-none small fw-bold">Details <i class="fas fa-angle-right ms-1"></i></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <div class="card h-100 border-0 shadow-sm hover-lift">
+                <div class="card-body p-4">
+                  <div class="d-flex align-items-center mb-3">
+                    <div class="rounded-circle bg-info bg-opacity-10 p-3 me-3">
+                      <i class="fas fa-clipboard-check fa-2x text-info"></i>
+                    </div>
+                    <div>
+                      <h6 class="text-muted mb-0 small">Marks Entries</h6>
+                      <h2 class="fw-bold mb-0 counter">{{ marks|default:"0" }}</h2>
+                    </div>
+                  </div>
+                  <div class="progress mb-2" style="height: 5px;">
+                    <div class="progress-bar bg-info" role="progressbar" style="width: {{ marks|default:0|mul:100|div:100 }}%;" aria-valuenow="{{ marks|default:0 }}" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-muted small">Completed / Total</span>
+                    <a href="#" class="text-info text-decoration-none small fw-bold">Details <i class="fas fa-angle-right ms-1"></i></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block exam-js %}
+<script>
+  $(document).ready(function() {
+    // Initialize DataTables with custom styling
+    $('#scheduleTable, #paperTable').each(function() {
+      $(this).DataTable({
+        "paging": true,
+        "lengthChange": true,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "autoWidth": false,
+        "responsive": true,
+        "language": {
+          "emptyTable": "No data available",
+          "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+          "infoEmpty": "Showing 0 to 0 of 0 entries",
+          "lengthMenu": "Show _MENU_ entries",
+          "search": "<i class='fas fa-search'></i> Search:",
+          "zeroRecords": "No matching records found"
+        },
+        "dom": '<"d-flex justify-content-between align-items-center mb-3"<"d-flex align-items-center"l><"d-flex"f>>t<"d-flex justify-content-between align-items-center mt-3"<"text-muted"i><"d-flex"p>>',
+        "drawCallback": function() {
+          // Add animation to rows
+          $(this).find('tbody tr').addClass('fade-in');
+
+          // Add tooltips to action buttons
+          $(this).find('[data-bs-toggle="tooltip"]').tooltip();
+        }
+      });
+    });
+
+    // Add hover effects to quick action buttons
+    $('.btn-outline-primary, .btn-outline-success, .btn-outline-warning, .btn-outline-info').hover(
+      function() {
+        $(this).find('i').addClass('fa-beat-fade');
+      },
+      function() {
+        $(this).find('i').removeClass('fa-beat-fade');
+      }
+    );
+  });
+</script>
+{% endblock exam-js %}

@@ -1,0 +1,6 @@
+/.venv
+SMS/debug.log
+*.pyc
+__pycache__/
+db.sqlite3
+

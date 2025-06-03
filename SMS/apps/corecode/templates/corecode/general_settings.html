@@ -1,0 +1,262 @@
+{% extends 'corecode/system_settings_base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block settings-icon %}fas fa-server{% endblock settings-icon %}
+{% block settings-title %}General Settings{% endblock settings-title %}
+{% block settings-icon-title %}fas fa-server{% endblock settings-icon-title %}
+{% block settings-page-title %}General Settings{% endblock settings-page-title %}
+{% block settings-subtitle %}Configure basic system settings{% endblock settings-subtitle %}
+
+{% block content-icon %}fas fa-server{% endblock content-icon %}
+{% block content-title %}General Configuration{% endblock content-title %}
+
+{% block settings-content %}
+<div class="row mb-4">
+  <div class="col-md-12">
+    <div class="alert alert-info d-flex align-items-center" role="alert">
+      <i class="fas fa-info-circle fa-2x me-3"></i>
+      <div>
+        <h5 class="alert-heading">General Settings</h5>
+        <p class="mb-0">Configure basic system settings including college information, contact details, and system preferences.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <form method="POST" enctype="multipart/form-data" id="generalSettingsForm">
+      {% csrf_token %}
+      
+      <!-- College Information -->
+      <div class="card mb-4 settings-card">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="fas fa-university me-2"></i> College Information</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">College Name</label>
+              {{ form.college_name|add_class:"form-control" }}
+              <div class="text-danger small">{{ form.college_name.errors }}</div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Established Year</label>
+              {{ form.established_year|add_class:"form-control" }}
+              <div class="text-danger small">{{ form.established_year.errors }}</div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">College Type</label>
+              {{ form.college_type|add_class:"form-select" }}
+              <div class="text-danger small">{{ form.college_type.errors }}</div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Principal Name</label>
+              {{ form.principal_name|add_class:"form-control" }}
+              <div class="text-danger small">{{ form.principal_name.errors }}</div>
+            </div>
+            <div class="col-md-12 mb-3">
+              <label class="form-label fw-bold">College Address</label>
+              {{ form.college_address|add_class:"form-control" }}
+              <div class="text-danger small">{{ form.college_address.errors }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Contact Information -->
+      <div class="card mb-4 settings-card">
+        <div class="card-header bg-info text-white">
+          <h5 class="mb-0"><i class="fas fa-address-card me-2"></i> Contact Information</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">College Email</label>
+              {{ form.college_email|add_class:"form-control" }}
+              <div class="text-danger small">{{ form.college_email.errors }}</div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">College Phone</label>
+              {{ form.college_phone|add_class:"form-control" }}
+              <div class="text-danger small">{{ form.college_phone.errors }}</div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Admin Email</label>
+              {{ form.admin_email|add_class:"form-control" }}
+              <div class="text-danger small">{{ form.admin_email.errors }}</div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Admin Contact</label>
+              {{ form.admin_contact|add_class:"form-control" }}
+              <div class="text-danger small">{{ form.admin_contact.errors }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Social Media & Branding -->
+      <div class="card mb-4 settings-card">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0"><i class="fas fa-share-alt me-2"></i> Social Media & Branding</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">College Logo</label>
+              <div class="input-group mb-3">
+                {% if form.instance.college_logo %}
+                <div class="current-logo mb-2 d-block w-100">
+                  <img src="{{ form.instance.college_logo.url }}" alt="Current Logo" class="img-thumbnail" style="max-height: 100px;">
+                  <p class="text-muted small mt-1">Current logo</p>
+                </div>
+                {% endif %}
+                {{ form.college_logo|add_class:"form-control" }}
+              </div>
+              <div class="text-danger small">{{ form.college_logo.errors }}</div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Facebook Link</label>
+              {{ form.facebook_link|add_class:"form-control" }}
+              <div class="text-danger small">{{ form.facebook_link.errors }}</div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Twitter Link</label>
+              {{ form.twitter_link|add_class:"form-control" }}
+              <div class="text-danger small">{{ form.twitter_link.errors }}</div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">LinkedIn Link</label>
+              {{ form.linkedin_link|add_class:"form-control" }}
+              <div class="text-danger small">{{ form.linkedin_link.errors }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- System Preferences -->
+      <div class="card mb-4 settings-card">
+        <div class="card-header bg-warning text-dark">
+          <h5 class="mb-0"><i class="fas fa-sliders-h me-2"></i> System Preferences</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Default Language</label>
+              <select class="form-select" name="default_language">
+                <option value="en" selected>English</option>
+                <option value="hi">Hindi</option>
+                <option value="es">Spanish</option>
+                <option value="fr">French</option>
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Time Zone</label>
+              <select class="form-select" name="time_zone">
+                <option value="UTC" selected>UTC</option>
+                <option value="Asia/Kolkata">Asia/Kolkata</option>
+                <option value="America/New_York">America/New_York</option>
+                <option value="Europe/London">Europe/London</option>
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Date Format</label>
+              <select class="form-select" name="date_format">
+                <option value="DD/MM/YYYY" selected>DD/MM/YYYY</option>
+                <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Currency Symbol</label>
+              <select class="form-select" name="currency_symbol">
+                <option value="₹" selected>₹ (INR)</option>
+                <option value="$">$ (USD)</option>
+                <option value="€">€ (EUR)</option>
+                <option value="£">£ (GBP)</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="row mt-3">
+            <div class="col-md-6 mb-3">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="enableNotifications" checked>
+                <label class="form-check-label fw-bold" for="enableNotifications">Enable Email Notifications</label>
+              </div>
+              <div class="text-muted small">Send email notifications for important system events</div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="enableMaintenance">
+                <label class="form-check-label fw-bold" for="enableMaintenance">Maintenance Mode</label>
+              </div>
+              <div class="text-muted small">Put the system in maintenance mode (only admins can access)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Form Submission -->
+      <div class="d-flex justify-content-between">
+        <button type="button" class="btn btn-outline-secondary" onclick="window.location.href='{% url 'system_settings_dashboard' %}'">
+          <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+        </button>
+        <div>
+          <button type="reset" class="btn btn-outline-danger me-2">
+            <i class="fas fa-undo me-2"></i> Reset Changes
+          </button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save me-2"></i> Save Settings
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock settings-content %}
+
+{% block settings-js %}
+<script>
+  $(document).ready(function() {
+    // Form validation
+    $('#generalSettingsForm').on('submit', function(e) {
+      let valid = true;
+      
+      // Basic validation for required fields
+      if ($('#id_college_name').val() === '') {
+        $('#id_college_name').addClass('is-invalid');
+        valid = false;
+      } else {
+        $('#id_college_name').removeClass('is-invalid');
+      }
+      
+      if ($('#id_college_email').val() === '') {
+        $('#id_college_email').addClass('is-invalid');
+        valid = false;
+      } else {
+        $('#id_college_email').removeClass('is-invalid');
+      }
+      
+      // Prevent form submission if validation fails
+      if (!valid) {
+        e.preventDefault();
+        toastr.error('Please fill in all required fields');
+      } else {
+        // Show loading state
+        $(this).find('button[type="submit"]').html('<i class="fas fa-spinner fa-spin me-2"></i> Saving...');
+      }
+    });
+    
+    // Reset form confirmation
+    $('button[type="reset"]').on('click', function(e) {
+      e.preventDefault();
+      if (confirm('Are you sure you want to reset all changes?')) {
+        $('#generalSettingsForm')[0].reset();
+        toastr.info('Form has been reset');
+      }
+    });
+  });
+</script>
+{% endblock settings-js %}

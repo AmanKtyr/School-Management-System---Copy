@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block breadcrumb-left %}
+<div class="breadcrumb-container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-chevron">
+      <li class="breadcrumb-item">
+        <a href="{% url 'home' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-home"></i> Home
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="#" class="text-decoration-none fw-bold">
+          <i class="fas fa-clipboard-list"></i> Results
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'create-result' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-plus-circle"></i> Create Results
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <i class="fas fa-tasks"></i> Select Subjects
+      </li>
+    </ol>
+  </nav>
+</div>
+{% endblock breadcrumb-left %}
+
+{% block title %}
+  Select all the subjects you want to create
+{% endblock title %}
+
+
+{% block content %}
+
+
+  <p>You selected <b>{{ count }} students</b> from the previous page.</p>
+
+  <form method="POST">
+    {% csrf_token %}
+
+    {{ form.non_field_errors }}
+
+    <div class="form-group row">
+      {{ form.session.errors }}
+      <label class="col-2" for="{{ form.session.id_for_label }}">{{ form.session.label_tag}}</label>
+      <div class="col">{{ form.session | add_class:"form-control" }}</div>
+    </div>
+
+    <div class="form-group row">
+      {{ form.term.errors }}
+      <label class="col-2" for="{{ form.term.id_for_label }}">{{ form.term.label_tag}}</label>
+      <div class="col">{{ form.term | add_class:"form-control" }}</div>
+    </div>
+    <div class="form-group row">
+      {{ form.subjects.errors }}
+      <label class="col-2" for="{{ form.subjects.id_for_label }}">{{ form.subjects.label_tag}}</label>
+      <div class="col">{{ form.subjects | add_class:"form-check-input" }}</div>
+    </div>
+
+    <input type="hidden" name="finish" value="True">
+    <input type="hidden" name="students" value="{{ students }}">
+
+    <input type="submit" class="btn btn-success" value="Create">
+  </form>
+
+{% endblock content %}

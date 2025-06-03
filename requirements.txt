@@ -1,0 +1,78 @@
+# Deployment instructions for Django project
+# 1. Collect static files
+# 2. Apply migrations
+# 3. (Optional) Create superuser
+# 4. (Optional) Set environment variables for production
+#
+# Run these commands in PowerShell:
+#
+# python SMS/manage.py collectstatic --noinput
+# python SMS/manage.py migrate
+# python SMS/manage.py createsuperuser
+#
+# Make sure to set DATABASE_URL and DJANGO_SECRET_KEY in your production environment.
+#
+# For Render/Heroku, add a build command for collectstatic and migrate if needed.
+
+appdirs==1.4.4
+arabic-reshaper==3.0.0
+asgiref==3.8.1
+asn1crypto==1.5.1
+black==23.1.0
+certifi==2025.1.31
+cffi==1.17.1
+chardet==5.2.0
+charset-normalizer==3.4.1
+click==8.1.3
+colorama==0.4.6
+cryptography==44.0.2
+cssselect2==0.8.0
+defusedxml==0.7.1
+dj-database-url==2.3.0
+Django==5.2
+django-filter==25.1
+django-widget-tweaks==1.4.12
+flake8==4.0.1
+gunicorn==23.0.0
+html5lib==1.1
+idna==3.10
+isort==5.11.0
+lxml==5.3.2
+mccabe==0.6.1
+mypy-extensions==1.0.0
+mysql-connector-python==9.3.0
+# mysqlclient==2.2.7
+PyMySQL==1.1.1
+oscrypto==1.3.0
+packaging==24.2
+pathspec==0.10.0
+Pillow==10.0.0
+platformdirs==4.3.6
+psycopg2-binary==2.9.10
+pycodestyle==2.8.0
+pycparser==2.22
+pyflakes==2.4.0
+pyHanko==0.26.0
+pyhanko-certvalidator==0.26.8
+pypdf==5.4.0
+python-bidi==0.6.6
+pytz==2024.1
+PyYAML==6.0.2
+qrcode==8.1
+regex==2024.11.6
+reportlab==4.3.1
+requests==2.32.3
+setuptools==75.8.2
+six==1.17.0
+sqlparse==0.5.0
+svglib==1.5.1
+tinycss2==1.4.0
+tomli==2.0.1
+typing_extensions==4.13.2
+tzdata==2025.1
+tzlocal==5.3.1
+uritools==4.0.3
+urllib3==2.4.0
+webencodings==0.5.1
+whitenoise==6.9.0
+xhtml2pdf==0.2.17

@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Report Card - {{ student.fullname }}</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f8f9fa;
+    }
+
+    .report-card {
+      background-color: #fff;
+      border: 1px solid #000;
+      margin: 20px auto;
+      max-width: 800px;
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .report-header {
+      text-align: center;
+      padding: 15px;
+      border-bottom: 2px solid #000;
+    }
+
+    .school-logo {
+      max-height: 80px;
+      margin-bottom: 10px;
+    }
+
+    .school-name {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .school-address {
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+
+    .report-title {
+      font-size: 18px;
+      font-weight: bold;
+      text-transform: uppercase;
+      background-color: #f8f9fa;
+      padding: 5px;
+      border: 1px solid #dee2e6;
+      margin-top: 10px;
+    }
+
+    .student-photo {
+      border: 1px solid #000;
+      height: 120px;
+      width: 100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #f8f9fa;
+    }
+
+    .student-info {
+      margin-top: 15px;
+    }
+
+    .info-row {
+      display: flex;
+      margin-bottom: 8px;
+    }
+
+    .info-label {
+      font-weight: bold;
+      width: 120px;
+    }
+
+    .info-value {
+      flex: 1;
+    }
+
+    .marks-table th, .marks-table td {
+      padding: 8px;
+      border: 1px solid #dee2e6;
+    }
+
+    .marks-table th {
+      background-color: #f8f9fa;
+      font-weight: bold;
+    }
+
+    .signature-section {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+      padding-top: 10px;
+    }
+
+    .signature-box {
+      text-align: center;
+      width: 150px;
+    }
+
+    .signature-line {
+      border-top: 1px solid #000;
+      margin-top: 40px;
+      padding-top: 5px;
+    }
+
+    .grade-scale {
+      font-size: 12px;
+      margin-top: 15px;
+      padding: 10px;
+      border: 1px solid #dee2e6;
+      background-color: #f8f9fa;
+    }
+
+    .attendance-section {
+      margin-top: 15px;
+    }
+
+    .remarks-section {
+      margin-top: 15px;
+      padding: 10px;
+      border: 1px solid #dee2e6;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      margin-top: 15px;
+      padding: 5px;
+      border-top: 1px solid #dee2e6;
+    }
+
+    .performance-chart {
+      height: 200px;
+      margin-top: 15px;
+    }
+
+    @media print {
+      body {
+        background-color: #fff;
+      }
+
+      .report-card {
+        box-shadow: none;
+        margin: 0;
+        border: 1px solid #000;
+        page-break-inside: avoid;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+
+      .page-break {
+        page-break-after: always;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Print Controls - Only visible on screen -->
+    <div class="no-print bg-light p-3 mb-3 rounded shadow-sm">
+      <div class="d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">Report Card Preview</h4>
+        <div>
+          <button onclick="window.print();" class="btn btn-primary">
+            <i class="fas fa-print me-1"></i> Print
+          </button>
+          <a href="{% url 'exams:results' %}" class="btn btn-secondary ms-2">
+            <i class="fas fa-arrow-left me-1"></i> Back to Results
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Report Card -->
+    <div class="report-card p-4">
+      <div class="report-header">
+        {% if profile.college_logo %}
+        <img src="{{ profile.college_logo.url }}" alt="School Logo" class="school-logo">
+        {% else %}
+        <img src="/static/dist/img/logo.png" alt="School Logo" class="school-logo">
+        {% endif %}
+        <div class="school-name">{{ profile.college_name|default:"SCHOOL NAME" }}</div>
+        <div class="school-address">{{ profile.college_address|default:"123 School Address, City, State, ZIP" }}</div>
+        <div class="school-contact">Phone: {{ profile.college_phone|default:"123-456-7890" }} | Email: {{ profile.college_email|default:"info@school.edu" }}</div>
+        {% if profile.established_year or profile.college_type or profile.principal_name %}
+        <div class="school-details">Est: {{ profile.established_year|default:"" }} | {{ profile.college_type|default:"" }} | Principal: {{ profile.principal_name|default:"" }}</div>
+        {% endif %}
+        <div class="report-title">Report Card</div>
+      </div>
+
+      <div class="row mt-3">
+        <div class="col-md-9">
+          <div class="student-info">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="info-row">
+                  <div class="info-label">Name:</div>
+                  <div class="info-value">{{ student.fullname }}</div>
+                </div>
+                <div class="info-row">
+                  <div class="info-label">Reg. Number:</div>
+                  <div class="info-value">{{ student.registration_number }}</div>
+                </div>
+                <div class="info-row">
+                  <div class="info-label">Class:</div>
+                  <div class="info-value">{{ student.current_class.name }} {{ student.current_section|default:"" }}</div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="info-row">
+                  <div class="info-label">Exam:</div>
+                  <div class="info-value">{{ exam.name }}</div>
+                </div>
+                <div class="info-row">
+                  <div class="info-label">Session:</div>
+                  <div class="info-value">{{ exam.session.name }}</div>
+                </div>
+                <div class="info-row">
+                  <div class="info-label">Term:</div>
+                  <div class="info-value">{{ exam.term.name }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 text-center">
+          <div class="student-photo">
+            {% if student.passport %}
+            <img src="{{ student.passport.url }}" alt="Student Photo" style="max-width: 100%; max-height: 100%;">
+            {% else %}
+            <span class="text-muted">Photo Not Available</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="marks-section mt-4">
+        <h5>Academic Performance</h5>
+        <div class="table-responsive">
+          <table class="table table-bordered marks-table">
+            <thead>
+              <tr>
+                <th>S/N</th>
+                <th>Subject</th>
+                <th>Max Marks</th>
+                <th>Pass Marks</th>
+                <th>Marks Obtained</th>
+                <th>Grade</th>
+                <th>Remarks</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for mark in marks %}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ mark.subject_name }}</td>
+                <td>{{ mark.max_marks }}</td>
+                <td>{{ mark.passing_marks }}</td>
+                <td>{{ mark.marks_obtained }}</td>
+                <td>{{ mark.grade }}</td>
+                <td>{{ mark.remarks|default:"-" }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="7" class="text-center">No marks available</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+            <tfoot>
+              <tr class="table-light">
+                <th colspan="2">Total</th>
+                <th>{{ total_max_marks }}</th>
+                <th>{{ total_passing_marks }}</th>
+                <th>{{ total_obtained_marks }}</th>
+                <th colspan="2">{{ percentage }}%</th>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <div class="row mt-4">
+        <div class="col-md-6">
+          <div class="summary-section">
+            <h5>Result Summary</h5>
+            <table class="table table-bordered">
+              <tr>
+                <th>Total Marks</th>
+                <td>{{ total_obtained_marks }} / {{ total_max_marks }}</td>
+              </tr>
+              <tr>
+                <th>Percentage</th>
+                <td>{{ percentage }}%</td>
+              </tr>
+              <tr>
+                <th>Grade</th>
+                <td>{{ overall_grade }}</td>
+              </tr>
+              <tr>
+                <th>Rank in Class</th>
+                <td>{{ rank }} / {{ total_students }}</td>
+              </tr>
+              <tr>
+                <th>Result</th>
+                <td>
+                  {% if is_pass %}
+                  <span class="badge bg-success">PASS</span>
+                  {% else %}
+                  <span class="badge bg-danger">FAIL</span>
+                  {% endif %}
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="attendance-section">
+            <h5>Attendance Record</h5>
+            <table class="table table-bordered">
+              <tr>
+                <th>Total Working Days</th>
+                <td>{{ total_working_days }}</td>
+              </tr>
+              <tr>
+                <th>Days Present</th>
+                <td>{{ days_present }}</td>
+              </tr>
+              <tr>
+                <th>Days Absent</th>
+                <td>{{ days_absent }}</td>
+              </tr>
+              <tr>
+                <th>Attendance Percentage</th>
+                <td>{{ attendance_percentage }}%</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="performance-chart mt-4">
+        <h5>Subject-wise Performance</h5>
+        <canvas id="performanceChart"></canvas>
+      </div>
+
+      <div class="remarks-section mt-4">
+        <h5>Remarks</h5>
+        <div class="row">
+          <div class="col-md-12">
+            <p><strong>Class Teacher's Remarks:</strong> {{ class_teacher_remarks|default:"No remarks provided." }}</p>
+            <p><strong>Principal's Remarks:</strong> {{ principal_remarks|default:"No remarks provided." }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grade-scale mt-4">
+        <h5>Grading Scale</h5>
+        <div class="row">
+          <div class="col-md-6">
+            <table class="table table-sm table-bordered">
+              <tr>
+                <th>Grade</th>
+                <th>Percentage Range</th>
+                <th>Description</th>
+              </tr>
+              <tr>
+                <td>A+</td>
+                <td>90% - 100%</td>
+                <td>Outstanding</td>
+              </tr>
+              <tr>
+                <td>A</td>
+                <td>80% - 89%</td>
+                <td>Excellent</td>
+              </tr>
+              <tr>
+                <td>B+</td>
+                <td>70% - 79%</td>
+                <td>Very Good</td>
+              </tr>
+              <tr>
+                <td>B</td>
+                <td>60% - 69%</td>
+                <td>Good</td>
+              </tr>
+            </table>
+          </div>
+          <div class="col-md-6">
+            <table class="table table-sm table-bordered">
+              <tr>
+                <th>Grade</th>
+                <th>Percentage Range</th>
+                <th>Description</th>
+              </tr>
+              <tr>
+                <td>C+</td>
+                <td>50% - 59%</td>
+                <td>Above Average</td>
+              </tr>
+              <tr>
+                <td>C</td>
+                <td>40% - 49%</td>
+                <td>Average</td>
+              </tr>
+              <tr>
+                <td>F</td>
+                <td>Below 40%</td>
+                <td>Fail</td>
+              </tr>
+              <tr>
+                <td colspan="3"></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="signature-section mt-4">
+        <div class="signature-box">
+          <div class="signature-line">Class Teacher</div>
+        </div>
+        <div class="signature-box">
+          <div class="signature-line">Examination In-charge</div>
+        </div>
+        <div class="signature-box">
+          <div class="signature-line">{{ profile.principal_name|default:"Principal" }}</div>
+        </div>
+      </div>
+
+      <div class="footer mt-4">
+        <div>This report card is electronically generated and does not require a seal.</div>
+        <div>Date of Issue: {{ issue_date|date:"d M, Y" }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    // Initialize performance chart
+    document.addEventListener('DOMContentLoaded', function() {
+      var ctx = document.getElementById('performanceChart').getContext('2d');
+
+      var subjects = [{% for mark in marks %}'{{ mark.subject_name }}',{% endfor %}];
+      var marks = [{% for mark in marks %}{{ mark.marks_obtained }},{% endfor %}];
+      var maxMarks = [{% for mark in marks %}{{ mark.max_marks }},{% endfor %}];
+
+      var chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: subjects,
+          datasets: [
+            {
+              label: 'Marks Obtained',
+              data: marks,
+              backgroundColor: 'rgba(54, 162, 235, 0.2)',
+              borderColor: 'rgba(54, 162, 235, 1)',
+              borderWidth: 1
+            },
+            {
+              label: 'Maximum Marks',
+              data: maxMarks,
+              backgroundColor: 'rgba(255, 99, 132, 0.2)',
+              borderColor: 'rgba(255, 99, 132, 1)',
+              borderWidth: 1,
+              type: 'line'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: Math.max(...maxMarks) + 10
+            }
+          }
+        }
+      });
+    });
+
+    // Auto-print when page loads
+    window.onload = function() {
+      // Uncomment to automatically print
+      // window.print();
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,315 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block breadcrumb-left %}
+<div class="breadcrumb-container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-chevron">
+      <li class="breadcrumb-item">
+        <a href="{% url 'home' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-home"></i> Home
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="#" class="text-decoration-none fw-bold">
+          <i class="fas fa-copy"></i> Management
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <i class="fas fa-clock"></i> Academic Terms
+      </li>
+    </ol>
+  </nav>
+</div>
+{% endblock breadcrumb-left %}
+
+{% block title-icon %}fas fa-clock{% endblock title-icon %}
+
+{% block title %}Academic Terms{% endblock title %}
+
+{% block subtitle %}Manage academic terms for the school year{% endblock subtitle %}
+
+
+{% block breadcrumb %}
+{% endblock breadcrumb %}
+
+{% block page-actions %}
+  <a class="btn btn-primary" href="#" data-toggle="modal" data-target="#modal1">
+    <i class="fas fa-plus me-2"></i> Add New Term
+  </a>
+{% endblock page-actions %}
+
+
+{% block content %}
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-light">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-list me-2"></i> Term List
+            <span class="badge bg-primary ms-2">{{ object_list|length }}</span>
+          </h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover table-striped" id="termTable">
+              <thead class="table-light">
+                <tr>
+                  <th width="5%" class="text-center">#</th>
+                  <th width="60%">Term Name</th>
+                  <th width="20%" class="text-center">Status</th>
+                  <th width="15%" class="text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for object in object_list %}
+                <tr class="term-row" data-term-id="{{ object.id }}" data-term-name="{{ object }}" data-term-current="{{ object.current|yesno:'true,false' }}">
+                  <td class="text-center">{{ forloop.counter }}</td>
+                  <td>
+                    <span class="fw-medium">{{ object }}</span>
+                  </td>
+                  <td class="text-center">
+                    {% if object.current == True %}
+                      <span class="badge bg-success">Current</span>
+                    {% else %}
+                      <span class="badge bg-secondary">Inactive</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-center">
+                    <div class="btn-group btn-group-sm">
+                      <button type="button" class="btn btn-outline-primary edit-term-btn" data-term-id="{{ object.id }}" title="Edit Term">
+                        <i class="fa fa-edit"></i>
+                      </button>
+                      <a href="{% url 'term-delete' object.id %}" class="btn btn-outline-danger" title="Delete Term" {% if object.current %}disabled{% endif %}>
+                        <i class="fa fa-trash-alt"></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="4" class="text-center py-4">
+                    <div class="empty-state">
+                      <i class="fas fa-clock fa-3x text-muted mb-3"></i>
+                      <h5>No Terms Found</h5>
+                      <p class="text-muted">Start by adding your first academic term using the 'Add New Term' button.</p>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Edit Term Modal -->
+  <div class="modal fade" id="editTermModal" tabindex="-1" aria-labelledby="editTermModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="editTermForm">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title" id="editTermModalLabel">
+              <i class="fas fa-edit me-2"></i> Edit Term
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            {% csrf_token %}
+            <input type="hidden" id="editTermId" name="term_id">
+            <div class="mb-3">
+              <label for="editTermName" class="form-label fw-bold">Term Name</label>
+              <input type="text" class="form-control" id="editTermName" name="name" required>
+              <div class="invalid-feedback">Please enter a term name.</div>
+            </div>
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="editTermCurrent" name="current">
+              <label class="form-check-label" for="editTermCurrent">Set as current term</label>
+            </div>
+          </div>
+          <div class="modal-footer bg-light">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              <i class="fas fa-times me-1"></i> Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="saveEditTermBtn">
+              <i class="fas fa-save me-1"></i> Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add New Term Modal -->
+  <div class="modal fade" id="modal1" tabindex="-1" aria-labelledby="addTermModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form action="{% url 'term-create' %}" method="POST" id="addTermForm">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title" id="addTermModalLabel">
+              <i class="fas fa-plus-circle me-2"></i> Add New Term
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            {% csrf_token %}
+            <div class="alert alert-info">
+              <i class="fas fa-info-circle me-2"></i> Enter the academic term name (e.g., "First Term", "Second Term").
+            </div>
+            {% for field in form %}
+            <div class="mb-3">
+              <label for="{{ field.id_for_label }}" class="form-label fw-bold">{{ field.label }}</label>
+              {{ field|add_class:"form-control" }}
+              <div class="form-text">{{ field.help_text }}</div>
+              <div class="invalid-feedback">{{ field.errors }}</div>
+            </div>
+            {% endfor %}
+          </div>
+          <div class="modal-footer bg-light">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              <i class="fas fa-times me-1"></i> Cancel
+            </button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save me-1"></i> Save Term
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+{% endblock content %}
+
+{% block morejs %}
+<script>
+  $(document).ready(function() {
+    // Setup CSRF token for AJAX requests
+    var csrftoken = $('input[name="csrfmiddlewaretoken"]').val();
+
+    $.ajaxSetup({
+      beforeSend: function(xhr, settings) {
+        if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+          xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+      }
+    });
+
+    // Handle the Add Term button click
+    $('#addTermBtn').on('click', function(e) {
+      e.preventDefault();
+      var modal = new bootstrap.Modal(document.getElementById('modal1'));
+      modal.show();
+    });
+
+    // Edit term button click
+    $('.edit-term-btn').on('click', function() {
+      var termId = $(this).data('term-id');
+      var termRow = $('.term-row[data-term-id="' + termId + '"]');
+      var termName = termRow.data('term-name');
+      var termCurrent = termRow.data('term-current') === 'true';
+
+      // Populate the edit form
+      $('#editTermId').val(termId);
+      $('#editTermName').val(termName);
+      $('#editTermCurrent').prop('checked', termCurrent);
+
+      // Show the edit modal
+      var editModal = new bootstrap.Modal(document.getElementById('editTermModal'));
+      editModal.show();
+    });
+
+    // Handle edit term form submission
+    $('#editTermForm').on('submit', function(e) {
+      e.preventDefault();
+
+      var termId = $('#editTermId').val();
+      var termName = $('#editTermName').val();
+      var termCurrent = $('#editTermCurrent').is(':checked');
+
+      if (!termName.trim()) {
+        $('#editTermName').addClass('is-invalid');
+        return false;
+      }
+
+      // Show loading state
+      var $btn = $('#saveEditTermBtn');
+      var originalHtml = $btn.html();
+      $btn.html('<i class="fas fa-spinner fa-spin me-1"></i> Saving...');
+      $btn.prop('disabled', true);
+
+      // Make AJAX call to update term
+      $.ajax({
+        url: '/api/term/' + termId + '/update/',
+        type: 'POST',
+        data: {
+          name: termName,
+          current: termCurrent,
+          csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val()
+        },
+        success: function(response) {
+          // Close modal
+          var editModal = bootstrap.Modal.getInstance(document.getElementById('editTermModal'));
+          editModal.hide();
+
+          // Show success message
+          alert('Term updated successfully!');
+
+          // Update the UI
+          var row = $('.term-row[data-term-id="' + termId + '"]');
+          row.data('term-name', termName);
+          row.data('term-current', termCurrent ? 'true' : 'false');
+          row.find('td:nth-child(2) span').text(termName);
+
+          // Update status badge
+          if (termCurrent) {
+            row.find('td:nth-child(3) span').removeClass('bg-secondary').addClass('bg-success').text('Current');
+            // Update other rows to show as inactive
+            $('.term-row').not(row).each(function() {
+              $(this).data('term-current', 'false');
+              $(this).find('td:nth-child(3) span').removeClass('bg-success').addClass('bg-secondary').text('Inactive');
+            });
+          } else {
+            row.find('td:nth-child(3) span').removeClass('bg-success').addClass('bg-secondary').text('Inactive');
+          }
+
+          // Reset button
+          $btn.html(originalHtml);
+          $btn.prop('disabled', false);
+        },
+        error: function(xhr) {
+          var errorMsg = 'Failed to update term';
+          if (xhr.responseJSON && xhr.responseJSON.error) {
+            errorMsg = xhr.responseJSON.error;
+          }
+          alert(errorMsg);
+
+          // Reset button
+          $btn.html(originalHtml);
+          $btn.prop('disabled', false);
+        }
+      });
+    });
+
+    // Form validation
+    $('#addTermForm').on('submit', function(e) {
+      var form = $(this);
+      var nameField = form.find('input[name="name"]');
+      var isValid = true;
+
+      if (!nameField.val().trim()) {
+        nameField.addClass('is-invalid');
+        nameField.siblings('.invalid-feedback').text('Term name is required');
+        isValid = false;
+      } else {
+        nameField.removeClass('is-invalid');
+      }
+
+      return isValid;
+    });
+  });
+</script>
+{% endblock morejs %}
+

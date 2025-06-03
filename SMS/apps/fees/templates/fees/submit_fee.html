@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block breadcrumb-left %}
+<div class="breadcrumb-container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-chevron">
+      <li class="breadcrumb-item">
+        <a href="{% url 'home' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-home"></i> Home
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'fees:fee_list' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-money-bill-wave"></i> Fee Management
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <i class="fas fa-hand-holding-usd"></i> Submit Fee
+      </li>
+    </ol>
+  </nav>
+</div>
+{% endblock breadcrumb-left %}
+
+{% block title-icon %}fas fa-hand-holding-usd{% endblock title-icon %}
+
+{% block title %}Submit Fee{% endblock title %}
+
+{% block subtitle %}Select a student to submit fee payment{% endblock subtitle %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-lg p-4">
+        <h2 class="text-center">💳 Submit Fee</h2>
+        <form method="GET" class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Select Class</label>
+                <select class="form-select" name="class_filter" required onchange="this.form.submit()">
+                    <option value="">Choose...</option>
+                    {% for class in classes %}
+                        <option value="{{ class }}" {% if request.GET.class_filter == class %}selected{% endif %}>{{ class }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Select Section</label>
+                <select class="form-select" name="section_filter" required onchange="this.form.submit()">
+                    <option value="">Choose...</option>
+                    {% for section in sections %}
+                        <option value="{{ section }}" {% if request.GET.section_filter == section %}selected{% endif %}>{{ section }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+    </div>
+
+    {% if students %}
+    <div class="card shadow-lg p-4 mt-4">
+        <h4 class="text-center">📄 Student Fee Details</h4>
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered text-center">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Roll No</th>
+                        <th>Class</th>
+                        <th>Section</th>
+                        <th>Total Fee (₹)</th>
+                        <th>Paid Fee (₹)</th>
+                        <th>Pending Fee (₹)</th>
+                        <th>Submit Fee</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td>{{ student.name }}</td>
+                        <td>{{ student.roll_number }}</td>
+                        <td>{{ student.class_name }}</td>
+                        <td>{{ student.section }}</td>
+                        <td>₹{{ student.total_fee }}</td>
+                        <td>₹{{ student.paid_fee }}</td>
+                        <td>₹{{ student.pending_fee }}</td>
+                        <td>
+                            <a href="{% url 'submit_fee' student.id %}" class="btn btn-sm btn-success">💰 Submit Fee</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted">No students found for this class & section.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

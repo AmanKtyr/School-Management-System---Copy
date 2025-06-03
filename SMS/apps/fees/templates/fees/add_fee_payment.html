@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block breadcrumb-left %}
+<div class="breadcrumb-container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-chevron">
+      <li class="breadcrumb-item">
+        <a href="{% url 'home' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-home"></i> Home
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'fees:fee_list' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-money-bill-wave"></i> Fee Management
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <i class="fas fa-credit-card"></i> Add Payment
+      </li>
+    </ol>
+  </nav>
+</div>
+{% endblock breadcrumb-left %}
+
+{% block title-icon %}fas fa-credit-card{% endblock title-icon %}
+
+{% block title %}Add Fee Payment{% endblock title %}
+
+{% block subtitle %}Record a new fee payment for {{ student.fullname }}{% endblock subtitle %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Left Column - Pending Fees -->
+        <div class="col-md-5">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i>Pending Fees</h4>
+                </div>
+                <div class="card-body">
+                    {% if pending_fees %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i> Total pending amount: <strong>₹{{ total_pending|floatformat:2 }}</strong>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Fee Type</th>
+                                    <th>Amount (₹)</th>
+                                    <th>Due Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for fee in pending_fees %}
+                                <tr>
+                                    <td>{{ fee.fee_type }}</td>
+                                    <td>{{ fee.get_discounted_amount|floatformat:2 }}</td>
+                                    <td>{{ fee.due_date|date:"d M Y" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i> No pending fees at this time.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column - Payment Form -->
+        <div class="col-md-7">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-credit-card me-2"></i>Add Fee Payment for {{ student.fullname }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Class:</strong> {{ student.current_class }}</p>
+                            <p><strong>Registration Number:</strong> {{ student.registration_number }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Section:</strong> {{ student.section }}</p>
+                        </div>
+                    </div>
+
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="amount" class="form-label">Amount (₹)</label>
+                            <input type="number" class="form-control" id="amount" name="amount" required step="0.01" value="{{ total_pending|floatformat:2 }}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="payment_method" class="form-label">Payment Method</label>
+                            <select class="form-select" id="payment_method" name="payment_method" required onchange="toggleTransactionId()">
+                                <option value="">Select Payment Method</option>
+                                <option value="Cash">Cash</option>
+                                <option value="Online">Online</option>
+                                <option value="Bank Transfer">Bank Transfer</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3" id="transaction_id_div" style="display: none;">
+                            <label for="transaction_id" class="form-label">Transaction ID</label>
+                            <input type="text" class="form-control" id="transaction_id" name="transaction_id" placeholder="Enter transaction ID for online or bank transfer">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="fee_category" class="form-label">Fee Category</label>
+                            <select class="form-select" id="fee_category" name="fee_category" required>
+                                <option value="">Select Fee Category</option>
+                                <option value="Regular">Regular Fee</option>
+                                <option value="Transport">Transport Fee</option>
+                                <option value="Library">Library Fee</option>
+                                <option value="Laboratory">Laboratory Fee</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="fee_type" class="form-label">Pay for Specific Fee (Optional)</label>
+                            <select class="form-select" id="fee_type" name="fee_type">
+                                <option value="all">Pay for all pending fees</option>
+                                {% for fee in pending_fees %}
+                                <option value="{{ fee.id }}">{{ fee.fee_type }} - ₹{{ fee.get_discounted_amount|floatformat:2 }}</option>
+                                {% endfor %}
+                            </select>
+                            <small class="text-muted">If you select a specific fee, the payment will be applied to that fee only.</small>
+                        </div>
+
+                        <div class="text-end">
+                            <a href="{% url 'student-detail' pk=student.id %}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Submit Payment</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function toggleTransactionId() {
+        const paymentMethod = document.getElementById('payment_method').value;
+        const transactionIdDiv = document.getElementById('transaction_id_div');
+        const transactionIdInput = document.getElementById('transaction_id');
+
+        if (paymentMethod === 'Online' || paymentMethod === 'Bank Transfer') {
+            transactionIdDiv.style.display = 'block';
+            transactionIdInput.required = true;
+        } else {
+            transactionIdDiv.style.display = 'none';
+            transactionIdInput.required = false;
+            transactionIdInput.value = '';
+        }
+    }
+
+    // Call the function on page load to handle initial state
+    document.addEventListener('DOMContentLoaded', function() {
+        toggleTransactionId();
+    });
+</script>
+{% endblock %}

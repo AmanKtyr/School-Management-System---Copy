@@ -1,0 +1,1391 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block breadcrumb-left %}
+<div class="breadcrumb-container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-chevron">
+      <li class="breadcrumb-item">
+        <a href="{% url 'home' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-home"></i> Home
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="#" class="text-decoration-none fw-bold">
+          <i class="fas fa-copy"></i> Management
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <i class="fas fa-book"></i> Subjects
+      </li>
+    </ol>
+  </nav>
+</div>
+{% endblock breadcrumb-left %}
+
+{% block title-icon %}fas fa-book{% endblock title-icon %}
+
+{% block title %}Subject Management{% endblock title %}
+
+{% block subtitle %}Create and manage academic subjects taught in your institution{% endblock subtitle %}
+
+{% block breadcrumb %}
+{% endblock breadcrumb %}
+
+{% block page-actions %}
+  <div class="d-flex gap-2">
+    <button type="button" class="btn btn-primary rounded-3 shadow-sm" id="addSubjectBtn">
+      <i class="fas fa-plus me-2"></i> Add New Subject
+    </button>
+    <button type="button" class="btn btn-success rounded-3 shadow-sm" id="bulkAssignBtn">
+      <i class="fas fa-link me-2"></i> Bulk Assign to Classes
+    </button>
+    <button type="button" class="btn btn-info text-white rounded-3 shadow-sm" id="manageAssignmentsBtn">
+      <i class="fas fa-tasks me-2"></i> Manage Assignments
+    </button>
+  </div>
+{% endblock page-actions %}
+
+{% block content %}
+{% csrf_token %}
+<div class="row mb-4">
+  <div class="col-md-6">
+    <div class="input-group">
+      <span class="input-group-text bg-primary text-white"><i class="fas fa-search"></i></span>
+      <input type="text" id="subjectSearchInput" class="form-control" placeholder="Search subjects...">
+    </div>
+  </div>
+  <div class="col-md-6 text-end">
+    <div class="btn-group" role="group">
+      <button type="button" class="btn btn-outline-primary" id="refreshSubjectList">
+        <i class="fas fa-sync-alt"></i> Refresh
+      </button>
+      <div class="btn-group" role="group">
+        <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="fas fa-sort"></i> Sort
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item sort-option" data-sort="name-asc" href="#">Name (A-Z)</a></li>
+          <li><a class="dropdown-item sort-option" data-sort="name-desc" href="#">Name (Z-A)</a></li>
+          <li><a class="dropdown-item sort-option" data-sort="classes-asc" href="#">Classes (Low-High)</a></li>
+          <li><a class="dropdown-item sort-option" data-sort="classes-desc" href="#">Classes (High-Low)</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <div class="card shadow-sm">
+      <div class="card-header bg-light">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-list me-2"></i> Subject List
+          <span class="badge bg-primary ms-2" id="totalSubjectCount">{{ object_list|length }}</span>
+        </h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover table-striped" id="subjectTable">
+            <thead class="table-light">
+              <tr>
+                <th width="5%" class="text-center">#</th>
+                <th width="30%">Subject Name</th>
+                <th width="15%" class="text-center">Classes</th>
+                <th width="15%" class="text-center">Department</th>
+                <th width="20%" class="text-center">Assigned To</th>
+                <th width="15%" class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for object in object_list %}
+              <tr class="subject-row" data-subject-id="{{ object.id }}" data-subject-name="{{ object }}">
+                <td class="text-center">{{ forloop.counter }}</td>
+                <td>
+                  <span class="fw-medium">{{ object }}</span>
+                </td>
+                <td class="text-center">
+                  <span class="badge bg-primary class-count" data-subject-id="{{ object.id }}">Loading...</span>
+                </td>
+                <td class="text-center">
+                  <span class="department-info" data-subject-id="{{ object.id }}">General</span>
+                </td>
+                <td class="text-center">
+                  <div class="class-assignments" data-subject-id="{{ object.id }}">
+                    <div class="d-flex align-items-center justify-content-center">
+                      <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                      </div>
+                      <span class="text-muted">Loading assignments...</span>
+                    </div>
+                  </div>
+                </td>
+                <td class="text-center">
+                  <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-outline-primary edit-subject-btn" data-subject-id="{{ object.id }}" title="Edit Subject">
+                      <i class="fa fa-edit"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-info view-subject-details" data-subject-id="{{ object.id }}" title="View Details">
+                      <i class="fa fa-eye"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-success quick-assign-btn" data-subject-id="{{ object.id }}" data-subject-name="{{ object }}" title="Quick Assign">
+                      <i class="fa fa-user-plus"></i>
+                    </button>
+                    <a href="{% url 'subject-delete' object.id %}" class="btn btn-outline-danger" title="Delete Subject">
+                      <i class="fa fa-trash-alt"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="6" class="text-center py-4">
+                  <div class="empty-state">
+                    <i class="fas fa-book fa-3x text-muted mb-3"></i>
+                    <h5>No Subjects Found</h5>
+                    <p class="text-muted">Start by adding your first subject using the 'Add New Subject' button.</p>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card-footer bg-light">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <small class="text-muted">Showing {{ object_list|length }} subjects</small>
+          </div>
+          <div>
+            <nav aria-label="Subject navigation">
+              <ul class="pagination pagination-sm mb-0">
+                <li class="page-item disabled">
+                  <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                </li>
+                <li class="page-item active" aria-current="page">
+                  <a class="page-link" href="#">1</a>
+                </li>
+                <li class="page-item disabled">
+                  <a class="page-link" href="#">Next</a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Subject Details Modal -->
+<div class="modal fade" id="subjectDetailsModal" tabindex="-1" aria-labelledby="subjectDetailsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-light">
+        <h5 class="modal-title" id="subjectDetailsModalLabel">
+          <i class="fas fa-info-circle me-2"></i> Subject Details
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label fw-bold">Subject Name:</label>
+              <p id="detailSubjectName" class="form-control-plaintext">-</p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label fw-bold">Department:</label>
+              <p id="detailDepartment" class="form-control-plaintext">-</p>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <div class="mb-3">
+              <label class="form-label fw-bold">Classes:</label>
+              <div id="detailClasses" class="form-control-plaintext">Loading...</div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <div class="mb-3">
+              <label class="form-label fw-bold">Recent Exams:</label>
+              <div id="detailExams" class="form-control-plaintext">Loading...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="editSubjectLink" class="btn btn-primary">
+          <i class="fas fa-edit me-1"></i> Edit Subject
+        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-1"></i> Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add New Subject Modal -->
+<div class="modal fade" id="modal1" tabindex="-1" aria-labelledby="addSubjectModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="{% url 'subject-create' %}" method="POST" id="addSubjectForm">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title" id="addSubjectModalLabel">
+            <i class="fas fa-plus-circle me-2"></i> Add New Subject
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          {% csrf_token %}
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i> Enter the subject name (e.g., "Mathematics", "Physics", "English Literature").
+          </div>
+          {% for field in form %}
+          <div class="mb-3">
+            <label for="{{ field.id_for_label }}" class="form-label fw-bold">{{ field.label }}</label>
+            {{ field|add_class:"form-control" }}
+            <div class="form-text">{{ field.help_text }}</div>
+            <div class="invalid-feedback">{{ field.errors }}</div>
+          </div>
+          {% endfor %}
+          <div class="mb-3">
+            <label for="subjectCode" class="form-label fw-bold">Subject Code</label>
+            <input type="text" class="form-control" id="subjectCode" name="code" placeholder="e.g., MATH101">
+            <div class="form-text">Optional code for this subject</div>
+          </div>
+          <div class="mb-3">
+            <label for="subjectDepartment" class="form-label fw-bold">Department</label>
+            <select class="form-select" id="subjectDepartment" name="department">
+              <option value="">Select Department</option>
+              <option value="Science">Science</option>
+              <option value="Mathematics">Mathematics</option>
+              <option value="Languages">Languages</option>
+              <option value="Social Sciences">Social Sciences</option>
+              <option value="Commerce">Commerce</option>
+              <option value="Arts">Arts</option>
+              <option value="Computer Science">Computer Science</option>
+              <option value="General">General</option>
+            </select>
+            <div class="form-text">Department this subject belongs to</div>
+          </div>
+          <div class="mb-3">
+            <label for="subjectDescription" class="form-label fw-bold">Description</label>
+            <textarea class="form-control" id="subjectDescription" name="description" rows="3" placeholder="Brief description of the subject"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="fas fa-times me-1"></i> Cancel
+          </button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save me-1"></i> Save Subject
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Assign Modal -->
+<div class="modal fade" id="quickAssignModal" tabindex="-1" aria-labelledby="quickAssignModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="quickAssignModalLabel">
+          <i class="fas fa-link me-2"></i> Quick Assign Subject
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-info">
+          <i class="fas fa-info-circle me-2"></i> Quickly assign <strong id="quickAssignSubjectName">this subject</strong> to a class.
+        </div>
+        <input type="hidden" id="quickAssignSubjectId" value="">
+        <div class="mb-3">
+          <label for="quickAssignClassSelect" class="form-label fw-bold">Select Class</label>
+          <select class="form-select" id="quickAssignClassSelect">
+            <option value="">Select a class</option>
+            <!-- Classes will be loaded dynamically -->
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="quickAssignSectionInput" class="form-label fw-bold">Section (Optional)</label>
+          <input type="text" class="form-control" id="quickAssignSectionInput" placeholder="e.g., A, B, C">
+          <div class="form-text">Leave blank to assign to all sections</div>
+        </div>
+        <div class="mb-3">
+          <label for="quickAssignTeacherSelect" class="form-label fw-bold">Teacher (Optional)</label>
+          <select class="form-select" id="quickAssignTeacherSelect">
+            <option value="">Select a teacher</option>
+            <!-- Teachers will be loaded dynamically -->
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-1"></i> Cancel
+        </button>
+        <button type="button" class="btn btn-success" id="saveQuickAssignBtn">
+          <i class="fas fa-save me-1"></i> Save Assignment
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bulk Assign Modal -->
+<div class="modal fade" id="bulkAssignModal" tabindex="-1" aria-labelledby="bulkAssignModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="bulkAssignModalLabel">
+          <i class="fas fa-link me-2"></i> Bulk Assign Subjects to Classes
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-info">
+          <i class="fas fa-info-circle me-2"></i> Assign multiple subjects to classes at once.
+        </div>
+
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <div class="card h-100">
+              <div class="card-header bg-light">
+                <h6 class="mb-0">Select Subjects</h6>
+              </div>
+              <div class="card-body p-0">
+                <div class="list-group list-group-flush" id="bulkSubjectsList" style="max-height: 250px; overflow-y: auto;">
+                  {% for subject in object_list %}
+                  <label class="list-group-item">
+                    <input class="form-check-input me-2 bulk-subject-checkbox" type="checkbox" value="{{ subject.id }}">
+                    {{ subject.name }}
+                  </label>
+                  {% endfor %}
+                </div>
+              </div>
+              <div class="card-footer bg-light">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="selectAllSubjects">
+                  <label class="form-check-label" for="selectAllSubjects">Select All Subjects</label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card h-100">
+              <div class="card-header bg-light">
+                <h6 class="mb-0">Select Classes</h6>
+              </div>
+              <div class="card-body p-0">
+                <div class="list-group list-group-flush" id="bulkClassesList" style="max-height: 250px; overflow-y: auto;">
+                  <!-- Classes will be loaded dynamically -->
+                  <div class="d-flex justify-content-center align-items-center p-3">
+                    <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <span>Loading classes...</span>
+                  </div>
+                </div>
+              </div>
+              <div class="card-footer bg-light">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="selectAllClasses">
+                  <label class="form-check-label" for="selectAllClasses">Select All Classes</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="bulkAssignSectionInput" class="form-label fw-bold">Section (Optional)</label>
+              <input type="text" class="form-control" id="bulkAssignSectionInput" placeholder="e.g., A, B, C">
+              <div class="form-text">Leave blank to assign to all sections</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="bulkAssignTeacherSelect" class="form-label fw-bold">Teacher (Optional)</label>
+              <select class="form-select" id="bulkAssignTeacherSelect">
+                <option value="">Select a teacher</option>
+                <!-- Teachers will be loaded dynamically -->
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-grid gap-2">
+          <button type="button" class="btn btn-success" id="saveBulkAssignBtn">
+            <i class="fas fa-save me-2"></i> Save All Assignments
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-1"></i> Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Subject Modal -->
+<div class="modal fade" id="editSubjectModal" tabindex="-1" aria-labelledby="editSubjectModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="editSubjectForm">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title" id="editSubjectModalLabel">
+            <i class="fas fa-edit me-2"></i> Edit Subject
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          {% csrf_token %}
+          <input type="hidden" id="editSubjectId" name="subject_id">
+          <div class="mb-3">
+            <label for="editSubjectName" class="form-label fw-bold">Subject Name</label>
+            <input type="text" class="form-control" id="editSubjectName" name="name" required>
+            <div class="invalid-feedback">Subject name is required</div>
+          </div>
+          <div class="mb-3">
+            <label for="editSubjectCode" class="form-label fw-bold">Subject Code</label>
+            <input type="text" class="form-control" id="editSubjectCode" name="code" placeholder="e.g., MATH101">
+            <div class="form-text">Optional code for this subject</div>
+          </div>
+          <div class="mb-3">
+            <label for="editSubjectDepartment" class="form-label fw-bold">Department</label>
+            <select class="form-select" id="editSubjectDepartment" name="department">
+              <option value="">Select Department</option>
+              <option value="Science">Science</option>
+              <option value="Mathematics">Mathematics</option>
+              <option value="Languages">Languages</option>
+              <option value="Social Sciences">Social Sciences</option>
+              <option value="Commerce">Commerce</option>
+              <option value="Arts">Arts</option>
+              <option value="Computer Science">Computer Science</option>
+              <option value="General">General</option>
+            </select>
+            <div class="form-text">Department this subject belongs to</div>
+          </div>
+          <div class="mb-3">
+            <label for="editSubjectDescription" class="form-label fw-bold">Description</label>
+            <textarea class="form-control" id="editSubjectDescription" name="description" rows="3" placeholder="Brief description of the subject"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="fas fa-times me-1"></i> Cancel
+          </button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save me-1"></i> Update Subject
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Manage Assignments Modal -->
+<div class="modal fade" id="manageAssignmentsModal" tabindex="-1" aria-labelledby="manageAssignmentsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title" id="manageAssignmentsModalLabel">
+          <i class="fas fa-tasks me-2"></i> Manage Subject Assignments
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row mb-4">
+          <div class="col-md-4">
+            <div class="mb-3">
+              <label for="manageSubjectSelect" class="form-label fw-bold">Filter by Subject</label>
+              <select class="form-select" id="manageSubjectSelect">
+                <option value="">All Subjects</option>
+                {% for subject in object_list %}
+                <option value="{{ subject.id }}">{{ subject.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mb-3">
+              <label for="manageClassSelect" class="form-label fw-bold">Filter by Class</label>
+              <select class="form-select" id="manageClassSelect">
+                <option value="">All Classes</option>
+                <!-- Classes will be loaded dynamically -->
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mb-3">
+              <label for="manageTeacherSelect" class="form-label fw-bold">Filter by Teacher</label>
+              <select class="form-select" id="manageTeacherSelect">
+                <option value="">All Teachers</option>
+                <!-- Teachers will be loaded dynamically -->
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover" id="allAssignmentsTable">
+            <thead class="table-light">
+              <tr>
+                <th width="5%" class="text-center">#</th>
+                <th width="25%">Subject</th>
+                <th width="20%">Class</th>
+                <th width="15%">Section</th>
+                <th width="20%">Teacher</th>
+                <th width="15%" class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- All assignments will be loaded dynamically -->
+              <tr>
+                <td colspan="6" class="text-center py-4">
+                  <div class="d-flex justify-content-center align-items-center">
+                    <div class="spinner-border text-primary me-3" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <span>Loading assignments...</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-primary" id="refreshAssignmentsBtn">
+          <i class="fas fa-sync-alt me-1"></i> Refresh
+        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-1"></i> Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block morejs %}
+<script>
+  $(document).ready(function() {
+    // Setup CSRF token for AJAX requests
+    var csrftoken = $('input[name="csrfmiddlewaretoken"]').val();
+
+    $.ajaxSetup({
+      beforeSend: function(xhr, settings) {
+        if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+          xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+      }
+    });
+
+    // Load all necessary data
+    loadAllClasses();
+    loadAllTeachers();
+    loadSubjectData();
+    loadAllAssignments();
+
+    // Handle the Add Subject button click
+    $('#addSubjectBtn').on('click', function(e) {
+      e.preventDefault();
+      var modal = new bootstrap.Modal(document.getElementById('modal1'));
+      modal.show();
+    });
+
+    // Handle Bulk Assign button click
+    $('#bulkAssignBtn').on('click', function(e) {
+      e.preventDefault();
+      var modal = new bootstrap.Modal(document.getElementById('bulkAssignModal'));
+      modal.show();
+    });
+
+    // Handle Manage Assignments button click
+    $('#manageAssignmentsBtn').on('click', function(e) {
+      e.preventDefault();
+      var modal = new bootstrap.Modal(document.getElementById('manageAssignmentsModal'));
+      modal.show();
+    });
+
+    // Search functionality
+    $('#subjectSearchInput').on('keyup', function() {
+      var value = $(this).val().toLowerCase();
+      $('#subjectTable tbody tr').filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+      });
+      updateEmptyState();
+    });
+
+    // Refresh button
+    $('#refreshSubjectList').on('click', function() {
+      location.reload();
+    });
+
+    // Sort functionality
+    $('.sort-option').on('click', function(e) {
+      e.preventDefault();
+      var sortType = $(this).data('sort');
+      sortTable(sortType);
+    });
+
+    // View subject details
+    $('.view-subject-details').on('click', function() {
+      var subjectId = $(this).data('subject-id');
+      var subjectName = $(this).closest('tr').data('subject-name');
+      var department = $(this).closest('tr').find('.department-info').text();
+
+      $('#detailSubjectName').text(subjectName);
+      $('#detailDepartment').text(department);
+      $('#editSubjectLink').data('subject-id', subjectId);
+
+      // Load classes for this subject
+      loadClassesForSubject(subjectId);
+
+      // Load exams for this subject
+      loadExamsForSubject(subjectId);
+
+      var detailsModal = new bootstrap.Modal(document.getElementById('subjectDetailsModal'));
+      detailsModal.show();
+    });
+
+    // Edit subject from details modal
+    $('#editSubjectLink').on('click', function(e) {
+      e.preventDefault();
+      var subjectId = $(this).data('subject-id');
+
+      // Close the details modal
+      var detailsModal = bootstrap.Modal.getInstance(document.getElementById('subjectDetailsModal'));
+      detailsModal.hide();
+
+      // Open the edit modal with the subject data
+      loadSubjectForEdit(subjectId);
+    });
+
+    // Edit subject directly from list
+    $('.edit-subject-btn').on('click', function() {
+      var subjectId = $(this).data('subject-id');
+      loadSubjectForEdit(subjectId);
+    });
+
+    // Quick Assign button click
+    $('.quick-assign-btn').on('click', function() {
+      var subjectId = $(this).data('subject-id');
+      var subjectName = $(this).closest('tr').data('subject-name');
+
+      $('#quickAssignSubjectId').val(subjectId);
+      $('#quickAssignSubjectName').text(subjectName);
+
+      var quickAssignModal = new bootstrap.Modal(document.getElementById('quickAssignModal'));
+      quickAssignModal.show();
+    });
+
+    // Save Quick Assignment
+    $('#saveQuickAssignBtn').on('click', function() {
+      var subjectId = $('#quickAssignSubjectId').val();
+      var classId = $('#quickAssignClassSelect').val();
+      var section = $('#quickAssignSectionInput').val();
+      var teacherId = $('#quickAssignTeacherSelect').val();
+
+      if (!subjectId || !classId) {
+        alert('Please select a class');
+        return;
+      }
+
+      // Debug information
+      console.log('Assigning subject:', {
+        subject_id: subjectId,
+        class_id: classId,
+        section: section,
+        teacher_id: teacherId,
+        csrf_token: $('input[name="csrfmiddlewaretoken"]').val()
+      });
+
+      // Show loading state
+      var $btn = $(this);
+      var originalHtml = $btn.html();
+      $btn.html('<i class="fas fa-spinner fa-spin me-1"></i> Saving...');
+      $btn.prop('disabled', true);
+
+      // Make AJAX call to assign subject
+      $.ajax({
+        url: '/api/assign-subject/',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+          subject_id: subjectId,
+          class_id: classId,
+          section: section,
+          teacher_id: teacherId
+        }),
+        headers: {
+          'X-CSRFToken': $('input[name="csrfmiddlewaretoken"]').val()
+        },
+        success: function(response) {
+          // Reset form
+          $('#quickAssignClassSelect').val('');
+          $('#quickAssignSectionInput').val('');
+          $('#quickAssignTeacherSelect').val('');
+
+          // Close modal
+          var quickAssignModal = bootstrap.Modal.getInstance(document.getElementById('quickAssignModal'));
+          quickAssignModal.hide();
+
+          // Show success message
+          alert('Subject assigned successfully!');
+
+          // Refresh data
+          loadSubjectData();
+          loadAllAssignments();
+        },
+        error: function(xhr) {
+          var errorMsg = 'Failed to assign subject';
+          if (xhr.responseJSON && xhr.responseJSON.error) {
+            errorMsg = xhr.responseJSON.error;
+          }
+          alert(errorMsg);
+        },
+        complete: function() {
+          // Reset button
+          $btn.html(originalHtml);
+          $btn.prop('disabled', false);
+        }
+      });
+    });
+
+    // Select All Subjects checkbox
+    $('#selectAllSubjects').on('change', function() {
+      $('.bulk-subject-checkbox').prop('checked', $(this).prop('checked'));
+    });
+
+    // Select All Classes checkbox
+    $('#selectAllClasses').on('change', function() {
+      $('.bulk-class-checkbox').prop('checked', $(this).prop('checked'));
+    });
+
+    // Save Bulk Assignments
+    $('#saveBulkAssignBtn').on('click', function() {
+      var selectedSubjects = [];
+      var selectedClasses = [];
+      var section = $('#bulkAssignSectionInput').val();
+      var teacherId = $('#bulkAssignTeacherSelect').val();
+
+      // Get selected subjects
+      $('.bulk-subject-checkbox:checked').each(function() {
+        selectedSubjects.push($(this).val());
+      });
+
+      // Get selected classes
+      $('.bulk-class-checkbox:checked').each(function() {
+        selectedClasses.push($(this).val());
+      });
+
+      if (selectedSubjects.length === 0 || selectedClasses.length === 0) {
+        alert('Please select at least one subject and one class');
+        return;
+      }
+
+      // Show loading state
+      var $btn = $(this);
+      var originalHtml = $btn.html();
+      $btn.html('<i class="fas fa-spinner fa-spin me-1"></i> Saving...');
+      $btn.prop('disabled', true);
+
+      // Counter for tracking completed assignments
+      var totalAssignments = selectedSubjects.length * selectedClasses.length;
+      var completedAssignments = 0;
+      var successCount = 0;
+      var errorCount = 0;
+
+      // Process each subject-class combination
+      selectedSubjects.forEach(function(subjectId) {
+        selectedClasses.forEach(function(classId) {
+          // Make AJAX call to assign subject
+          $.ajax({
+            url: '/api/assign-subject/',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+              subject_id: subjectId,
+              class_id: classId,
+              section: section,
+              teacher_id: teacherId
+            }),
+            headers: {
+              'X-CSRFToken': $('input[name="csrfmiddlewaretoken"]').val()
+            },
+            success: function() {
+              successCount++;
+            },
+            error: function() {
+              errorCount++;
+            },
+            complete: function() {
+              completedAssignments++;
+
+              // Check if all assignments are completed
+              if (completedAssignments === totalAssignments) {
+                // Reset form
+                $('.bulk-subject-checkbox').prop('checked', false);
+                $('.bulk-class-checkbox').prop('checked', false);
+                $('#selectAllSubjects').prop('checked', false);
+                $('#selectAllClasses').prop('checked', false);
+                $('#bulkAssignSectionInput').val('');
+                $('#bulkAssignTeacherSelect').val('');
+
+                // Close modal
+                var bulkAssignModal = bootstrap.Modal.getInstance(document.getElementById('bulkAssignModal'));
+                bulkAssignModal.hide();
+
+                // Show result message
+                var message = successCount + ' assignments completed successfully';
+                if (errorCount > 0) {
+                  message += ', ' + errorCount + ' failed';
+                }
+                alert(message);
+
+                // Refresh data
+                loadSubjectData();
+                loadAllAssignments();
+
+                // Reset button
+                $btn.html(originalHtml);
+                $btn.prop('disabled', false);
+              }
+            }
+          });
+        });
+      });
+    });
+
+    // Filter assignments in manage modal
+    $('#manageSubjectSelect, #manageClassSelect, #manageTeacherSelect').on('change', function() {
+      filterAssignments();
+    });
+
+    // Refresh assignments button
+    $('#refreshAssignmentsBtn').on('click', function() {
+      loadAllAssignments();
+    });
+
+    // Load class counts and assignments for each subject
+
+    // Function to load class counts and assignments
+    function loadSubjectData() {
+      console.log('Loading subject data...');
+      $('.subject-row').each(function() {
+        var row = $(this);
+        var subjectId = row.data('subject-id');
+        console.log('Loading data for subject ID:', subjectId);
+
+        // Make AJAX call to get class count and data
+        $.ajax({
+          url: '/subject/' + subjectId + '/data/',
+          type: 'GET',
+          success: function(data) {
+            console.log('Received data for subject ID:', subjectId, data);
+            // Update class count with proper styling
+            var classCount = data.class_count || 0;
+            row.find('.class-count').text(classCount);
+
+            // Change badge color based on class count
+            if (classCount > 0) {
+              row.find('.class-count').removeClass('bg-primary').addClass('bg-success');
+            } else {
+              row.find('.class-count').removeClass('bg-success').addClass('bg-primary');
+            }
+
+            // Update department if available
+            if (data.department) {
+              row.find('.department-info').text(data.department);
+            }
+
+            // Update class assignments
+            var assignmentsHtml = '';
+            if (data.classes && data.classes.length > 0) {
+              if (data.classes.length <= 3) {
+                // Show all classes if 3 or fewer
+                data.classes.forEach(function(classItem) {
+                  assignmentsHtml += '<span class="badge bg-light text-dark p-2 me-1 mb-1">' + classItem + '</span>';
+                });
+              } else {
+                // Show first 2 classes and a count for the rest
+                for (var i = 0; i < 2; i++) {
+                  assignmentsHtml += '<span class="badge bg-light text-dark p-2 me-1 mb-1">' + data.classes[i] + '</span>';
+                }
+                assignmentsHtml += '<span class="badge bg-secondary p-2">+' + (data.classes.length - 2) + ' more</span>';
+              }
+            } else {
+              assignmentsHtml = '<span class="text-muted">Not assigned</span>';
+            }
+            row.find('.class-assignments').html(assignmentsHtml);
+          },
+          error: function(xhr, status, error) {
+            console.error('Error loading data for subject ID:', subjectId, error);
+            row.find('.class-count').text('0');
+            row.find('.class-assignments').html('<span class="text-muted">Not assigned</span>');
+          }
+        });
+      });
+    }
+
+    // Function to load all classes
+    function loadAllClasses() {
+      // Show loading state
+      $('#quickAssignClassSelect').html('<option value="">Loading classes...</option>');
+      $('#manageClassSelect').html('<option value="">Loading classes...</option>');
+      $('#bulkClassesList').html('<div class="text-center py-3"><i class="fas fa-spinner fa-spin me-2"></i> Loading classes...</div>');
+
+      $.ajax({
+        url: '/api/classes/',
+        type: 'GET',
+        success: function(data) {
+          // Populate class dropdowns
+          var classOptions = '<option value="">Select a class</option>';
+          var bulkClassesHtml = '';
+
+          if (data && data.length > 0) {
+            data.forEach(function(classItem) {
+              classOptions += '<option value="' + classItem.id + '">' + classItem.name + '</option>';
+              bulkClassesHtml += '<label class="list-group-item"><input class="form-check-input me-2 bulk-class-checkbox" type="checkbox" value="' + classItem.id + '">' + classItem.name + '</label>';
+            });
+          } else {
+            bulkClassesHtml = '<div class="alert alert-warning"><i class="fas fa-exclamation-triangle me-2"></i> No classes found. Please add classes first.</div>';
+          }
+
+          $('#quickAssignClassSelect').html(classOptions);
+          $('#manageClassSelect').html('<option value="">All Classes</option>' + classOptions);
+          $('#bulkClassesList').html(bulkClassesHtml);
+        },
+        error: function(xhr, status, error) {
+          console.error('Failed to load classes:', error);
+          var errorMessage = '<div class="alert alert-danger"><i class="fas fa-exclamation-circle me-2"></i> Failed to load classes. Please refresh the page and try again.</div>';
+          $('#bulkClassesList').html(errorMessage);
+          $('#quickAssignClassSelect').html('<option value="">Error loading classes</option>');
+          $('#manageClassSelect').html('<option value="">Error loading classes</option>');
+        }
+      });
+    }
+
+    // Function to load all teachers
+    function loadAllTeachers() {
+      // Show loading state
+      $('#quickAssignTeacherSelect').html('<option value="">Loading teachers...</option>');
+      $('#bulkAssignTeacherSelect').html('<option value="">Loading teachers...</option>');
+      $('#manageTeacherSelect').html('<option value="">Loading teachers...</option>');
+
+      $.ajax({
+        url: '/api/teachers/',
+        type: 'GET',
+        success: function(data) {
+          // Populate teacher dropdowns
+          var teacherOptions = '<option value="">Select a teacher</option>';
+
+          if (data && data.length > 0) {
+            data.forEach(function(teacher) {
+              teacherOptions += '<option value="' + teacher.id + '">' + teacher.name + '</option>';
+            });
+          }
+
+          $('#quickAssignTeacherSelect').html(teacherOptions);
+          $('#bulkAssignTeacherSelect').html(teacherOptions);
+          $('#manageTeacherSelect').html('<option value="">All Teachers</option>' + teacherOptions);
+        },
+        error: function(xhr, status, error) {
+          console.error('Failed to load teachers:', error);
+          var errorOption = '<option value="">Error loading teachers</option>';
+          $('#quickAssignTeacherSelect').html(errorOption);
+          $('#bulkAssignTeacherSelect').html(errorOption);
+          $('#manageTeacherSelect').html(errorOption);
+        }
+      });
+    }
+
+    // Function to load all assignments
+    function loadAllAssignments() {
+      $('#allAssignmentsTable tbody').html('<tr><td colspan="6" class="text-center py-4"><div class="d-flex justify-content-center align-items-center"><div class="spinner-border text-primary me-3" role="status"><span class="visually-hidden">Loading...</span></div><span>Loading assignments...</span></div></td></tr>');
+
+      $.ajax({
+        url: '/api/all-assignments/',
+        type: 'GET',
+        success: function(data) {
+          if (data && data.length > 0) {
+            var assignmentsHtml = '';
+
+            data.forEach(function(assignment, index) {
+              assignmentsHtml += '<tr class="assignment-row" data-subject-id="' + assignment.subject_id + '" data-class-id="' + assignment.class_id + '" data-teacher-id="' + (assignment.teacher_id || '') + '">';
+              assignmentsHtml += '<td class="text-center">' + (index + 1) + '</td>';
+              assignmentsHtml += '<td>' + assignment.subject_name + '</td>';
+              assignmentsHtml += '<td>' + assignment.class_name + '</td>';
+              assignmentsHtml += '<td>' + (assignment.section || '-') + '</td>';
+              assignmentsHtml += '<td>' + (assignment.teacher_name || 'Not Assigned') + '</td>';
+              assignmentsHtml += '<td class="text-center"><div class="btn-group btn-group-sm">';
+              assignmentsHtml += '<button type="button" class="btn btn-outline-primary edit-assignment-btn" data-assignment-id="' + assignment.id + '" title="Edit Assignment"><i class="fa fa-edit"></i></button>';
+              assignmentsHtml += '<button type="button" class="btn btn-outline-danger remove-assignment-btn" data-assignment-id="' + assignment.id + '" title="Remove Assignment"><i class="fa fa-trash-alt"></i></button>';
+              assignmentsHtml += '</div></td>';
+              assignmentsHtml += '</tr>';
+            });
+
+            $('#allAssignmentsTable tbody').html(assignmentsHtml);
+
+            // Add event handlers for edit and remove buttons
+            $('.edit-assignment-btn').on('click', function() {
+              var assignmentId = $(this).data('assignment-id');
+              editAssignment(assignmentId);
+            });
+
+            $('.remove-assignment-btn').on('click', function() {
+              var assignmentId = $(this).data('assignment-id');
+              removeAssignment(assignmentId);
+            });
+
+            // Apply any active filters
+            filterAssignments();
+          } else {
+            $('#allAssignmentsTable tbody').html('<tr><td colspan="6" class="text-center py-4"><div class="empty-state"><i class="fas fa-link fa-3x text-muted mb-3"></i><h5>No Assignments Found</h5><p class="text-muted">No subjects have been assigned to classes yet.</p></div></td></tr>');
+          }
+        },
+        error: function() {
+          $('#allAssignmentsTable tbody').html('<tr><td colspan="6" class="text-center py-4"><div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i> Failed to load assignments</div></td></tr>');
+        }
+      });
+    }
+
+    // Function to filter assignments in the manage modal
+    function filterAssignments() {
+      var subjectId = $('#manageSubjectSelect').val();
+      var classId = $('#manageClassSelect').val();
+      var teacherId = $('#manageTeacherSelect').val();
+
+      $('.assignment-row').each(function() {
+        var row = $(this);
+        var rowSubjectId = row.data('subject-id');
+        var rowClassId = row.data('class-id');
+        var rowTeacherId = row.data('teacher-id');
+
+        var showRow = true;
+
+        if (subjectId && rowSubjectId != subjectId) {
+          showRow = false;
+        }
+
+        if (classId && rowClassId != classId) {
+          showRow = false;
+        }
+
+        if (teacherId && rowTeacherId != teacherId) {
+          showRow = false;
+        }
+
+        row.toggle(showRow);
+      });
+
+      // Show empty state if no rows are visible
+      var visibleRows = $('.assignment-row:visible').length;
+      if (visibleRows === 0) {
+        if ($('#allAssignmentsTable tbody .empty-filtered-state').length === 0) {
+          $('#allAssignmentsTable tbody').append('<tr class="empty-filtered-state"><td colspan="6" class="text-center py-4"><div class="empty-state"><i class="fas fa-filter fa-3x text-muted mb-3"></i><h5>No Matching Assignments</h5><p class="text-muted">No assignments match your filter criteria.</p></div></td></tr>');
+        }
+      } else {
+        $('#allAssignmentsTable tbody .empty-filtered-state').remove();
+
+        // Update row numbers
+        $('.assignment-row:visible').each(function(index) {
+          $(this).find('td:first').text(index + 1);
+        });
+      }
+    }
+
+    // Function to edit an assignment
+    function editAssignment(assignmentId) {
+      // Implementation would go here
+      alert('Edit assignment functionality would be implemented here');
+    }
+
+    // Function to remove an assignment
+    function removeAssignment(assignmentId) {
+      if (confirm('Are you sure you want to remove this assignment?')) {
+        $.ajax({
+          url: '/api/remove-subject/' + assignmentId + '/',
+          type: 'POST',
+          headers: {
+            'X-CSRFToken': $('input[name="csrfmiddlewaretoken"]').val()
+          },
+          success: function() {
+            alert('Assignment removed successfully');
+            loadAllAssignments();
+            loadSubjectData();
+          },
+          error: function() {
+            alert('Failed to remove assignment');
+          }
+        });
+      }
+    }
+
+    // Function to load classes for a subject
+    function loadClassesForSubject(subjectId) {
+      $('#detailClasses').html('<div class="text-center py-3"><i class="fas fa-spinner fa-spin me-2"></i> Loading classes...</div>');
+
+      // Make AJAX call to get classes
+      $.ajax({
+        url: '/subject/' + subjectId + '/data/',
+        type: 'GET',
+        success: function(data) {
+          var classesHtml = '<div class="row">';
+
+          if (data.classes && data.classes.length > 0) {
+            data.classes.forEach(function(classItem) {
+              classesHtml += '<div class="col-md-4 mb-2"><span class="badge bg-light text-dark p-2 d-block text-start"><i class="fas fa-school me-1"></i> ' + classItem + '</span></div>';
+            });
+          } else {
+            classesHtml += '<div class="col-12"><div class="alert alert-info"><i class="fas fa-info-circle me-2"></i> This subject is not assigned to any classes yet.</div></div>';
+          }
+
+          classesHtml += '</div>';
+          $('#detailClasses').html(classesHtml);
+        },
+        error: function(xhr, status, error) {
+          console.error('Failed to load classes for subject:', error);
+          $('#detailClasses').html('<div class="alert alert-warning"><i class="fas fa-exclamation-triangle me-2"></i> Unable to load classes for this subject. Please try again.</div>');
+        }
+      });
+    }
+
+    // Function to load exams for a subject
+    function loadExamsForSubject(subjectId) {
+      $('#detailExams').html('<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading exams...</div>');
+
+      // Make AJAX call to get exams
+      $.ajax({
+        url: '/subject/' + subjectId + '/exams/',
+        type: 'GET',
+        success: function(data) {
+          if (data.exams && data.exams.length > 0) {
+            var examsHtml = '<div class="table-responsive"><table class="table table-sm table-bordered"><thead><tr><th>Exam</th><th>Class</th><th>Date</th></tr></thead><tbody>';
+
+            data.exams.forEach(function(exam) {
+              examsHtml += '<tr><td>' + exam.name + '</td><td>' + exam.class + '</td><td>' + exam.date + '</td></tr>';
+            });
+
+            examsHtml += '</tbody></table></div>';
+            $('#detailExams').html(examsHtml);
+          } else {
+            $('#detailExams').html('<p class="text-muted">No recent exams found for this subject.</p>');
+          }
+        },
+        error: function() {
+          $('#detailExams').html('<div class="alert alert-warning"><i class="fas fa-exclamation-triangle me-2"></i> Unable to load exam data.</div>');
+        }
+      });
+    }
+
+    // Function to sort the table
+    function sortTable(sortType) {
+      var rows = $('#subjectTable tbody tr').get();
+
+      rows.sort(function(a, b) {
+        var keyA, keyB;
+
+        switch(sortType) {
+          case 'name-asc':
+          case 'name-desc':
+            keyA = $(a).find('td:nth-child(2)').text().toUpperCase();
+            keyB = $(b).find('td:nth-child(2)').text().toUpperCase();
+            break;
+          case 'classes-asc':
+          case 'classes-desc':
+            keyA = parseInt($(a).find('.class-count').text()) || 0;
+            keyB = parseInt($(b).find('.class-count').text()) || 0;
+            break;
+          default:
+            return 0;
+        }
+
+        if (sortType.endsWith('-asc')) {
+          return keyA > keyB ? 1 : keyA < keyB ? -1 : 0;
+        } else {
+          return keyA < keyB ? 1 : keyA > keyB ? -1 : 0;
+        }
+      });
+
+      // Reorder the table
+      $.each(rows, function(index, row) {
+        $('#subjectTable tbody').append(row);
+        // Update the counter column
+        $(row).find('td:first').text(index + 1);
+      });
+
+      // Update sort indicator
+      $('.sort-option').removeClass('active');
+      $(`[data-sort="${sortType}"]`).addClass('active');
+    }
+
+    // Function to update empty state when filtering
+    function updateEmptyState() {
+      var visibleRows = $('#subjectTable tbody tr:visible').length;
+      if (visibleRows === 0) {
+        if ($('#subjectTable tbody .empty-filtered-state').length === 0) {
+          $('#subjectTable tbody').append('<tr class="empty-filtered-state"><td colspan="6" class="text-center py-4"><div class="empty-state"><i class="fas fa-filter fa-3x text-muted mb-3"></i><h5>No Matching Subjects</h5><p class="text-muted">No subjects match your search criteria.</p></div></td></tr>');
+        }
+      } else {
+        $('#subjectTable tbody .empty-filtered-state').remove();
+      }
+    }
+
+    // Function to load subject data for editing
+    function loadSubjectForEdit(subjectId) {
+      // Clear previous form data
+      $('#editSubjectForm')[0].reset();
+      $('#editSubjectId').val(subjectId);
+
+      // Show loading state
+      $('#editSubjectName').attr('disabled', true).val('Loading...');
+      $('#editSubjectCode').attr('disabled', true);
+      $('#editSubjectDepartment').attr('disabled', true);
+      $('#editSubjectDescription').attr('disabled', true);
+
+      // Fetch subject data
+      $.ajax({
+        url: '/subject/' + subjectId + '/data/',
+        type: 'GET',
+        success: function(data) {
+          // Populate form with subject data
+          $('#editSubjectName').val(data.name || '');
+          $('#editSubjectCode').val(data.code || '');
+          $('#editSubjectDepartment').val(data.department || '');
+          $('#editSubjectDescription').val(data.description || '');
+
+          // Enable form fields
+          $('#editSubjectName').attr('disabled', false);
+          $('#editSubjectCode').attr('disabled', false);
+          $('#editSubjectDepartment').attr('disabled', false);
+          $('#editSubjectDescription').attr('disabled', false);
+
+          // Show the modal
+          var editModal = new bootstrap.Modal(document.getElementById('editSubjectModal'));
+          editModal.show();
+        },
+        error: function() {
+          alert('Failed to load subject data. Please try again.');
+        }
+      });
+    }
+
+    // Handle edit subject form submission
+    $('#editSubjectForm').on('submit', function(e) {
+      e.preventDefault();
+
+      var form = $(this);
+      var subjectId = $('#editSubjectId').val();
+      var nameField = form.find('input[name="name"]');
+      var isValid = true;
+
+      // Validate form
+      if (!nameField.val().trim()) {
+        nameField.addClass('is-invalid');
+        nameField.siblings('.invalid-feedback').text('Subject name is required');
+        isValid = false;
+      } else {
+        nameField.removeClass('is-invalid');
+      }
+
+      if (!isValid) {
+        return false;
+      }
+
+      // Prepare form data
+      var formData = {
+        name: $('#editSubjectName').val(),
+        code: $('#editSubjectCode').val(),
+        department: $('#editSubjectDepartment').val(),
+        description: $('#editSubjectDescription').val(),
+        csrfmiddlewaretoken: form.find('input[name="csrfmiddlewaretoken"]').val()
+      };
+
+      // Submit form via AJAX
+      $.ajax({
+        url: '/subject/' + subjectId + '/update-ajax/',
+        type: 'POST',
+        data: formData,
+        success: function(response) {
+          // Close the modal
+          var editModal = bootstrap.Modal.getInstance(document.getElementById('editSubjectModal'));
+          editModal.hide();
+
+          // Show success message
+          alert('Subject updated successfully!');
+
+          // Update the UI
+          var row = $('.subject-row[data-subject-id="' + subjectId + '"]');
+          row.data('subject-name', formData.name);
+          row.find('td:nth-child(2) span').text(formData.name);
+          row.find('.department-info').text(formData.department || 'General');
+
+          // Refresh data
+          loadSubjectData();
+        },
+        error: function(xhr) {
+          if (xhr.responseJSON && xhr.responseJSON.error) {
+            alert('Error: ' + xhr.responseJSON.error);
+          } else {
+            alert('Failed to update subject. Please try again.');
+          }
+        }
+      });
+    });
+
+    // Form validation
+    $('#addSubjectForm').on('submit', function(e) {
+      var form = $(this);
+      var nameField = form.find('input[name="name"]');
+      var isValid = true;
+
+      if (!nameField.val().trim()) {
+        nameField.addClass('is-invalid');
+        nameField.siblings('.invalid-feedback').text('Subject name is required');
+        isValid = false;
+      } else {
+        nameField.removeClass('is-invalid');
+      }
+
+      return isValid;
+    });
+
+    // Function to handle AJAX errors
+    $(document).ajaxError(function(event, jqXHR, settings, thrownError) {
+      if (settings.url.includes('/subject/') && settings.url.includes('/data/')) {
+        var row = $('.subject-row[data-subject-id="' + settings.url.split('/')[2] + '"]');
+        row.find('.class-count').text('0');
+        console.error('Error loading subject data:', thrownError);
+      }
+    });
+
+    // Helper function to handle AJAX errors
+    function handleAjaxError(jqXHR, textStatus, errorThrown) {
+      console.error('AJAX Error:', textStatus, errorThrown);
+
+      // Show a user-friendly error message
+      if (jqXHR.responseJSON && jqXHR.responseJSON.error) {
+        alert('Error: ' + jqXHR.responseJSON.error);
+      } else {
+        alert('An error occurred while communicating with the server. Please try again.');
+      }
+    }
+  });
+</script>
+{% endblock morejs %}

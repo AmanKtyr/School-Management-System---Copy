@@ -1,0 +1,946 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title-icon %}fas fa-user-tie{% endblock title-icon %}
+
+{% block title %}{{ object.fullname }}{% endblock title %}
+
+{% block subtitle %}Non-Teaching Staff Details{% endblock subtitle %}
+
+{% block breadcrumb-left %}
+<div class="breadcrumb-container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-chevron">
+      <li class="breadcrumb-item">
+        <a href="{% url 'home' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-home"></i> Home
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'non-teaching-staffs-list' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-user-tie"></i> Non-Teaching Staffs
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'non-teaching-staffs-list' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-list"></i> List
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <i class="fas fa-info-circle"></i> Details
+      </li>
+    </ol>
+  </nav>
+</div>
+{% endblock breadcrumb-left %}
+
+{% block page-actions %}
+<div class="action-buttons">
+  <a href="{% url 'non-teaching-staffs-update' object.id %}" class="btn btn-warning text-white action-btn">
+    <i class="fas fa-edit"></i> Edit Profile
+  </a>
+  <a href="#" class="btn btn-primary action-btn" id="printStaffProfile">
+    <i class="fas fa-print"></i> Print Profile
+  </a>
+  <div class="dropdown d-inline-block">
+    <button class="btn btn-success action-btn dropdown-toggle" type="button" id="moreActionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="fas fa-ellipsis-h"></i> More Actions
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="moreActionsDropdown">
+      <li><a class="dropdown-item" href="{% url 'non-teaching-staffs-delete' object.id %}"><i class="fas fa-trash-alt me-2 text-danger"></i> Delete Staff</a></li>
+      <li><a class="dropdown-item" href="#"><i class="fas fa-id-card me-2 text-primary"></i> Generate ID Card</a></li>
+      <li><a class="dropdown-item" href="#"><i class="fas fa-file-pdf me-2 text-danger"></i> Export as PDF</a></li>
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item" href="#"><i class="fas fa-envelope me-2 text-success"></i> Send Email</a></li>
+    </ul>
+  </div>
+</div>
+{% endblock page-actions %}
+
+{% block content-header %}
+<!-- Modern Industry-Ready Staff Profile Header -->
+<div class="staff-profile-container mb-4">
+  <!-- Top Banner with Background Image -->
+  <div class="profile-banner position-relative mb-4">
+    <div class="banner-overlay"></div>
+    <div class="container-fluid px-4 py-5">
+      <div class="row align-items-end">
+        <div class="col-md-7">
+          <div class="d-flex align-items-center">
+            <!-- Profile Image with Status Indicator -->
+            <div class="profile-image-container position-relative me-4">
+              {% if object.passport %}
+              <img src="{{ object.passport.url }}" class="profile-image" alt="{{ object.fullname }}">
+              {% else %}
+              <img src="{% static 'dist/img/worker.svg' %}" class="profile-image" alt="{{ object.fullname }}">
+              {% endif %}
+
+              <!-- Status Indicator -->
+              <div class="status-indicator-modern {% if object.current_status == 'active' %}active{% else %}inactive{% endif %}">
+                <i class="fas {% if object.current_status == 'active' %}fa-check{% else %}fa-times{% endif %}"></i>
+              </div>
+            </div>
+
+            <!-- Staff Information -->
+            <div class="staff-info text-white">
+              <h2 class="staff-name mb-1">{{ object.fullname }}</h2>
+              <div class="staff-designation mb-2">
+                <span class="designation-badge">Non-Teaching Staff</span>
+                <span class="id-badge"><i class="fas fa-briefcase me-1"></i>{{ object.job_role }}</span>
+              </div>
+              <div class="staff-specialization">
+                <i class="fas fa-map-marker-alt me-1"></i> {{ object.address|default:"Address not specified" }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Staff Profile Stats -->
+  <div class="staff-stats-container mb-4">
+    <div class="container-fluid px-4">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="stats-card-wrapper">
+            <div class="stats-card">
+              <div class="stats-icon bg-primary-light">
+                <i class="fas fa-calendar-check text-primary"></i>
+              </div>
+              <div class="stats-info">
+                <h3 class="stats-value">{{ object.date_of_registration|date:"d M Y" }}</h3>
+                <p class="stats-label">Joined Date</p>
+              </div>
+            </div>
+
+            <div class="stats-card">
+              <div class="stats-icon bg-success-light">
+                <i class="fas fa-briefcase text-success"></i>
+              </div>
+              <div class="stats-info">
+                <h3 class="stats-value">{{ object.job_role }}</h3>
+                <p class="stats-label">Job Role</p>
+              </div>
+            </div>
+
+            <div class="stats-card">
+              <div class="stats-icon bg-info-light">
+                <i class="fas fa-file-alt text-info"></i>
+              </div>
+              <div class="stats-info">
+                <h3 class="stats-value">0</h3>
+                <p class="stats-label">Documents</p>
+              </div>
+            </div>
+
+            <div class="stats-card">
+              <div class="stats-icon bg-warning-light">
+                <i class="fas fa-user-clock text-warning"></i>
+              </div>
+              <div class="stats-info">
+                <h3 class="stats-value">{{ object.current_status|title }}</h3>
+                <p class="stats-label">Current Status</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Tabs -->
+  <div class="container-fluid px-4">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="modern-tabs">
+          <ul class="nav nav-pills" id="staffProfileTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="personal-tab" data-bs-toggle="tab" data-bs-target="#personal" type="button" role="tab" aria-controls="personal" aria-selected="true">
+                <i class="fas fa-user me-2"></i>Personal Info
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="professional-tab" data-bs-toggle="tab" data-bs-target="#professional" type="button" role="tab" aria-controls="professional" aria-selected="false">
+                <i class="fas fa-briefcase me-2"></i>Professional
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="documents-tab" data-bs-toggle="tab" data-bs-target="#documents" type="button" role="tab" aria-controls="documents" aria-selected="false">
+                <i class="fas fa-file-alt me-2"></i>Documents
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button" role="tab" aria-controls="activity" aria-selected="false">
+                <i class="fas fa-chart-line me-2"></i>Activity
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content-header %}
+{% block content %}
+<div class="row">
+  <!-- Left Column - Quick Info -->
+  <div class="col-md-4 mb-4">
+    <div class="card shadow-sm rounded-3 h-100">
+      <div class="card-header bg-light">
+        <h5 class="card-title mb-0"><i class="fas fa-info-circle me-2"></i>Quick Information</h5>
+      </div>
+      <div class="card-body p-4">
+        <div class="quick-contact mb-4">
+          <h6 class="fw-bold mb-3 border-bottom pb-2"><i class="fas fa-address-card me-2"></i>Contact Details</h6>
+          <div class="d-flex align-items-center mb-3">
+            <div class="contact-icon me-3 bg-light rounded-circle p-2">
+              <i class="fas fa-phone text-primary"></i>
+            </div>
+            <div>
+              <small class="text-muted d-block">Phone Number</small>
+              <span>{{ object.mobile_number|default:"Not provided" }}</span>
+            </div>
+          </div>
+          <div class="d-flex align-items-center mb-3">
+            <div class="contact-icon me-3 bg-light rounded-circle p-2">
+              <i class="fas fa-map-marker-alt text-danger"></i>
+            </div>
+            <div>
+              <small class="text-muted d-block">Address</small>
+              <span>{{ object.address|default:"Not provided" }}</span>
+            </div>
+          </div>
+          <div class="d-flex align-items-center">
+            <div class="contact-icon me-3 bg-light rounded-circle p-2">
+              <i class="fas fa-calendar-alt text-success"></i>
+            </div>
+            <div>
+              <small class="text-muted d-block">Date of Birth</small>
+              <span>{{ object.date_of_birth }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="staff-job-role mb-4">
+          <h6 class="fw-bold mb-3 border-bottom pb-2"><i class="fas fa-tasks me-2"></i>Job Role</h6>
+          <div class="p-3 bg-light rounded-3">
+            <p class="mb-0">{{ object.job_role|default:"Not specified" }}</p>
+          </div>
+        </div>
+
+        <div class="staff-status-info mb-4">
+          <h6 class="fw-bold mb-3 border-bottom pb-2"><i class="fas fa-info-circle me-2"></i>Status Information</h6>
+          <div class="d-flex align-items-center mb-3">
+            <div class="contact-icon me-3 bg-light rounded-circle p-2">
+              <i class="fas fa-user-check text-info"></i>
+            </div>
+            <div>
+              <small class="text-muted d-block">Current Status</small>
+              <span>{{ object.get_current_status_display }}</span>
+            </div>
+          </div>
+          <div class="d-flex align-items-center">
+            <div class="contact-icon me-3 bg-light rounded-circle p-2">
+              <i class="fas fa-calendar-plus text-warning"></i>
+            </div>
+            <div>
+              <small class="text-muted d-block">Registration Date</small>
+              <span>{{ object.date_of_registration }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-grid gap-2">
+          <a href="tel:{{ object.mobile_number }}" class="btn btn-outline-primary">
+            <i class="fas fa-phone-alt me-2"></i> Call
+          </a>
+          <a href="#" class="btn btn-outline-success">
+            <i class="fas fa-envelope me-2"></i> Email
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column - Tab Content -->
+  <div class="col-md-8 mb-4">
+    <div class="card shadow-sm rounded-3 h-100">
+      <div class="card-body p-0">
+        <div class="tab-content" id="staffProfileTabsContent">
+          <!-- Personal Information Tab -->
+          <div class="tab-pane fade show active" id="personal" role="tabpanel" aria-labelledby="personal-tab">
+            <div class="p-4">
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold mb-0"><i class="fas fa-user-circle me-2 text-primary"></i>Personal Information</h5>
+                <a href="{% url 'non-teaching-staffs-update' object.id %}" class="btn btn-sm btn-outline-primary">
+                  <i class="fas fa-edit me-1"></i> Edit
+                </a>
+              </div>
+
+              <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                  <div class="info-card p-3 border rounded-3 h-100 bg-light bg-opacity-50">
+                    <div class="d-flex align-items-center mb-2">
+                      <div class="icon-circle bg-primary text-white me-2">
+                        <i class="fas fa-user"></i>
+                      </div>
+                      <h6 class="fw-bold mb-0">Basic Details</h6>
+                    </div>
+                    <div class="info-list mt-3">
+                      <div class="info-item d-flex mb-2">
+                        <div class="info-label text-muted" style="width: 120px;">Full Name:</div>
+                        <div class="info-value fw-medium flex-grow-1">{{ object.fullname }}</div>
+                      </div>
+                      <div class="info-item d-flex mb-2">
+                        <div class="info-label text-muted" style="width: 120px;">Gender:</div>
+                        <div class="info-value fw-medium flex-grow-1">{{ object.get_gender_display }}</div>
+                      </div>
+                      <div class="info-item d-flex mb-2">
+                        <div class="info-label text-muted" style="width: 120px;">Date of Birth:</div>
+                        <div class="info-value fw-medium flex-grow-1">{{ object.date_of_birth }}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="info-card p-3 border rounded-3 h-100 bg-light bg-opacity-50">
+                    <div class="d-flex align-items-center mb-2">
+                      <div class="icon-circle bg-success text-white me-2">
+                        <i class="fas fa-id-card"></i>
+                      </div>
+                      <h6 class="fw-bold mb-0">Contact & Status</h6>
+                    </div>
+                    <div class="info-list mt-3">
+                      <div class="info-item d-flex mb-2">
+                        <div class="info-label text-muted" style="width: 120px;">Mobile:</div>
+                        <div class="info-value fw-medium flex-grow-1">{{ object.mobile_number|default:"Not provided" }}</div>
+                      </div>
+                      <div class="info-item d-flex mb-2">
+                        <div class="info-label text-muted" style="width: 120px;">Status:</div>
+                        <div class="info-value fw-medium flex-grow-1">
+                          {% if object.current_status == 'active' %}
+                            <span class="badge bg-success px-2 py-1">Active</span>
+                          {% else %}
+                            <span class="badge bg-secondary px-2 py-1">Inactive</span>
+                          {% endif %}
+                        </div>
+                      </div>
+                      <div class="info-item d-flex mb-2">
+                        <div class="info-label text-muted" style="width: 120px;">Joined Date:</div>
+                        <div class="info-value fw-medium flex-grow-1">{{ object.date_of_registration }}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row g-4">
+                <div class="col-md-12">
+                  <div class="info-card p-3 border rounded-3 bg-light bg-opacity-50">
+                    <div class="d-flex align-items-center mb-2">
+                      <div class="icon-circle bg-info text-white me-2">
+                        <i class="fas fa-map-marker-alt"></i>
+                      </div>
+                      <h6 class="fw-bold mb-0">Address Information</h6>
+                    </div>
+                    <div class="info-list mt-3">
+                      <div class="info-item d-flex mb-2">
+                        <div class="info-value fw-medium flex-grow-1">{{ object.address|default:"Address not provided" }}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-12">
+                  <div class="info-card p-3 border rounded-3 bg-light bg-opacity-50">
+                    <div class="d-flex align-items-center mb-2">
+                      <div class="icon-circle bg-warning text-white me-2">
+                        <i class="fas fa-sticky-note"></i>
+                      </div>
+                      <h6 class="fw-bold mb-0">Additional Notes</h6>
+                    </div>
+                    <div class="info-list mt-3">
+                      <div class="info-item d-flex mb-2">
+                        <div class="info-value fw-medium flex-grow-1">{{ object.others|default:"No additional notes" }}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Professional Tab -->
+          <div class="tab-pane fade" id="professional" role="tabpanel" aria-labelledby="professional-tab">
+            <div class="p-4">
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold mb-0"><i class="fas fa-briefcase me-2 text-success"></i>Professional Information</h5>
+                <a href="{% url 'non-teaching-staffs-update' object.id %}" class="btn btn-sm btn-outline-success">
+                  <i class="fas fa-edit me-1"></i> Edit
+                </a>
+              </div>
+
+              <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-success text-white">
+                  <h5 class="mb-0"><i class="fas fa-briefcase me-2"></i>Current Position</h5>
+                </div>
+                <div class="card-body">
+                  <table class="table table-bordered">
+                    <tr>
+                      <th width="40%" class="bg-light">Job Role</th>
+                      <td>{{ object.job_role|default:"Not specified" }}</td>
+                    </tr>
+                    <tr>
+                      <th class="bg-light">Status</th>
+                      <td>
+                        {% if object.current_status == 'active' %}
+                          <span class="badge bg-success px-3 py-2">Active</span>
+                        {% else %}
+                          <span class="badge bg-secondary px-3 py-2">Inactive</span>
+                        {% endif %}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th class="bg-light">Joined Date</th>
+                      <td>{{ object.date_of_registration }}</td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+
+              <div class="row mb-4">
+                <div class="col-12">
+                  <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-info text-white">
+                      <h5 class="mb-0"><i class="fas fa-history me-2"></i>Employment History</h5>
+                    </div>
+                    <div class="card-body">
+                      <div class="table-responsive">
+                        <table class="table table-bordered">
+                          <thead class="table-light">
+                            <tr>
+                              <th>Position</th>
+                              <th>Department</th>
+                              <th>Start Date</th>
+                              <th>End Date</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td colspan="4" class="text-center text-muted">No employment history available</td>
+                            </tr>
+                            <!-- This section would be populated dynamically if employment history was available -->
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                  <h5 class="mb-0"><i class="fas fa-award me-2"></i>Qualifications & Skills</h5>
+                </div>
+                <div class="card-body">
+                  <p class="text-muted mb-0">No qualification records available. Update staff profile to add qualifications.</p>
+                  <!-- This section would be populated dynamically if qualification data was available -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Documents Tab -->
+          <div class="tab-pane fade" id="documents" role="tabpanel" aria-labelledby="documents-tab">
+            <div class="p-4">
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold mb-0"><i class="fas fa-file-alt me-2 text-info"></i>Staff Documents</h5>
+                <button class="btn btn-sm btn-primary">
+                  <i class="fas fa-upload me-2"></i>Upload New
+                </button>
+              </div>
+
+              <div class="card border-0 shadow-sm">
+                <div class="card-header bg-info text-white">
+                  <h5 class="mb-0"><i class="fas fa-folder me-2"></i>Document Library</h5>
+                </div>
+                <div class="card-body">
+                  <div class="document-list">
+                    <div class="alert alert-info mb-0">
+                      <i class="fas fa-info-circle me-2"></i>No documents have been uploaded for this staff member yet.
+                    </div>
+                    <!-- This section would be populated dynamically if documents were available -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Activity Tab -->
+          <div class="tab-pane fade" id="activity" role="tabpanel" aria-labelledby="activity-tab">
+            <div class="p-4">
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold mb-0"><i class="fas fa-chart-line me-2 text-warning"></i>Activity Log</h5>
+              </div>
+
+              <div class="card border-0 shadow-sm">
+                <div class="card-header bg-warning text-white">
+                  <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Activities</h5>
+                </div>
+                <div class="card-body">
+                  <div class="timeline p-3">
+                    <div class="timeline-item d-flex mb-4">
+                      <div class="timeline-icon bg-primary text-white rounded-circle p-3 me-3">
+                        <i class="fas fa-user-plus"></i>
+                      </div>
+                      <div class="timeline-content">
+                        <h6 class="fw-bold mb-1">Staff Registered</h6>
+                        <p class="text-muted small mb-2">{{ object.date_of_registration }}</p>
+                        <p class="mb-0">Staff member was added to the system.</p>
+                      </div>
+                    </div>
+                    <!-- More timeline items would be added dynamically based on staff activity -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Print Modal -->
+<div class="modal fade" id="printPreviewModal" tabindex="-1" aria-labelledby="printPreviewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="printPreviewModalLabel"><i class="fas fa-print me-2"></i>Print Staff Profile</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="printPreviewContent">
+        <!-- Print content will be loaded here -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="confirmPrint">
+          <i class="fas fa-print me-2"></i>Print
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block morejs %}
+<style>
+  /* Modern Profile Banner */
+  .staff-profile-container {
+    font-family: 'Roboto', 'Segoe UI', sans-serif;
+  }
+
+  .profile-banner {
+    background: linear-gradient(135deg, #1E3C72, #2A5298, #3949ab);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .banner-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('{% static "dist/img/pattern-bg.png" %}') repeat;
+    opacity: 0.1;
+    z-index: 1;
+  }
+
+  .profile-banner .container-fluid {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Profile Image Styling */
+  .profile-image-container {
+    position: relative;
+  }
+
+  .profile-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 4px solid #ffffff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+  }
+
+  .profile-image:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Modern Status Indicator */
+  .status-indicator-modern {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+    border: 3px solid white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .status-indicator-modern.active {
+    background-color: #4caf50;
+  }
+
+  .status-indicator-modern.inactive {
+    background-color: #f44336;
+  }
+
+  /* Staff Info Styling */
+  .staff-info {
+    color: white;
+  }
+
+  .staff-name {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: white;
+  }
+
+  .staff-designation {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .designation-badge {
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    backdrop-filter: blur(5px);
+    color: white;
+  }
+
+  .id-badge {
+    background-color: rgba(255, 255, 255, 0.15);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    backdrop-filter: blur(5px);
+    color: white;
+  }
+
+  .staff-specialization {
+    font-size: 15px;
+    opacity: 0.9;
+    margin-top: 5px;
+    color: white;
+  }
+
+  /* Stats Cards */
+  .staff-stats-container {
+    margin-top: -20px;
+  }
+
+  .stats-card-wrapper {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+
+  .stats-card {
+    flex: 1;
+    min-width: 200px;
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+  }
+
+  .stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  }
+
+  .stats-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-right: 15px;
+  }
+
+  .bg-primary-light {
+    background-color: rgba(13, 110, 253, 0.1);
+  }
+
+  .bg-success-light {
+    background-color: rgba(25, 135, 84, 0.1);
+  }
+
+  .bg-info-light {
+    background-color: rgba(13, 202, 240, 0.1);
+  }
+
+  .bg-warning-light {
+    background-color: rgba(255, 193, 7, 0.1);
+  }
+
+  .stats-info {
+    flex: 1;
+  }
+
+  .stats-value {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 5px;
+    color: #333;
+  }
+
+  .stats-label {
+    font-size: 13px;
+    color: #6c757d;
+    margin-bottom: 0;
+  }
+
+  /* Modern Tabs */
+  .modern-tabs {
+    margin-bottom: 20px;
+  }
+
+  .modern-tabs .nav-pills {
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #f8f9fa;
+    padding: 5px;
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .modern-tabs .nav-link {
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-weight: 500;
+    color: #495057;
+    transition: all 0.3s ease;
+    margin: 3px;
+  }
+
+  .modern-tabs .nav-link:hover {
+    background-color: rgba(13, 110, 253, 0.1);
+    color: #0d6efd;
+  }
+
+  .modern-tabs .nav-link.active {
+    background-color: #0d6efd;
+    color: white;
+    box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
+  }
+
+  /* Icon circle styles */
+  .icon-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+
+  /* Info card hover effect */
+  .info-card:hover {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    transition: all 0.3s ease;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .profile-banner .row {
+      flex-direction: column;
+    }
+
+    .profile-banner .col-md-7,
+    .profile-banner .col-md-5 {
+      width: 100%;
+    }
+
+    .stats-card {
+      min-width: 100%;
+      margin-bottom: 15px;
+    }
+  }
+</style>
+<script>
+  $(document).ready(function() {
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Initialize dropdowns
+    var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+    var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
+      return new bootstrap.Dropdown(dropdownToggleEl);
+    });
+
+    // Handle print button click
+    $('#printStaffProfile').on('click', function(e) {
+      e.preventDefault();
+
+      // Clone the staff profile content for the print preview
+      var printContent = `
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h3 class="mb-0">{{ object.fullname }}</h3>
+            <p class="text-muted mb-0">{{ object.job_role }}</p>
+          </div>
+          <div>
+            <img src="{% static 'dist/img/logo.png' %}" height="60" alt="School Logo">
+          </div>
+        </div>
+        <hr>
+        <div class="row">
+          <div class="col-md-4 text-center mb-4">
+            {% if object.passport %}
+            <img src="{{ object.passport.url }}" class="rounded-circle border border-3 border-primary img-fluid shadow-sm" style="width: 180px; height: 180px; object-fit: cover;">
+            {% else %}
+            <img src="{% static 'dist/img/worker.svg' %}" class="rounded-circle border border-3 border-primary img-fluid shadow-sm" style="width: 180px; height: 180px; object-fit: cover;">
+            {% endif %}
+            <h5 class="mt-3 fw-bold">{{ object.fullname }}</h5>
+            <p class="badge bg-primary text-white px-3 py-2">Non-Teaching Staff</p>
+            <p class="text-muted small">Registration Date: {{ object.date_of_registration }}</p>
+          </div>
+
+          <div class="col-md-8">
+            <div class="card border-0 shadow-sm mb-4">
+              <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-user me-2"></i>Personal Information</h5>
+              </div>
+              <div class="card-body">
+                <table class="table table-bordered">
+                  <tr>
+                    <th width="40%" class="bg-light">Job Role</th>
+                    <td>{{ object.job_role }}</td>
+                  </tr>
+                  <tr>
+                    <th class="bg-light">Gender</th>
+                    <td>{{ object.get_gender_display }}</td>
+                  </tr>
+                  <tr>
+                    <th class="bg-light">Date of Birth</th>
+                    <td>{{ object.date_of_birth }}</td>
+                  </tr>
+                  <tr>
+                    <th class="bg-light">Mobile Number</th>
+                    <td>{{ object.mobile_number|default:"Not provided" }}</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+              <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Additional Information</h5>
+              </div>
+              <div class="card-body">
+                <table class="table table-bordered">
+                  <tr>
+                    <th width="40%" class="bg-light">Address</th>
+                    <td>{{ object.address|default:"Not provided" }}</td>
+                  </tr>
+                  <tr>
+                    <th class="bg-light">Status</th>
+                    <td>
+                      {% if object.current_status == 'active' %}
+                        <span class="badge bg-success px-3 py-2">Active</span>
+                      {% else %}
+                        <span class="badge bg-secondary px-3 py-2">Inactive</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4 text-center">
+          <p class="mb-0 small">This document was generated from the School Management System on ${new Date().toLocaleDateString()}</p>
+        </div>
+      `;
+
+      // Load the content into the modal
+      $('#printPreviewContent').html(printContent);
+
+      // Show the modal
+      var printModal = new bootstrap.Modal(document.getElementById('printPreviewModal'));
+      printModal.show();
+    });
+
+    // Handle confirm print button
+    $('#confirmPrint').on('click', function() {
+      // Get the print content
+      var contentToPrint = document.getElementById('printPreviewContent').innerHTML;
+
+      // Create a new window for printing
+      var printWindow = window.open('', '_blank');
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Staff Profile - {{ object.fullname }}</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+            <style>
+              body { padding: 20px; }
+              @media print {
+                body { padding: 0; }
+                .no-print { display: none; }
+              }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              ${contentToPrint}
+            </div>
+            <script>
+              window.onload = function() {
+                window.print();
+                window.onafterprint = function() {
+                  window.close();
+                }
+              }
+            </script>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    });
+  });
+</script>
+{% endblock morejs %}

@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block breadcrumb-left %}
+<div class="breadcrumb-container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-chevron">
+      <li class="breadcrumb-item">
+        <a href="{% url 'home' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-home"></i> Home
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="#" class="text-decoration-none fw-bold">
+          <i class="fas fa-copy"></i> Management
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'fee_settings' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-money-bill-wave"></i> Fee Settings
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <i class="fas fa-list"></i> Fee Structure List
+      </li>
+    </ol>
+  </nav>
+</div>
+{% endblock breadcrumb-left %}
+
+{% block title %}Fee Structure List{% endblock title %}
+
+{% block content %}
+<style>
+    /* Custom styles for fee settings list */
+    .fee-card {
+        background: linear-gradient(145deg, #ffffff, #f5f7fa);
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+    }
+
+    .fee-card .card-header {
+        background: linear-gradient(135deg, #1E3C72, #2A5298);
+        color: white;
+        border-radius: 15px 15px 0 0;
+        padding: 1.5rem;
+    }
+
+    .stats-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        transition: transform 0.3s ease;
+    }
+
+    .stats-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .stats-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .table-custom {
+        border-collapse: separate;
+        border-spacing: 0 8px;
+    }
+
+    .table-custom thead th {
+        border: none;
+        font-weight: 600;
+        color: #495057;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        padding: 1rem;
+    }
+
+    .table-custom tbody tr {
+        background: white;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        border-radius: 8px;
+        transition: transform 0.2s ease;
+    }
+
+    .table-custom tbody tr:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .table-custom tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+        border: none;
+    }
+
+    .badge-custom {
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-weight: 500;
+    }
+
+    .btn-edit {
+        background: linear-gradient(135deg, #FF9966, #FF5E62);
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-edit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 94, 98, 0.3);
+    }
+
+    .add-new-btn {
+        background: linear-gradient(135deg, #43cea2, #185a9d);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 25px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .add-new-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(67, 206, 162, 0.3);
+    }
+</style>
+
+<div class="container mt-4">
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="stats-card">
+                <div class="stats-icon" style="background: rgba(52, 152, 219, 0.1); color: #3498db;">
+                    <i class="fas fa-school"></i>
+                </div>
+                <h3>{{ total_classes }}</h3>
+                <p class="text-muted mb-0">Total Classes</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stats-card">
+                <div class="stats-icon" style="background: rgba(46, 204, 113, 0.1); color: #2ecc71;">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <h3>₹{{ total_fees|floatformat:2 }}</h3>
+                <p class="text-muted mb-0">Total Fees Configured</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stats-card">
+                <div class="stats-icon" style="background: rgba(155, 89, 182, 0.1); color: #9b59b6;">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3>{{ active_settings }}</h3>
+                <p class="text-muted mb-0">Active Fee Settings</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="fee-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <h3 class="mb-0"><i class="fas fa-cog me-2"></i>Fee Settings List</h3>
+                <p class="mb-0 mt-1 text-white-50">Manage all your class fee configurations</p>
+            </div>
+            <a href="{% url 'fee_settings' %}" class="add-new-btn">
+                <i class="fas fa-plus me-2"></i>Add New Fee Setting
+            </a>
+        </div>
+        <div class="card-body p-4">
+            {% if fee_settings_list %}
+            <div class="table-responsive">
+                <table class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>CLASS & SECTION</th>
+                            <th>FREQUENCY</th>
+                            <th>TOTAL FEES</th>
+                            <th>STATUS</th>
+                            <th>LAST UPDATED</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for setting in fee_settings_list %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-sm bg-primary-subtle rounded-circle me-3 d-flex align-items-center justify-content-center">
+                                        <i class="fas fa-graduation-cap text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0">Class {{ setting.class_name }}</h6>
+                                        <small class="text-muted">Section {{ setting.section }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge badge-custom bg-info">{{ setting.frequency }}</span>
+                            </td>
+                            <td>
+                                <h6 class="mb-0">₹{{ setting.get_total_fees|floatformat:2 }}</h6>
+                                <small class="text-muted">Total Amount</small>
+                            </td>
+                            <td>
+                                <span class="badge badge-custom bg-success">Active</span>
+                            </td>
+                            <td>
+                                <div>
+                                    <h6 class="mb-0">{{ setting.updated_at|date:"d M Y" }}</h6>
+                                    <small class="text-muted">{{ setting.updated_at|time:"H:i A" }}</small>
+                                </div>
+                            </td>
+                            <td>
+                                <a href="{% url 'fee_settings' %}?class_name={{ setting.class_name.id }}&section={{ setting.section }}"
+                                   class="btn btn-edit">
+                                    <i class="fas fa-edit me-2"></i>Edit
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <img src="{% static 'dist/img/empty-state.svg' %}" alt="No data" style="width: 200px; margin-bottom: 20px;">
+                <h4>No Fee Settings Found</h4>
+                <p class="text-muted">Start by adding your first fee setting configuration</p>
+                <a href="{% url 'fee_settings' %}" class="btn btn-primary mt-3">
+                    <i class="fas fa-plus me-2"></i>Add Fee Setting
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
