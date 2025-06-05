@@ -2,173 +2,291 @@
 {% block content %}
 <div class="container mt-4">
   <h2 class="mb-4"><i class="fas fa-bus-alt me-2" style="color:#007bff;"></i>Transport Management</h2>
-  <div class="row mb-4">
-    <div class="col-md-3">
-      <div class="card text-center shadow-sm">
-        <div class="card-body">
-          <i class="fas fa-bus fa-2x mb-2" style="color:#007bff;"></i>
-          <h5 class="card-title">Buses</h5>
-          <p class="card-text">Manage all school buses.</p>
-          <a href="#buses" class="btn btn-outline-primary btn-sm">View Buses</a>
-          <a href="{% url 'bus_add' %}" class="btn btn-primary btn-sm mt-2">Add Bus</a>
-        </div>
-      </div>
+
+  {% if messages %}
+  <div class="mb-3">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-    <div class="col-md-3">
-      <div class="card text-center shadow-sm">
-        <div class="card-body">
-          <i class="fas fa-route fa-2x mb-2" style="color:#28a745;"></i>
-          <h5 class="card-title">Routes</h5>
-          <p class="card-text">Define and assign bus routes.</p>
-          <a href="#routes" class="btn btn-outline-success btn-sm">View Routes</a>
-          <a href="{% url 'route_add' %}" class="btn btn-success btn-sm mt-2">Add Route</a>
-        </div>
-      </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <style>
+  .transport-cards-row {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+  }
+  .transport-card {
+    flex: 1 1 220px;
+    min-width: 220px;
+    max-width: 300px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    padding: 1.5rem 1rem 1rem 1rem;
+    text-align: center;
+    transition: box-shadow 0.2s;
+    margin-bottom: 1rem;
+  }
+  .transport-card:hover {
+    box-shadow: 0 4px 24px rgba(0,0,0,0.13);
+  }
+  .transport-card .card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  .transport-card .card-text {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 1.2rem;
+  }
+  .transport-card .btn {
+    min-width: 120px;
+    font-weight: 500;
+    border-radius: 6px;
+    margin-bottom: 0.3rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  }
+  .transport-card .btn + .btn {
+    margin-left: 0.5rem;
+  }
+  .transport-card .btn-primary, .transport-card .btn-success, .transport-card .btn-warning, .transport-card .btn-danger {
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .transport-card .btn-outline-primary, .transport-card .btn-outline-success, .transport-card .btn-outline-warning, .transport-card .btn-outline-danger {
+    background: #fff;
+    font-weight: 500;
+  }
+  .transport-card i {
+    margin-bottom: 0.7rem;
+    display: block;
+  }
+  table.table-hover tbody tr:hover {
+    background-color: #f5f5f5;
+  }
+  .table-responsive { overflow-x: auto; }
+  th.sortable { cursor: pointer; }
+  th.sortable:after { content: '\25B2\25BC'; font-size: 0.7em; margin-left: 4px; color: #bbb; }
+  </style>
+
+  <div class="transport-cards-row mb-5">
+    <div class="transport-card">
+      <i class="fas fa-bus fa-2x mb-2" style="color:#007bff;"></i>
+      <h5 class="card-title">Buses</h5>
+      <p class="card-text">Manage all school buses.</p>
+      <a href="#buses" class="btn btn-outline-primary btn-sm">View Buses</a>
+      <a href="{% url 'bus_add' %}" class="btn btn-primary btn-sm">Add Bus</a>
     </div>
-    <div class="col-md-3">
-      <div class="card text-center shadow-sm">
-        <div class="card-body">
-          <i class="fas fa-user-tie fa-2x mb-2" style="color:#ffc107;"></i>
-          <h5 class="card-title">Drivers</h5>
-          <p class="card-text">Manage driver details.</p>
-          <a href="#drivers" class="btn btn-outline-warning btn-sm">View Drivers</a>
-          <a href="{% url 'driver_add' %}" class="btn btn-warning btn-sm mt-2">Add Driver</a>
-        </div>
-      </div>
+    <div class="transport-card">
+      <i class="fas fa-route fa-2x mb-2" style="color:#28a745;"></i>
+      <h5 class="card-title">Routes</h5>
+      <p class="card-text">Define and assign bus routes.</p>
+      <a href="#routes" class="btn btn-outline-success btn-sm">View Routes</a>
+      <a href="{% url 'route_add' %}" class="btn btn-success btn-sm">Add Route</a>
     </div>
-    <div class="col-md-3">
-      <div class="card text-center shadow-sm">
-        <div class="card-body">
-          <i class="fas fa-users fa-2x mb-2" style="color:#dc3545;"></i>
-          <h5 class="card-title">Assignments</h5>
-          <p class="card-text">Assign students to buses/routes.</p>
-          <a href="#assignments" class="btn btn-outline-danger btn-sm">View Assignments</a>
-          <a href="{% url 'assignment_add' %}" class="btn btn-danger btn-sm mt-2">Add Assignment</a>
-        </div>
-      </div>
+    <div class="transport-card">
+      <i class="fas fa-user-tie fa-2x mb-2" style="color:#ffc107;"></i>
+      <h5 class="card-title">Drivers</h5>
+      <p class="card-text">Manage driver details.</p>
+      <a href="#drivers" class="btn btn-outline-warning btn-sm">View Drivers</a>
+      <a href="{% url 'driver_add' %}" class="btn btn-warning btn-sm">Add Driver</a>
+    </div>
+    <div class="transport-card">
+      <i class="fas fa-users fa-2x mb-2" style="color:#dc3545;"></i>
+      <h5 class="card-title">Assignments</h5>
+      <p class="card-text">Assign students to buses/routes.</p>
+      <a href="#assignments" class="btn btn-outline-danger btn-sm">View Assignments</a>
+      <a href="{% url 'assignment_add' %}" class="btn btn-danger btn-sm">Add Assignment</a>
     </div>
   </div>
 
   <div id="buses" class="mb-5">
-    <h4>Buses</h4>
-    <table class="table table-bordered table-hover">
-      <thead class="table-secondary">
-        <tr>
-          <th>Number</th>
-          <th>Capacity</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for bus in buses %}
-        <tr>
-          <td>{{ bus.number }}</td>
-          <td>{{ bus.capacity }}</td>
-          <td>{{ bus.status }}</td>
-          <td>
-            <a href="{% url 'bus_edit' bus.pk %}" class="btn btn-sm btn-warning">Edit</a>
-            <a href="{% url 'bus_delete' bus.pk %}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this bus?');">Delete</a>
-          </td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="4" class="text-center text-muted">No buses found.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <h4>Buses <button class="btn btn-outline-secondary btn-sm ms-2" onclick="location.reload()" title="Refresh"><i class="fas fa-sync-alt"></i> Refresh</button></h4>
+    <input type="text" class="form-control form-control-sm mb-2" placeholder="Search buses..." onkeyup="filterTable('buses-table', this.value)">
+    <div class="table-responsive">
+      <table id="buses-table" class="table table-bordered table-hover" style="min-width:600px">
+        <thead class="table-secondary">
+          <tr>
+            <th class="sortable" onclick="sortTable('buses-table',0)">Number</th>
+            <th class="sortable" onclick="sortTable('buses-table',1)">Capacity</th>
+            <th class="sortable" onclick="sortTable('buses-table',2)">Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for bus in buses %}
+          <tr>
+            <td>{{ bus.number }}</td>
+            <td>{{ bus.capacity }}</td>
+            <td>{{ bus.status }}</td>
+            <td>
+              <a href="{% url 'bus_edit' bus.pk %}" class="btn btn-sm btn-warning">Edit</a>
+              <a href="{% url 'bus_delete' bus.pk %}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this bus?');">Delete</a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4" class="text-center text-muted">No buses found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <div id="routes" class="mb-5">
-    <h4>Routes</h4>
-    <table class="table table-bordered table-hover">
-      <thead class="table-secondary">
-        <tr>
-          <th>Name</th>
-          <th>Start Point</th>
-          <th>End Point</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for route in routes %}
-        <tr>
-          <td>{{ route.name }}</td>
-          <td>{{ route.start_point }}</td>
-          <td>{{ route.end_point }}</td>
-          <td>{{ route.status }}</td>
-          <td>
-            <a href="{% url 'route_edit' route.pk %}" class="btn btn-sm btn-warning">Edit</a>
-            <a href="{% url 'route_delete' route.pk %}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this route?');">Delete</a>
-          </td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="5" class="text-center text-muted">No routes found.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <h4>Routes <button class="btn btn-outline-secondary btn-sm ms-2" onclick="location.reload()" title="Refresh"><i class="fas fa-sync-alt"></i> Refresh</button></h4>
+    <input type="text" class="form-control form-control-sm mb-2" placeholder="Search routes..." onkeyup="filterTable('routes-table', this.value)">
+    <div class="table-responsive">
+      <table id="routes-table" class="table table-bordered table-hover" style="min-width:600px">
+        <thead class="table-secondary">
+          <tr>
+            <th class="sortable" onclick="sortTable('routes-table',0)">Name</th>
+            <th class="sortable" onclick="sortTable('routes-table',1)">Start Point</th>
+            <th class="sortable" onclick="sortTable('routes-table',2)">End Point</th>
+            <th class="sortable" onclick="sortTable('routes-table',3)">Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for route in routes %}
+          <tr>
+            <td>{{ route.name }}</td>
+            <td>{{ route.start_point }}</td>
+            <td>{{ route.end_point }}</td>
+            <td>{{ route.status }}</td>
+            <td>
+              <a href="{% url 'route_edit' route.pk %}" class="btn btn-sm btn-warning">Edit</a>
+              <a href="{% url 'route_delete' route.pk %}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this route?');">Delete</a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" class="text-center text-muted">No routes found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <div id="drivers" class="mb-5">
-    <h4>Drivers</h4>
-    <table class="table table-bordered table-hover">
-      <thead class="table-secondary">
-        <tr>
-          <th>Name</th>
-          <th>Phone</th>
-          <th>License Number</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for driver in drivers %}
-        <tr>
-          <td>{{ driver.name }}</td>
-          <td>{{ driver.phone }}</td>
-          <td>{{ driver.license_number }}</td>
-          <td>{{ driver.status }}</td>
-          <td>
-            <a href="{% url 'driver_edit' driver.pk %}" class="btn btn-sm btn-warning">Edit</a>
-            <a href="{% url 'driver_delete' driver.pk %}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this driver?');">Delete</a>
-          </td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="5" class="text-center text-muted">No drivers found.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <h4>Drivers <button class="btn btn-outline-secondary btn-sm ms-2" onclick="location.reload()" title="Refresh"><i class="fas fa-sync-alt"></i> Refresh</button></h4>
+    <input type="text" class="form-control form-control-sm mb-2" placeholder="Search drivers..." onkeyup="filterTable('drivers-table', this.value)">
+    <div class="table-responsive">
+      <table id="drivers-table" class="table table-bordered table-hover" style="min-width:600px">
+        <thead class="table-secondary">
+          <tr>
+            <th class="sortable" onclick="sortTable('drivers-table',0)">Name</th>
+            <th class="sortable" onclick="sortTable('drivers-table',1)">Phone</th>
+            <th class="sortable" onclick="sortTable('drivers-table',2)">License Number</th>
+            <th class="sortable" onclick="sortTable('drivers-table',3)">Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for driver in drivers %}
+          <tr>
+            <td>{{ driver.name }}</td>
+            <td>{{ driver.phone }}</td>
+            <td>{{ driver.license_number }}</td>
+            <td>{{ driver.status }}</td>
+            <td>
+              <a href="{% url 'driver_edit' driver.pk %}" class="btn btn-sm btn-warning">Edit</a>
+              <a href="{% url 'driver_delete' driver.pk %}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this driver?');">Delete</a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" class="text-center text-muted">No drivers found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <div id="assignments" class="mb-5">
-    <h4>Assignments</h4>
-    <table class="table table-bordered table-hover">
-      <thead class="table-secondary">
-        <tr>
-          <th>Student Name</th>
-          <th>Bus</th>
-          <th>Route</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for assignment in assignments %}
-        <tr>
-          <td>{{ assignment.student_name }}</td>
-          <td>{{ assignment.bus.number }}</td>
-          <td>{{ assignment.route.name }}</td>
-          <td>{{ assignment.status }}</td>
-          <td>
-            <a href="{% url 'assignment_edit' assignment.pk %}" class="btn btn-sm btn-warning">Edit</a>
-            <a href="{% url 'assignment_delete' assignment.pk %}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this assignment?');">Delete</a>
-          </td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="5" class="text-center text-muted">No assignments found.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <h4>Assignments <button class="btn btn-outline-secondary btn-sm ms-2" onclick="location.reload()" title="Refresh"><i class="fas fa-sync-alt"></i> Refresh</button></h4>
+    <input type="text" class="form-control form-control-sm mb-2" placeholder="Search assignments..." onkeyup="filterTable('assignments-table', this.value)">
+    <div class="table-responsive">
+      <table id="assignments-table" class="table table-bordered table-hover" style="min-width:600px">
+        <thead class="table-secondary">
+          <tr>
+            <th class="sortable" onclick="sortTable('assignments-table',0)">Student Name</th>
+            <th class="sortable" onclick="sortTable('assignments-table',1)">Bus</th>
+            <th class="sortable" onclick="sortTable('assignments-table',2)">Route</th>
+            <th class="sortable" onclick="sortTable('assignments-table',3)">Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for assignment in assignments %}
+          <tr>
+            <td>{{ assignment.student_name }}</td>
+            <td>{{ assignment.bus.number }}</td>
+            <td>{{ assignment.route.name }}</td>
+            <td>{{ assignment.status }}</td>
+            <td>
+              <a href="{% url 'assignment_edit' assignment.pk %}" class="btn btn-sm btn-warning">Edit</a>
+              <a href="{% url 'assignment_delete' assignment.pk %}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this assignment?');">Delete</a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" class="text-center text-muted">No assignments found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
+
+<script>
+function filterTable(tableId, query) {
+  query = query.toLowerCase();
+  var table = document.getElementById(tableId);
+  var trs = table.getElementsByTagName('tr');
+  var found = false;
+  for (var i = 1; i < trs.length; i++) { // skip header
+    var tds = trs[i].getElementsByTagName('td');
+    if (tds.length === 0) continue;
+    var rowText = '';
+    for (var j = 0; j < tds.length; j++) {
+      rowText += tds[j].textContent.toLowerCase() + ' ';
+    }
+    if (rowText.indexOf(query) > -1) {
+      trs[i].style.display = '';
+      found = true;
+    } else {
+      trs[i].style.display = 'none';
+    }
+  }
+  // Show/hide 'No ... found' row
+  var emptyRow = table.querySelector('tr.text-muted');
+  if (emptyRow) {
+    emptyRow.style.display = found ? 'none' : '';
+  }
+}
+
+function sortTable(tableId, colIndex) {
+  var table = document.getElementById(tableId);
+  var rows = Array.from(table.tBodies[0].rows);
+  var asc = table.getAttribute('data-sort-col') == colIndex && table.getAttribute('data-sort-dir') == 'asc' ? false : true;
+  rows = rows.filter(row => row.style.display !== 'none');
+  rows.sort(function(a, b) {
+    var aText = a.cells[colIndex].textContent.trim().toLowerCase();
+    var bText = b.cells[colIndex].textContent.trim().toLowerCase();
+    if (!isNaN(aText) && !isNaN(bText)) {
+      aText = parseFloat(aText); bText = parseFloat(bText);
+    }
+    if (aText < bText) return asc ? -1 : 1;
+    if (aText > bText) return asc ? 1 : -1;
+    return 0;
+  });
+  for (var i = 0; i < rows.length; i++) table.tBodies[0].appendChild(rows[i]);
+  table.setAttribute('data-sort-col', colIndex);
+  table.setAttribute('data-sort-dir', asc ? 'asc' : 'desc');
+}
+</script>
 {% endblock %}
