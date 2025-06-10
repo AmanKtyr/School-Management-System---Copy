@@ -1,0 +1,24 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+  <h1>Teacher Dashboard</h1>
+  <p>Welcome to the teacher dashboard. Here you can manage your classes, assignments, and grades.</p>
+
+  # Template moved to ../TeacherDashboard/dashboard.html as per user request.
+
+  <h2>Your Classes</h2>
+  <ul>
+    <li>Class 1</li>
+    <li>Class 2</li>
+    <li>Class 3</li>
+  </ul>
+
+  <h2>Recent Assignments</h2>
+  <ul>
+    <li>Assignment 1 - Due Date: 2023-10-10</li>
+    <li>Assignment 2 - Due Date: 2023-10-15</li>
+  </ul>
+
+  <h2>Gradebook</h2>
+  <p>Access your gradebook <a href="{% url 'gradebook' %}">here</a>.</p>
+{% endblock %}

@@ -21,9 +21,7 @@ urlpatterns = [
     path("accounts/", include("django.contrib.auth.urls")),
     path("", include("apps.corecode.urls")),
     path("student/", include("apps.students.urls")),
-
-     path('attendance/', include(('apps.attendance.urls', 'attendance'))),
-
+    path('attendance/', include(('apps.attendance.urls', 'attendance'))),
     path("staff/", include("apps.staffs.urls")),
     # Finance app removed
     # Result app removed
@@ -35,4 +33,8 @@ urlpatterns = [
     # Documents app
     path('documents/', include('apps.documents.urls', namespace='documents')),
     path('transport/', include('apps.transport.urls')),
+    # Add dashboard apps
+    path('student-dashboard/', include('StudentDashboard.urls')),
+    path('teacher-dashboard/', include('TeacherDashboard.urls')),
+    path('account-dashboard/', include('AccountDashboard.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
