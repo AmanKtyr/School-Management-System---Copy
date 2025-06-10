@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth import logout, get_user_model
+from django.contrib.auth import logout, get_user_model, authenticate, login as auth_login
 import json
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -1958,3 +1958,34 @@ def save_automated_backup_settings(request):
         import traceback
         traceback.print_exc()
         return JsonResponse({'error': str(e)}, status=500)
+
+
+from django.contrib.auth import authenticate, login as auth_login
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.urls import reverse
+from django.views.decorators.csrf import csrf_protect
+
+@csrf_protect
+def custom_login(request):
+    if request.method == 'POST':
+        user_type = request.POST.get('user_type')
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            auth_login(request, user)
+            # Redirect based on user_type
+            if user_type == 'student':
+                return redirect('/student-dashboard/dashboard/')
+            elif user_type == 'teacher':
+                return redirect('/teacher-dashboard/dashboard/')
+            elif user_type == 'account':
+                return redirect('/account-dashboard/dashboard/')
+            elif user_type == 'admin':
+                return redirect(reverse('admin:index'))
+            else:
+                return redirect('/')
+        else:
+            messages.error(request, 'Invalid username or password.')
+    return render(request, 'registration/login.html')

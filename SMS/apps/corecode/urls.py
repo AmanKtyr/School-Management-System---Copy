@@ -19,6 +19,7 @@ from .views import (
 )
 
 urlpatterns = [
+    path('login/', views.custom_login, name='login'),
     path("", IndexView.as_view(), name="home"),
     path("site-config", views.site_config_view, name="configs"),  # Corrected view
     path(

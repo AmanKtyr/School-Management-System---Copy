@@ -164,6 +164,13 @@
       {% endif %}
       <form method="post" action="{% url 'login' %}">
         {% csrf_token %}
+        <select id="user_type" name="user_type" required style="width:100%;padding:15px;margin:16px 0;border-radius:12px;border:1px solid #ccc;font-size:16px;">
+          <option value="">-- Select User Type --</option>
+          <option value="student">Student</option>
+          <option value="teacher">Teacher</option>
+          <option value="account">Account</option>
+          <option value="admin">Admin</option>
+        </select>
         <input type="text" id="id_username" name="username" placeholder="Username" aria-label="Username">
         <div style="position: relative;">
           <input type="password" id="id_password" name="password" placeholder="Password" aria-label="Password">
