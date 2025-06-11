@@ -1974,16 +1974,20 @@ def custom_login(request):
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
         if user is not None:
+            # Restrict admin login to only superuser
+            if user_type == 'admin':
+                if not user.is_superuser:
+                    messages.error(request, 'Only admin user can login as admin.')
+                    return render(request, 'registration/login.html')
+                auth_login(request, user)
+                return redirect(reverse('admin:index'))
             auth_login(request, user)
-            # Redirect based on user_type
             if user_type == 'student':
                 return redirect('/student-dashboard/dashboard/')
             elif user_type == 'teacher':
                 return redirect('/teacher-dashboard/dashboard/')
             elif user_type == 'account':
                 return redirect('/account-dashboard/dashboard/')
-            elif user_type == 'admin':
-                return redirect(reverse('admin:index'))
             else:
                 return redirect('/')
         else:

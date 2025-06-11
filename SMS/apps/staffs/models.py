@@ -30,7 +30,25 @@ class Staff(models.Model):
     others = models.TextField(blank=True)
     passport = models.ImageField(blank=True, upload_to="staffs/passports/")
 
+    staff_login_id = models.CharField(max_length=50, unique=True, blank=True, null=True)
+    staff_password = models.CharField(max_length=50, blank=True, null=True)
 
+    def generate_staff_login_id(self):
+        # Username: first 3 letters of name (lowercase, no space) + unique id (year+random)
+        name_part = (self.fullname.replace(' ', '').lower()[:3] if self.fullname else 'usr')
+        if self.date_of_registration:
+            year_suffix = str(self.date_of_registration.year)[-2:]
+        else:
+            year_suffix = "25"
+        unique_number = str(random.randint(1000, 9999))
+        return f"{name_part}{year_suffix}{unique_number}"
+
+    def save(self, *args, **kwargs):
+        if not self.staff_login_id:
+            self.staff_login_id = self.generate_staff_login_id()
+        if not self.staff_password:
+            self.staff_password = self.staff_login_id  # Default password same as login id
+        super().save(*args, **kwargs)
 
     def registration_number(self):
       if self.date_of_registration:

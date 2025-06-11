@@ -3,4 +3,4 @@ from django.contrib.auth.decorators import login_required
 
 @login_required
 def student_dashboard(request):
-    return render(request, 'StudentDashboard/StudentDashboard/dashboard.html')
+    return render(request, 'StudentDashboard/dashboard.html')

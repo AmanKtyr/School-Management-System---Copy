@@ -15,16 +15,17 @@ Including another URLconf
 """
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib import admin
 from django.urls import include, path
 
 urlpatterns = [
+    path('admin/', admin.site.urls),  # <-- Add this line for admin
     path("accounts/", include("django.contrib.auth.urls")),
     path("", include("apps.corecode.urls")),
     path("student/", include("apps.students.urls")),
     path('attendance/', include(('apps.attendance.urls', 'attendance'))),
     path("staff/", include("apps.staffs.urls")),
-    # Finance app removed
-    # Result app removed
+   
     path("non-teaching-staffs/", include("apps.NonTeachingStaffs.urls")),
    # Added namespace
      path('fees/', include('apps.fees.urls', namespace='fees')),
