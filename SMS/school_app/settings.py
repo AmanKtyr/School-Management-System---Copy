@@ -37,6 +37,7 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'django-school-management-system.onre
 # Application definition
 
 INSTALLED_APPS = [
+    "django.contrib.admin",  # <-- Add this line for admin
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -55,6 +56,7 @@ INSTALLED_APPS = [
     'apps.documents',
     'django_filters',
     'apps.transport',
+    "TeacherDashboard",  # Ensure this is present for teacher dashboard templates
 ]
 
 MIDDLEWARE = [
