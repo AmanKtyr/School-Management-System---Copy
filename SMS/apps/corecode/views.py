@@ -1980,7 +1980,8 @@ def custom_login(request):
                     messages.error(request, 'Only admin user can login as admin.')
                     return render(request, 'registration/login.html')
                 auth_login(request, user)
-                return redirect(reverse('admin:index'))
+                # Fix: Redirect to home page instead of admin:index
+                return redirect('/')
             auth_login(request, user)
             if user_type == 'student':
                 return redirect('/student-dashboard/dashboard/')
