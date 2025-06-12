@@ -1,0 +1,724 @@
+{% load static %}
+{% comment %}Try to load breadcrumb_tags if available{% endcomment %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+  <title>{{ profile.college_name | default:"MySchool" }}</title>
+
+  <!-- Favicon -->
+  {% if profile.college_logo %}
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'dist/img/favicon/apple-touch-icon.png' %}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'dist/img/favicon/favicon-32x32.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'dist/img/favicon/favicon-16x16.png' %}">
+  <link rel="icon" href="{% static 'dist/img/favicon/favicon.ico' %}">
+  {% else %}
+  <!-- Default favicon if no college logo is available -->
+  <link rel="icon" href="{% static 'dist/img/favicon/default-favicon.ico' %}">
+  {% endif %}
+
+  <!-- Critical CSS inlined to prevent FOUC (Flash of Unstyled Content) -->
+  <style>
+    /* Critical styles to prevent flash */
+    body {
+      visibility: hidden;
+      font-family: 'Poppins', sans-serif !important;
+      background-color: #f8f9fa !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      height: 100% !important;
+      overflow-x: hidden !important;
+    }
+
+    /* Hide Control Sidebar immediately */
+    .control-sidebar, .control-sidebar-dark, .control-sidebar-bg {
+      display: none !important;
+      width: 0 !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      right: -300px !important;
+      position: absolute !important;
+    }
+
+    /* Navbar Styles */
+    .navbar {
+      background: linear-gradient(90deg, black, #1E3C72) !important;
+      color: white !important;
+    }
+
+    /* Initial Sidebar Styles - will be overridden by sidebar-fix.css */
+    .sidebar, .main-sidebar {
+      background: linear-gradient(90deg, black, #1E3C72) !important;
+      color: white !important;
+    }
+
+    /* Loader Styles */
+    .loader-wrapper {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+  </style>
+
+  <!-- Preload CSS to prevent styling flash -->
+  <link rel="stylesheet" href="{% static 'dist/css/preload.css' %}">
+
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="{% static 'plugins/fontawesome-free/css/all.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/toastr/toastr.min.css' %}">
+
+  <!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <!-- Required scripts for fee settings -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+
+  <!-- overlayScrollbars -->
+  <link rel="stylesheet"
+    href="{% static 'plugins/overlayScrollbars/css/OverlayScrollbars.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/Datatables/datatables.min.css' %}" />
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{% static 'dist/css/adminlte.min.css' %}">
+
+  <!-- Google Font: Source Sans Pro -->
+  <link
+    href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <!-- Custom styles -->
+  <link rel="stylesheet" href="{% static 'dist/css/style.css' %}">
+
+  <!-- Sidebar fix styles (must be last to override all other styles) -->
+  <link rel="stylesheet" href="{% static 'dist/css/sidebar-fix.css' %}">
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
+  <div class="wrapper">
+  <!-- Loader -->
+  <div class="loader-wrapper">
+    <div class="loader">
+      <div class="school-logo">
+        <i class="fas fa-graduation-cap"></i>
+      </div>
+    </div>
+    <div class="loading-text">LOADING</div>
+    <div class="loader-progress">
+      <div class="loader-progress-bar"></div>
+    </div>
+    <div class="loader-tagline">{{ profile.college_name | default:"MySchool" }} - Empowering Education</div>
+  </div>
+    <!-- Navbar -->
+    <nav class="main-header navbar navbar-expand navbar-dark">
+      <!-- Left navbar links -->
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i
+              class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+          <a href="{% url 'home' %} " class="nav-link"><i class="fa fa-home"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+          <a href="{% url 'current-session' %}" class="nav-link">Session: {{ current_session }}</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+          <a href="{% url 'current-session' %}" class="nav-link">Term: {{ current_term }}</a>
+        </li>
+      </ul>
+
+
+
+      <!-- Right navbar links -->
+      <ul class="navbar-nav ml-auto">
+        <!-- User Account Dropdown Menu -->
+        <li class="nav-item dropdown user-menu position-static position-md-relative">
+          <a class="nav-link dropdown-toggle user-dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" id="userDropdown">
+            <div class="user-avatar-container">
+              <div class="user-avatar">
+                <i class="fas fa-user-circle"></i>
+              </div>
+              <span class="user-status-indicator online" title="Online"></span>
+            </div>
+            <div class="user-info d-none d-md-inline-block">
+              <span class="user-name">{{ request.user.username }}</span>
+              <span class="user-role">{% if request.user.is_superuser %}Administrator{% else %}Staff{% endif %}</span>
+            </div>
+            <i class="fas fa-chevron-down user-dropdown-icon d-none d-md-inline-block"></i>
+          </a>
+          <div class="dropdown-menu dropdown-menu-end user-dropdown-menu" aria-labelledby="userDropdown" data-bs-popper="static">
+            <div class="user-header">
+              <div class="user-header-bg"></div>
+              <div class="user-header-content">
+                <div class="user-avatar-lg">
+                  <i class="fas fa-user-circle"></i>
+                  <span class="user-status-indicator-lg online" title="Online"></span>
+                </div>
+                <div class="user-details">
+                  <h6 class="user-name-lg">{{ request.user.username }}</h6>
+                  <p class="user-role-lg">{% if request.user.is_superuser %}Administrator{% else %}Staff{% endif %}</p>
+                </div>
+              </div>
+            </div>
+            <div class="user-menu-items">
+              <a href="{% url 'college_profile' %}" class="dropdown-item">
+                <div class="dropdown-item-icon">
+                  <i class="fas fa-user-cog"></i>
+                </div>
+                <div class="dropdown-item-content">
+                  <span class="dropdown-item-title">Profile</span>
+                  <span class="dropdown-item-description">View and edit your profile</span>
+                </div>
+              </a>
+              <a href="#" class="dropdown-item">
+                <div class="dropdown-item-icon">
+                  <i class="fas fa-cog"></i>
+                </div>
+                <div class="dropdown-item-content">
+                  <span class="dropdown-item-title">Settings</span>
+                  <span class="dropdown-item-description">Manage your preferences</span>
+                </div>
+              </a>
+              <div class="dropdown-divider"></div>
+              <a href="{% url 'logout' %}" class="dropdown-item">
+                <div class="dropdown-item-icon">
+                  <i class="fas fa-sign-out-alt"></i>
+                </div>
+                <div class="dropdown-item-content">
+                  <span class="dropdown-item-title">Sign out</span>
+                  <span class="dropdown-item-description">Log out of your account</span>
+                </div>
+              </a>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </nav>
+    <!-- /.navbar -->
+
+    <!-- Main Sidebar Container -->
+    <aside class="main-sidebar sidebar-dark-primary">
+      <!-- Brand Logo with College Logo -->
+      <a href="{% url 'home' %}" class="brand-link d-flex align-items-center">
+        {% if profile.college_logo %}
+        <img src="{{ profile.college_logo.url }}" alt="College Logo" class="brand-image img-circle elevation-3" style="opacity: .8; margin-right: 10px; max-height: 33px;">
+        {% else %}
+        <i class="fas fa-graduation-cap brand-image img-circle elevation-3" style="opacity: .8; margin-right: 10px; background-color: #fff; color: #1E3C72; padding: 5px; font-size: 16px;"></i>
+        {% endif %}
+        <span class="brand-text font-weight-light">{{ profile.college_name | default:"MySchool" }}</span>
+      </a>
+
+{% comment %} sidebar start {% endcomment %}
+
+<div class="sidebar">
+  <nav class="mt-2">
+      <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+          <li class="nav-item">
+              <a href="{% url 'home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                  <i class="nav-icon fas fa-tachometer-alt" style="color: #ff5733; text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);"></i>
+                  <p>Teacher Dashboard</p>
+              </a>
+          </li>
+
+          <li class="nav-header">My Students</li>
+          <li class="nav-item has-treeview  {% if request.resolver_match.url_name in 'student-list student-create student-create-udise' %}menu-open{% endif %}">
+              <a href="#" class="nav-link">
+                  <i class="nav-icon fas fa-user-graduate" style="color: #3399ff; text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);"></i>
+                  <p>Students<i class="fas fa-angle-left right"></i></p>
+              </a>
+              <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                      <a href="{% url 'student-list' %}" class="nav-link {% if request.resolver_match.url_name == 'student-list' %}active{% endif %}" >
+                          <i class="fas fa-list nav-icon" style="color: #33cc33;"></i>
+                          <p>Student List</p>
+                      </a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="{% url 'student-create' %}" class="nav-link {% if request.resolver_match.url_name == 'student-create' %}active{% endif %}">
+                          <i class="fas fa-user-plus nav-icon" style="color: #ffcc00;"></i>
+                          <p>Admissions</p>
+                      </a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="{% url 'student-create-udise' %}" class="nav-link {% if request.resolver_match.url_name == 'student-create-udise' %}active{% endif %}">
+                          <i class="fas fa-id-card nav-icon" style="color: #ff6600;"></i>
+                          <p>UDISE+ Student Form</p>
+                      </a>
+                  </li>
+              </ul>
+          </li>
+
+          <li class="nav-header">Attendance</li>
+            <li class="nav-item has-treeview {% if request.resolver_match.url_name in 'attendance_list holiday_list' %}menu-open{% endif %}">
+                <a href="#" class="nav-link">
+                    <i class="nav-icon fas fa-calendar-check" style="color: #ffcc00; text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);"></i>
+                    <p>Attendance<i class="fas fa-angle-left right"></i></p>
+                </a>
+                <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                      <a href="{% url 'attendance:attendance_list' %}" class="nav-link {% if request.resolver_match.url_name == 'attendance_list' %}active{% endif %}">
+                            <i class="fas fa-user-check nav-icon" style="color: #33ccff;"></i>
+                            <p>Student Attendance</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="{% url 'attendance:holiday_list' %}" class="nav-link {% if request.resolver_match.url_name == 'holiday_list' %}active{% endif %}">
+                            <i class="fas fa-calendar-minus nav-icon" style="color: #17a2b8;"></i>
+                            <p>Holiday Management</p>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+          <li class="nav-header">Examinations</li>
+          <li class="nav-item has-treeview {% if 'exams' in request.path %}menu-open{% endif %}">
+              <a href="{% url 'exams:dashboard' %}" class="nav-link {% if 'exams' in request.path %}active{% endif %}">
+                  <i class="nav-icon fas fa-graduation-cap" style="color: #ff9900; text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);"></i>
+                  <p>
+                      Examinations
+                      <i class="fas fa-angle-left right"></i>
+                  </p>
+              </a>
+              <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                      <a href="{% url 'exams:dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' and 'exams' in request.path %}active{% endif %}">
+                          <i class="fas fa-tachometer-alt nav-icon" style="color: #ff9900;"></i>
+                          <p>Dashboard</p>
+                      </a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="{% url 'exams:exam_list' %}" class="nav-link {% if request.resolver_match.url_name == 'exam_list' %}active{% endif %}">
+                          <i class="fas fa-list-alt nav-icon" style="color: #ff6600;"></i>
+                          <p>Manage Exams</p>
+                      </a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="{% url 'exams:exam_schedule_list' %}" class="nav-link {% if request.resolver_match.url_name == 'exam_schedule_list' %}active{% endif %}">
+                          <i class="fas fa-calendar-alt nav-icon" style="color: #ff6600;"></i>
+                          <p>Exam Schedule</p>
+                      </a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="{% url 'exams:question_paper_list' %}" class="nav-link {% if request.resolver_match.url_name == 'question_paper_list' %}active{% endif %}">
+                          <i class="fas fa-file-alt nav-icon" style="color: #ff3366;"></i>
+                          <p>Question Papers</p>
+                      </a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="{% url 'exams:admit_card_list' %}" class="nav-link {% if request.resolver_match.url_name == 'admit_card_list' %}active{% endif %}">
+                          <i class="fas fa-id-card nav-icon" style="color: #cc3300;"></i>
+                          <p>Admit Cards</p>
+                      </a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="{% url 'exams:marks_entry' %}" class="nav-link {% if request.resolver_match.url_name == 'marks_entry' %}active{% endif %}">
+                          <i class="fas fa-clipboard-check nav-icon" style="color: #33cc33;"></i>
+                          <p>Marks Entry</p>
+                      </a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="{% url 'exams:results' %}" class="nav-link {% if request.resolver_match.url_name == 'results' %}active{% endif %}">
+                          <i class="fas fa-chart-bar nav-icon" style="color: #3399ff;"></i>
+                          <p>Results & Reports</p>
+                      </a>
+                  </li>
+              </ul>
+          </li>
+
+          <li class="nav-header">Documents</li>
+          <li class="nav-item has-treeview {% if 'documents' in request.path %}menu-open{% endif %}">
+              <a href="{% url 'documents:dashboard' %}" class="nav-link {% if 'documents' in request.path %}active{% endif %}">
+                  <i class="nav-icon fas fa-folder-open" style="color: #9933ff; text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);"></i>
+                  <p>Documents<i class="fas fa-angle-left right"></i></p>
+              </a>
+              <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                      <a href="{% url 'documents:dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' and 'documents' in request.path %}active{% endif %}">
+                          <i class="fas fa-tachometer-alt nav-icon" style="color: #9933ff;"></i>
+                          <p>Dashboard</p>
+                      </a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="{% url 'documents:document_list' %}" class="nav-link {% if request.resolver_match.url_name == 'document_list' %}active{% endif %}">
+                          <i class="fas fa-file nav-icon" style="color: #33cc33;"></i>
+                          <p>All Documents</p>
+                      </a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="{% url 'documents:document_upload' %}" class="nav-link {% if request.resolver_match.url_name == 'document_upload' %}active{% endif %}">
+                          <i class="fas fa-upload nav-icon" style="color: #3399ff;"></i>
+                          <p>Upload Document</p>
+                      </a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="{% url 'documents:student_documents' %}" class="nav-link {% if request.resolver_match.url_name == 'student_documents' or request.resolver_match.url_name == 'student_documents_detail' %}active{% endif %}">
+                          <i class="fas fa-user-graduate nav-icon" style="color: #ff9900;"></i>
+                          <p>Student Documents</p>
+                      </a>
+                  </li>
+              </ul>
+          </li>
+
+          <li class="nav-header">Account</li>
+          <li class="nav-item">
+              <a href="{% url 'college_profile' %}" class="nav-link">
+                  <i class="nav-icon fas fa-user-cog" style="color: #007bff;"></i>
+                  <p>Profile</p>
+              </a>
+          </li>
+          <li class="nav-item">
+              <a href="{% url 'logout' %}" class="nav-link">
+                  <i class="nav-icon fas fa-sign-out-alt" style="color: #dc3545;"></i>
+                  <p>Sign Out</p>
+              </a>
+          </li>
+      </ul>
+  </nav>
+</div>
+
+
+{% comment %} sidebar {% endcomment %}
+
+    </aside>
+
+
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <section class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-1">
+            <div class="col-sm-8">
+              {% block breadcrumb-left %}
+              <!-- Default breadcrumb if not overridden -->
+              <div class="breadcrumb-container">
+                <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb breadcrumb-chevron">
+                    <li class="breadcrumb-item">
+                      <a href="{% url 'home' %}" class="text-decoration-none fw-bold">
+                        <i class="fas fa-home"></i> Home
+                      </a>
+                    </li>
+                    {% if request.resolver_match.url_name != 'home' %}
+                      <li class="breadcrumb-item active" aria-current="page">
+                        <i class="fas fa-link"></i> {{ request.resolver_match.url_name|title }}
+                      </li>
+                    {% endif %}
+                  </ol>
+                </nav>
+              </div>
+              {% endblock breadcrumb-left %}
+            </div>
+            <div class="col-sm-4">
+              <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item">{% block breadcrumb %}{% endblock breadcrumb %}</li>
+              </ol>
+            </div>
+          </div>
+        </div><!-- /.container-fluid -->
+      </section>
+
+      <!-- Professional Page Title Section -->
+      <div class="page-title-section">
+        <div class="container-fluid">
+          <div class="row align-items-center">
+            <div class="col-md-8">
+              <div class="page-title-container">
+                <div class="page-title-icon">
+                  <i class="{% block title-icon %}fas fa-file-alt{% endblock title-icon %}"></i>
+                </div>
+                <div class="page-title-content">
+                  <h1 class="page-title">{% block title %}{% endblock title %}</h1>
+                  <p class="page-subtitle">{% block subtitle %}{% endblock subtitle %}</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="page-actions text-md-end">
+                {% block page-actions %}{% endblock page-actions %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main content -->
+      <section class="content">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-md-12">
+              {% block fullcard %}
+              <div class="card">
+                {% block content-header %}{% endblock content-header %}
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col">
+                      {% block content %}
+
+                      {% endblock content %}
+                    </div>
+                  </div>
+                  <!-- /.row -->
+                </div>
+                <!-- ./card-body -->
+              </div>
+              {% endblock fullcard %}
+              <!-- /.card -->
+            </div>
+            <!-- /.col -->
+          </div>
+          <!-- /.row -->
+        </div>
+        <!--/. container-fluid -->
+      </section>
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- Footer -->
+    <footer class="main-footer">
+      <p>&copy; {{ profile.college_name | default:"MySchool" }} - All Rights Reserved
+      <i class="fas fa-heart"></i>
+      <i class="fas fa-graduation-cap"></i></p>
+    </footer>
+    <!-- /.footer -->
+
+    <!-- Control Sidebar removed -->
+
+
+  </div>
+  <!-- ./wrapper -->
+
+  <!-- REQUIRED SCRIPTS -->
+  <!-- jQuery (only load one version to avoid conflicts) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="{% static 'dist/js/jquery.formset.js' %}"></script>
+
+  <!-- Bootstrap -->
+  <!-- Bootstrap JS is loaded from CDN below -->
+  <script src="{% static 'plugins/toastr/toastr.min.js' %}"></script>
+  <!-- overlayScrollbars -->
+  <script
+    src="{% static 'plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js' %}"></script>
+
+  <!-- AdminLTE App -->
+  <script src="{% static 'dist/js/adminlte.js' %}"></script>
+
+  <!-- OPTIONAL SCRIPTS -->
+  <script src="{% static 'dist/js/demo.js' %}"></script>
+  <script>
+    // Initialize functionality after page load
+    $(window).on('load', function() {
+      // Make sure all links with the active class have the correct styling
+      $('.nav-link.active').css({
+        'background-color': '#1E3C72',
+        'color': '#ffc107',
+        'font-weight': 'bold'
+      });
+
+      // Remove control sidebar completely
+      $('.control-sidebar, .control-sidebar-dark, .control-sidebar-bg').remove();
+      $('[data-widget="control-sidebar"]').remove();
+      $('body').removeClass('control-sidebar-slide-open');
+      $('body').removeClass('control-sidebar-open');
+
+      // Fix content width
+      $('.content-wrapper, .main-footer, .main-header').css('margin-right', '0');
+
+      // Add a class to the body to ensure our CSS takes effect
+      $('body').addClass('no-control-sidebar');
+
+      // Sidebar toggle is handled by sidebar-fix.js
+    });
+  </script>
+  <script src="{% static 'dist/js/custom.js' %}"></script>
+
+  <!-- Sidebar fix script (must be last) -->
+  <script>
+    // Ensure jQuery and AdminLTE are loaded before loading sidebar-fix.js
+    $(document).ready(function() {
+      // Load sidebar-fix.js dynamically to ensure it runs after everything else
+      var script = document.createElement('script');
+      script.src = "{% static 'dist/js/sidebar-fix.js' %}";
+      document.body.appendChild(script);
+
+      // Load breadcrumbs.js for enhanced breadcrumb functionality
+      var breadcrumbScript = document.createElement('script');
+      breadcrumbScript.src = "{% static 'dist/js/breadcrumbs.js' %}";
+      document.body.appendChild(breadcrumbScript);
+    });
+  </script>
+
+
+  {% comment %} for dashboard chart {% endcomment %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+  {% if messages %}
+  {% for message in messages %}
+  <script type=text/javascript>
+    toastr.options.progressBar = true;
+    toastr.{{ message.tags }}('{{ message }}')
+  </script>
+  {% endfor %}
+  {% endif %}
+
+  <script src="{% static 'plugins/Datatables/datatables.min.js' %}"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Class-Section Filter Functionality -->
+  <script src="{% static 'dist/js/class-section-filter.js' %}"></script>
+
+  <script>
+    // Initialize Bootstrap 5 dropdowns
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize all dropdowns
+      var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+      var dropdownList = dropdownElementList.map(function(dropdownToggleEl) {
+        return new bootstrap.Dropdown(dropdownToggleEl, {
+          // Set dropdown options to ensure proper positioning
+          reference: 'parent',
+          popperConfig: {
+            placement: 'bottom-end',
+            modifiers: [
+              {
+                name: 'preventOverflow',
+                options: {
+                  boundary: document.body
+                }
+              }
+            ]
+          }
+        });
+      });
+
+      // Fix for edit dropdown in student profile
+      const editDropdown = document.getElementById('editDropdown');
+      if (editDropdown) {
+        editDropdown.addEventListener('click', function(e) {
+          const dropdownMenu = this.nextElementSibling;
+          if (dropdownMenu && dropdownMenu.classList.contains('dropdown-menu')) {
+            dropdownMenu.classList.toggle('show');
+            e.stopPropagation();
+          }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+          const dropdownMenus = document.querySelectorAll('.dropdown-menu.show');
+          dropdownMenus.forEach(function(menu) {
+            if (!menu.parentElement.contains(e.target)) {
+              menu.classList.remove('show');
+            }
+          });
+        });
+      }
+    });
+  </script>
+
+  {% block morejs %}
+
+  {% endblock morejs %}
+
+  <!-- All JavaScript moved to custom.js -->
+
+  <!-- Force CSS reload -->
+  <script>
+    // Force CSS reload by adding a timestamp to the CSS file URL
+    document.addEventListener('DOMContentLoaded', function() {
+      const links = document.getElementsByTagName('link');
+      for (let i = 0; i < links.length; i++) {
+        if (links[i].rel === 'stylesheet' && links[i].href.includes('style.css')) {
+          const timestamp = new Date().getTime();
+          links[i].href = links[i].href.split('?')[0] + '?v=' + timestamp;
+        }
+      }
+
+      // User dropdown logic for Teacher Dashboard
+      const userDropdownToggle = document.getElementById('userDropdown');
+      const userDropdownMenu = document.querySelector('.user-dropdown-menu');
+      if (userDropdownToggle && userDropdownMenu) {
+        userDropdownToggle.addEventListener('click', function(e) {
+          e.preventDefault();
+          userDropdownMenu.classList.toggle('show');
+          // Position dropdown below toggle
+          const rect = userDropdownToggle.getBoundingClientRect();
+          userDropdownMenu.style.top = (userDropdownToggle.offsetHeight + 5) + 'px';
+          userDropdownMenu.style.right = '0';
+          userDropdownMenu.style.left = 'auto';
+          // Prevent off-screen
+          const dropdownRect = userDropdownMenu.getBoundingClientRect();
+          const viewportWidth = window.innerWidth;
+          if (dropdownRect.right > viewportWidth) {
+            const overflow = dropdownRect.right - viewportWidth;
+            userDropdownMenu.style.right = overflow + 20 + 'px';
+          }
+        });
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+          if (!userDropdownToggle.contains(e.target) && !userDropdownMenu.contains(e.target)) {
+            if (userDropdownMenu.classList.contains('show')) {
+              userDropdownMenu.classList.remove('show');
+            }
+          }
+        });
+      }
+    });
+  </script>
+
+    <!-- Immediate script to handle page load -->
+  <script>
+    // Show loader first
+    document.addEventListener('DOMContentLoaded', function() {
+      var loaderWrapper = document.querySelector('.loader-wrapper');
+      if (loaderWrapper) {
+        loaderWrapper.style.display = 'flex';
+        loaderWrapper.style.visibility = 'visible';
+        loaderWrapper.style.opacity = '1';
+        loaderWrapper.classList.remove('loader-hidden');
+      }
+
+      // Keep body hidden until styles are loaded
+      document.body.style.visibility = 'hidden';
+    });
+
+    // When everything is loaded
+    window.onload = function() {
+      // Make body visible
+      document.body.style.visibility = 'visible';
+
+      // Hide loader after a short delay
+      setTimeout(function() {
+        var loaderWrapper = document.querySelector('.loader-wrapper');
+        if (loaderWrapper) {
+          loaderWrapper.classList.add('loader-hidden');
+          setTimeout(function() {
+            loaderWrapper.style.display = 'none';
+          }, 500);
+        }
+      }, 800);
+    };
+  </script>
+
+
+  </div> <!-- End of wrapper -->
+</body>
+
+</html>
