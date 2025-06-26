@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block breadcrumb-left %}
+<div class="breadcrumb-container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-chevron">
+      <li class="breadcrumb-item">
+        <a href="{% url 'home' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-home"></i> Home
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <i class="fas fa-tachometer-alt"></i> Staff Dashboard
+      </li>
+    </ol>
+  </nav>
+</div>
+{% endblock breadcrumb-left %}
+
+{% block title-icon %}fas fa-tachometer-alt{% endblock title-icon %}
+
+{% block title %}Staff Dashboard{% endblock title %}
+
+{% block subtitle %}Welcome to your staff dashboard{% endblock subtitle %}
+
+{% block page-actions %}
+<a href="{% url 'current-session' %}" class="btn btn-sm btn-outline-primary">
+  <i class="fas fa-calendar-alt"></i> Current Session: {{ current_session }}
+</a>
+{% endblock page-actions %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0"><i class="fas fa-user-tie me-2"></i> My Info</h5>
+        </div>
+        <div class="card-body">
+          <ul class="list-group">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Name
+              <span class="badge bg-primary">{{ request.user.first_name }}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Username
+              <span class="badge bg-info">{{ request.user.username }}</span>
+            </li>
+            <!-- Add more staff info as needed -->
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-info text-white">
+          <h5 class="mb-0"><i class="fas fa-calendar-check me-2"></i> Attendance</h5>
+        </div>
+        <div class="card-body">
+          <p>Attendance summary and quick links can go here.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-header bg-warning text-dark">
+          <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i> Documents</h5>
+        </div>
+        <div class="card-body">
+          <p>Staff documents and quick actions can go here.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="fas fa-cogs me-2"></i> Settings</h5>
+        </div>
+        <div class="card-body">
+          <p>Staff settings and preferences can go here.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %} 
