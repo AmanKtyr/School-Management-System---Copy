@@ -233,5 +233,6 @@ MESSAGE_TAGS = {
 
 CSRF_TRUSTED_ORIGINS = [
     'https://vidyabharti.in',
-    'https://django-school-management-system.onrender.com'
+    'https://django-school-management-system.onrender.com',
+    'https://web-production-41f28.up.railway.app'
 ]
