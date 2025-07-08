@@ -97,6 +97,12 @@ TEMPLATES = [
 WSGI_APPLICATION = "school_app.wsgi.application"
 
 
+# for CSRF protection on railway
+CSRF_TRUSTED_ORIGINS = [
+    "https://web-production-41f28.up.railway.app",
+]
+
+
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
