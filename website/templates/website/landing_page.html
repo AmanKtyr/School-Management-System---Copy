@@ -1,0 +1,255 @@
+{% extends 'website/base.html' %}
+{% load static %}
+
+{% block title %}Gurukul Setu - School & College Management System{% endblock %}
+
+{% block content %}
+
+    <!-- Hero Section -->
+    <section class="hero-section" id="home">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="hero-content">
+                        <h1>Transform Your Educational Institution with Gurukul Setu</h1>
+                        <p>A comprehensive SaaS solution for schools and colleges in India. Streamline administration, enhance teaching, and improve student outcomes with our all-in-one management system.</p>
+                        <div class="hero-btns">
+                            <a href="{% url 'login' %}" class="btn btn-primary">Get Started</a>
+                            <a href="#features" class="btn btn-outline">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="hero-image">
+                        <img src="https://smartstudent.app/media/2022/09/managment-software.png" alt="Gurukul Setu Dashboard" class="img-fluid" style="height: 500px;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section" id="features">
+        <div class="container">
+            <div class="section-header text-center">
+                <h2>Powerful Features for Modern Education</h2>
+                <p>Everything you need to manage your educational institution efficiently</p>
+            </div>
+            <div class="row">
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <h3>Student Management</h3>
+                        <p>Comprehensive student profiles, attendance tracking, and performance analytics.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <h3>Staff Management</h3>
+                        <p>Efficiently manage teaching and non-teaching staff records, attendance, and performance.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <h3>Fee Management</h3>
+                        <p>Streamline fee collection, generate invoices, and track payments with ease.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h3>Examination System</h3>
+                        <p>Create and manage exams, record marks, and generate comprehensive result reports.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <h3>Attendance Tracking</h3>
+                        <p>Track student and staff attendance with detailed reports and analytics.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-folder-open"></i>
+                        </div>
+                        <h3>Document Management</h3>
+                        <p>Securely store and manage important documents and certificates.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about-section" id="about">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="about-image">
+                        <img src="{% static 'img/school-management-system-service.jpg' %}" alt="About Gurukul Setu" class="img-fluid">
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="about-content">
+                        <h2>About Gurukul Setu</h2>
+                        <p>Gurukul Setu is a comprehensive School and College Management System designed specifically for Indian educational institutions. Our platform bridges the gap between traditional education and modern technology.</p>
+                        <p>With a focus on simplicity, security, and efficiency, Gurukul Setu helps educational institutions streamline their administrative processes, enhance teaching methodologies, and improve overall student outcomes.</p>
+                        <div class="about-stats">
+                            <div class="stat-item">
+                                <h3>500+</h3>
+                                <p>Schools & Colleges</p>
+                            </div>
+                            <div class="stat-item">
+                                <h3>100,000+</h3>
+                                <p>Students Managed</p>
+                            </div>
+                            <div class="stat-item">
+                                <h3>99.9%</h3>
+                                <p>Uptime</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials-section" id="testimonials">
+        <div class="container">
+            <div class="section-header text-center">
+                <h2>What Our Clients Say</h2>
+                <p>Trusted by educational institutions across India</p>
+            </div>
+            <div class="row">
+                <div class="col-lg-4 col-md-6">
+                    <div class="testimonial-card">
+                        <div class="testimonial-content">
+                            <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
+                            <p>"Gurukul Setu has transformed how we manage our school. The administrative burden has been reduced significantly, allowing us to focus more on education."</p>
+                        </div>
+                        <div class="testimonial-author">
+                            <div class="author-icon">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                            <div class="author-info">
+                                <h4>Rajesh Kumar</h4>
+                                <p>Principal, Delhi Public School</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="testimonial-card">
+                        <div class="testimonial-content">
+                            <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
+                            <p>"The fee management system is exceptional. We've reduced payment delays by 75% and our accounting team loves the automated reports and reconciliation."</p>
+                        </div>
+                        <div class="testimonial-author">
+                            <div class="author-icon">
+                                <i class="fas fa-user-cog"></i>
+                            </div>
+                            <div class="author-info">
+                                <h4>Priya Sharma</h4>
+                                <p>Administrator, St. Mary's College</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="testimonial-card">
+                        <div class="testimonial-content">
+                            <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
+                            <p>"As a teacher, I appreciate how easy it is to track attendance, manage grades, and communicate with students and parents through one platform."</p>
+                        </div>
+                        <div class="testimonial-author">
+                            <div class="author-icon">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                            </div>
+                            <div class="author-info">
+                                <h4>Amit Patel</h4>
+                                <p>Teacher, Modern Academy</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section" id="contact">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="contact-info">
+                        <h2>Get In Touch</h2>
+                        <p>Have questions about Gurukul Setu? Our team is here to help you.</p>
+                        <div class="info-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <div>
+                                <h4>Address</h4>
+                                <p>123 Education Street, Tech Park, Bangalore - 560001</p>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-phone-alt"></i>
+                            <div>
+                                <h4>Phone</h4>
+                                <p>+91 98765 43210</p>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-envelope"></i>
+                            <div>
+                                <h4>Email</h4>
+                                <p>info@gurukulsetu.com</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="contact-form">
+                        <h3>Send Us a Message</h3>
+                        <form>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" placeholder="Your Name">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <input type="email" class="form-control" placeholder="Your Email">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Subject">
+                            </div>
+                            <div class="form-group">
+                                <textarea class="form-control" rows="5" placeholder="Your Message"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

@@ -1,0 +1,504 @@
+{% load static %}
+<!-- Chatbot Widget -->
+<div class="chatbot-widget">
+    <div class="chatbot-toggle" id="chatbotToggle">
+        <i class="fas fa-comments"></i>
+    </div>
+    <div class="chatbot-container" id="chatbotContainer">
+        <div class="chatbot-header">
+            <div class="chatbot-title">
+                <img src="{% static 'img/logo-icon.png' %}" alt="Gurukul Setu" width="30">
+                <h4>Gurukul Setu Support</h4>
+            </div>
+            <div class="chatbot-actions">
+                <button class="minimize-btn" id="chatbotMinimize"><i class="fas fa-minus"></i></button>
+                <button class="close-btn" id="chatbotClose"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+        <div class="chatbot-body" id="chatbotBody">
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot-message">
+                    <div class="message-content">
+                        <p>👋 Hi there! I'm Guru, your virtual assistant. How can I help you today?</p>
+                    </div>
+                    <span class="message-time">Just now</span>
+                </div>
+                <div class="message bot-message">
+                    <div class="message-content">
+                        <p>You can ask me about:</p>
+                        <ul>
+                            <li>Our features and pricing</li>
+                            <li>Implementation process</li>
+                            <li>Technical support</li>
+                            <li>Or anything else about Gurukul Setu!</li>
+                        </ul>
+                    </div>
+                    <span class="message-time">Just now</span>
+                </div>
+            </div>
+        </div>
+        <div class="chatbot-footer">
+            <div class="quick-responses">
+                <button class="quick-response-btn" data-message="Tell me about your features">Features</button>
+                <button class="quick-response-btn" data-message="How much does it cost?">Pricing</button>
+                <button class="quick-response-btn" data-message="How do I get started?">Get Started</button>
+                <button class="quick-response-btn" data-message="I need technical support">Support</button>
+            </div>
+            <form id="chatbotForm">
+                <div class="input-group">
+                    <input type="text" id="chatbotInput" class="form-control" placeholder="Type your message...">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .chatbot-widget {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 9999;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .chatbot-toggle {
+        width: 60px;
+        height: 60px;
+        background: var(--primary-gradient);
+        color: var(--white);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(48, 152, 152, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .chatbot-toggle:hover {
+        transform: scale(1.05);
+    }
+
+    .chatbot-container {
+        position: absolute;
+        bottom: 80px;
+        right: 0;
+        width: 350px;
+        height: 500px;
+        background-color: var(--white);
+        border-radius: 15px;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(20px);
+    }
+
+    .chatbot-container.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .chatbot-header {
+        background: var(--primary-gradient);
+        color: var(--white);
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .chatbot-title {
+        display: flex;
+        align-items: center;
+    }
+
+    .chatbot-title img {
+        margin-right: 10px;
+    }
+
+    .chatbot-title h4 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .chatbot-actions button {
+        background: none;
+        border: none;
+        color: var(--white);
+        font-size: 14px;
+        cursor: pointer;
+        margin-left: 10px;
+        opacity: 0.8;
+        transition: opacity 0.3s ease;
+    }
+
+    .chatbot-actions button:hover {
+        opacity: 1;
+    }
+
+    .chatbot-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 15px;
+        background-color: #f8f9fa;
+    }
+
+    .chat-messages {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .message {
+        margin-bottom: 15px;
+        max-width: 80%;
+    }
+
+    .bot-message {
+        align-self: flex-start;
+    }
+
+    .user-message {
+        align-self: flex-end;
+    }
+
+    .message-content {
+        padding: 10px 15px;
+        border-radius: 15px;
+    }
+
+    .bot-message .message-content {
+        background-color: var(--white);
+        border: 1px solid #e9ecef;
+    }
+
+    .user-message .message-content {
+        background-color: var(--primary-color);
+        color: var(--white);
+    }
+
+    .message-content p {
+        margin: 0;
+    }
+
+    .message-content ul {
+        margin: 5px 0 0;
+        padding-left: 20px;
+    }
+
+    .message-time {
+        font-size: 11px;
+        color: #6c757d;
+        margin-top: 5px;
+        display: block;
+    }
+
+    .chatbot-footer {
+        padding: 15px;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .quick-responses {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+    }
+
+    .quick-response-btn {
+        background-color: #f1f3f5;
+        border: 1px solid #e9ecef;
+        border-radius: 20px;
+        padding: 5px 10px;
+        margin: 0 5px 5px 0;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .quick-response-btn:hover {
+        background-color: #e9ecef;
+    }
+
+    #chatbotForm .input-group {
+        position: relative;
+    }
+
+    #chatbotInput {
+        border-radius: 20px;
+        padding-right: 50px;
+        border: 1px solid #e9ecef;
+    }
+
+    #chatbotForm .btn {
+        position: absolute;
+        right: 0;
+        top: 0;
+        border-radius: 0 20px 20px 0;
+        padding: 7px 15px;
+        z-index: 10;
+    }
+
+    /* Scrollbar Styling */
+    .chatbot-body::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .chatbot-body::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    .chatbot-body::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 10px;
+    }
+
+    .chatbot-body::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }
+
+    /* Typing Indicator */
+    .typing-indicator {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        max-width: 80%;
+        align-self: flex-start;
+    }
+
+    .typing-indicator .message-content {
+        background-color: var(--white);
+        border: 1px solid #e9ecef;
+        padding: 12px 15px;
+        border-radius: 15px;
+    }
+
+    .typing-dots {
+        display: flex;
+    }
+
+    .typing-dot {
+        width: 8px;
+        height: 8px;
+        background-color: #adb5bd;
+        border-radius: 50%;
+        margin-right: 4px;
+        animation: typingAnimation 1.5s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(1) {
+        animation-delay: 0s;
+    }
+
+    .typing-dot:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .typing-dot:nth-child(3) {
+        animation-delay: 0.4s;
+        margin-right: 0;
+    }
+
+    @keyframes typingAnimation {
+        0% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-5px);
+        }
+        100% {
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatbotToggle = document.getElementById('chatbotToggle');
+        const chatbotContainer = document.getElementById('chatbotContainer');
+        const chatbotMinimize = document.getElementById('chatbotMinimize');
+        const chatbotClose = document.getElementById('chatbotClose');
+        const chatbotForm = document.getElementById('chatbotForm');
+        const chatbotInput = document.getElementById('chatbotInput');
+        const chatMessages = document.getElementById('chatMessages');
+        const quickResponseBtns = document.querySelectorAll('.quick-response-btn');
+
+        // Toggle chatbot
+        chatbotToggle.addEventListener('click', function() {
+            chatbotContainer.classList.add('active');
+        });
+
+        // Minimize chatbot
+        chatbotMinimize.addEventListener('click', function() {
+            chatbotContainer.classList.remove('active');
+        });
+
+        // Close chatbot
+        chatbotClose.addEventListener('click', function() {
+            chatbotContainer.classList.remove('active');
+        });
+
+        // Handle form submission
+        chatbotForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const message = chatbotInput.value.trim();
+
+            if (message) {
+                // Add user message
+                addMessage(message, 'user');
+
+                // Clear input
+                chatbotInput.value = '';
+
+                // Show typing indicator
+                showTypingIndicator();
+
+                // Simulate bot response after delay
+                setTimeout(function() {
+                    // Remove typing indicator
+                    removeTypingIndicator();
+
+                    // Add bot response
+                    const botResponse = getBotResponse(message);
+                    addMessage(botResponse, 'bot');
+
+                    // Scroll to bottom
+                    scrollToBottom();
+                }, 1500);
+            }
+        });
+
+        // Handle quick response buttons
+        quickResponseBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const message = this.getAttribute('data-message');
+
+                // Add user message
+                addMessage(message, 'user');
+
+                // Show typing indicator
+                showTypingIndicator();
+
+                // Simulate bot response after delay
+                setTimeout(function() {
+                    // Remove typing indicator
+                    removeTypingIndicator();
+
+                    // Add bot response
+                    const botResponse = getBotResponse(message);
+                    addMessage(botResponse, 'bot');
+
+                    // Scroll to bottom
+                    scrollToBottom();
+                }, 1500);
+            });
+        });
+
+        // Function to add message
+        function addMessage(message, sender) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message');
+            messageElement.classList.add(sender + '-message');
+
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const timeString = hours + ':' + minutes;
+
+            messageElement.innerHTML = `
+                <div class="message-content">
+                    <p>${message}</p>
+                </div>
+                <span class="message-time">${timeString}</span>
+            `;
+
+            chatMessages.appendChild(messageElement);
+
+            // Scroll to bottom
+            scrollToBottom();
+        }
+
+        // Function to show typing indicator
+        function showTypingIndicator() {
+            const typingElement = document.createElement('div');
+            typingElement.classList.add('typing-indicator');
+            typingElement.id = 'typingIndicator';
+
+            typingElement.innerHTML = `
+                <div class="message-content">
+                    <div class="typing-dots">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            `;
+
+            chatMessages.appendChild(typingElement);
+
+            // Scroll to bottom
+            scrollToBottom();
+        }
+
+        // Function to remove typing indicator
+        function removeTypingIndicator() {
+            const typingIndicator = document.getElementById('typingIndicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+
+        // Function to scroll to bottom
+        function scrollToBottom() {
+            const chatbotBody = document.getElementById('chatbotBody');
+            chatbotBody.scrollTop = chatbotBody.scrollHeight;
+        }
+
+        // Function to get bot response
+        function getBotResponse(message) {
+            message = message.toLowerCase();
+
+            if (message.includes('feature') || message.includes('what can you do')) {
+                return `Gurukul Setu offers a comprehensive suite of features including:<br>
+                - Student Management<br>
+                - Staff Management<br>
+                - Fee Management<br>
+                - Examination System<br>
+                - Attendance Tracking<br>
+                - Document Management<br><br>
+                Would you like to know more about any specific feature?`;
+            } else if (message.includes('price') || message.includes('cost') || message.includes('pricing')) {
+                return `Our pricing starts at ₹4,999 per month for the Basic plan. We also offer Standard (₹9,999/month) and Premium (₹19,999/month) plans with additional features. You can save 20% with annual billing. Check out our <a href="/pricing/">pricing page</a> for more details or use our pricing calculator to find the best plan for your institution.`;
+            } else if (message.includes('get started') || message.includes('begin') || message.includes('start')) {
+                return `Getting started with Gurukul Setu is easy! Here's how:<br>
+                1. <a href="/demo/">Request a demo</a> to see the system in action<br>
+                2. Choose a plan that fits your needs<br>
+                3. Our team will help you with implementation and data migration<br>
+                4. Training for your staff<br>
+                5. Go live with your new system!<br><br>
+                Would you like to schedule a demo now?`;
+            } else if (message.includes('support') || message.includes('help') || message.includes('issue')) {
+                return `We offer multiple support channels:<br>
+                - Email: support@gurukulsetu.com<br>
+                - Phone: +91 98765 43210 (9 AM - 6 PM IST, Mon-Sat)<br>
+                - Live chat on our website<br>
+                - Knowledge base with tutorials and FAQs<br><br>
+                How can we assist you today?`;
+            } else if (message.includes('demo') || message.includes('trial')) {
+                return `We offer a free 14-day trial and personalized demos. During the demo, our product specialists will walk you through all features and answer your questions. You can <a href="/demo/">request a demo here</a> and our team will contact you within 24 hours to schedule it.`;
+            } else if (message.includes('hello') || message.includes('hi') || message.includes('hey')) {
+                return `Hello! How can I help you today? Feel free to ask me anything about Gurukul Setu.`;
+            } else {
+                return `Thanks for your message. I'm not sure I understand completely. Could you please rephrase or choose one of the quick response options below? Alternatively, you can contact our human support team at support@gurukulsetu.com.`;
+            }
+        }
+    });
+</script>

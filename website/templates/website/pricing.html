@@ -1,0 +1,836 @@
+{% extends 'website/base.html' %}
+{% load static %}
+
+{% block title %}Pricing - Gurukul Setu{% endblock %}
+
+{% block extra_css %}
+<style>
+    .pricing-calculator {
+        background-color: var(--white);
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: var(--shadow);
+        margin-bottom: 50px;
+    }
+
+    .pricing-calculator h3 {
+        margin-bottom: 25px;
+        text-align: center;
+    }
+
+    .calculator-form {
+        margin-bottom: 30px;
+    }
+
+    .calculator-result {
+        background-color: rgba(48, 152, 152, 0.05);
+        border-radius: 15px;
+        padding: 30px;
+        margin-top: 40px;
+        display: none;
+        box-shadow: 0 5px 20px rgba(48, 152, 152, 0.1);
+        border: 1px solid rgba(48, 152, 152, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .calculator-result.active {
+        display: block;
+        animation: fadeInUp 0.5s ease forwards;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .result-plan, .result-plan-text {
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+
+    .result-price {
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin: 15px 0;
+        padding: 10px 0;
+        border-bottom: 1px dashed rgba(48, 152, 152, 0.2);
+    }
+
+    .result-features {
+        margin-top: 15px;
+        padding-left: 0;
+        list-style: none;
+    }
+
+    .result-features li {
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+    }
+
+    .result-features li i {
+        margin-right: 10px;
+        font-size: 16px;
+    }
+
+    .result-limits h5, .result-capacity h5 {
+        font-size: 18px;
+        margin-bottom: 15px;
+        color: var(--text-color);
+    }
+
+    .alert-info {
+        background-color: rgba(48, 152, 152, 0.1);
+        border-color: rgba(48, 152, 152, 0.2);
+        color: var(--primary-dark);
+    }
+
+    .alert-info i {
+        margin-right: 8px;
+        color: var(--primary-color);
+    }
+
+    .range-labels {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 5px;
+        font-size: 12px;
+        color: var(--text-light);
+    }
+
+    .form-range::-webkit-slider-thumb {
+        background: var(--primary-color);
+    }
+
+    .form-range::-moz-range-thumb {
+        background: var(--primary-color);
+    }
+
+    .form-range::-ms-thumb {
+        background: var(--primary-color);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Banner -->
+<section class="page-banner">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="page-banner-content">
+                    <h1>Our Pricing Plans</h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{% url 'landing_page' %}">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Pricing</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Pricing Calculator Section -->
+<section class="pricing-calculator-section">
+    <div class="container">
+        <div class="section-header text-center">
+            <h6>Find Your Plan</h6>
+            <h2>Pricing Calculator</h2>
+            <p>Use our calculator to find the perfect plan for your institution's needs and budget.</p>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="pricing-calculator">
+                    <h3>Calculate Your Price</h3>
+                    <form id="calculatorForm" class="calculator-form">
+                        <div class="mb-4">
+                            <label for="institutionType" class="form-label">Institution Type</label>
+                            <select class="form-select" id="institutionType">
+                                <option value="school">School</option>
+                                <option value="college">College</option>
+                                <option value="university">University</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="studentCount" class="form-label">Number of Students: <span id="studentCountValue">500</span></label>
+                            <input type="range" class="form-range" min="100" max="5000" step="100" value="500" id="studentCount">
+                            <div class="range-labels">
+                                <span>100</span>
+                                <span>1000</span>
+                                <span>2000</span>
+                                <span>3000</span>
+                                <span>4000</span>
+                                <span>5000+</span>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="staffCount" class="form-label">Number of Staff: <span id="staffCountValue">50</span></label>
+                            <input type="range" class="form-range" min="10" max="500" step="10" value="50" id="staffCount">
+                            <div class="range-labels">
+                                <span>10</span>
+                                <span>100</span>
+                                <span>200</span>
+                                <span>300</span>
+                                <span>400</span>
+                                <span>500+</span>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Required Modules</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" value="" id="studentManagement" checked disabled>
+                                        <label class="form-check-label" for="studentManagement">
+                                            Student Management
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" value="" id="staffManagement" checked disabled>
+                                        <label class="form-check-label" for="staffManagement">
+                                            Staff Management
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input module-checkbox" type="checkbox" value="" id="feeManagement" checked>
+                                        <label class="form-check-label" for="feeManagement">
+                                            Fee Management
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input module-checkbox" type="checkbox" value="" id="examSystem" checked>
+                                        <label class="form-check-label" for="examSystem">
+                                            Examination System
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input module-checkbox" type="checkbox" value="" id="attendanceTracking" checked>
+                                        <label class="form-check-label" for="attendanceTracking">
+                                            Attendance Tracking
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input module-checkbox" type="checkbox" value="" id="documentManagement">
+                                        <label class="form-check-label" for="documentManagement">
+                                            Document Management
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Billing Cycle</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="billingCycle" id="monthly" value="monthly" checked>
+                                <label class="form-check-label" for="monthly">
+                                    Monthly
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="billingCycle" id="yearly" value="yearly">
+                                <label class="form-check-label" for="yearly">
+                                    Yearly (Save 20%)
+                                </label>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary">Calculate Price</button>
+                        </div>
+                    </form>
+
+                    <div id="calculatorResult" class="calculator-result">
+                        <h4>Recommended Plan: <span class="result-plan">Standard Plan</span></h4>
+                        <p>Based on your requirements, we recommend our <span class="result-plan-text">Standard Plan</span>.</p>
+                        <div class="result-price">₹<span id="resultPrice">9,999</span> <span id="resultBilling">per month</span></div>
+
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <div class="result-limits mb-3">
+                                    <h5>Your Requirements:</h5>
+                                    <ul class="result-features">
+                                        <li><i class="fas fa-users text-primary"></i> <span id="inputStudents">500 students</span></li>
+                                        <li><i class="fas fa-user-tie text-primary"></i> <span id="inputStaff">50 staff members</span></li>
+                                        <li><i class="fas fa-th-large text-primary"></i> <span id="inputModules">3 modules</span></li>
+                                        <li><i class="fas fa-building text-primary"></i> <span id="inputInstitution">School</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="result-capacity">
+                                    <h5>Plan Capacity:</h5>
+                                    <ul class="result-features">
+                                        <li><i class="fas fa-check-circle text-success"></i> <span id="resultStudents">Up to 800 students</span></li>
+                                        <li><i class="fas fa-check-circle text-success"></i> <span id="resultStaff">Up to 100 staff members</span></li>
+                                        <li><i class="fas fa-check-circle text-success"></i> <span id="resultModules">All selected modules</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <h5>Included Features:</h5>
+                            <ul class="result-features" id="resultFeaturesList">
+                                <!-- Features will be populated dynamically -->
+                            </ul>
+                        </div>
+
+                        <div class="alert alert-info mt-4">
+                            <i class="fas fa-info-circle"></i>
+                            <span id="planRecommendationReason">This plan is recommended based on your student count, staff size, and selected modules.</span>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <a href="{% url 'demo' %}" class="btn btn-primary me-2">Request a Demo</a>
+                            <a href="{% url 'contact' %}" class="btn btn-outline-primary">Contact Sales</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Pricing Section -->
+<section class="pricing-section">
+    <div class="container">
+        <div class="section-header text-center">
+            <h6>Affordable Plans</h6>
+            <h2>Choose the Right Plan for Your Institution</h2>
+            <p>We offer flexible pricing options to meet the needs of educational institutions of all sizes.</p>
+        </div>
+
+        <!-- Pricing Toggle -->
+        <div class="pricing-toggle text-center">
+            <span class="monthly active">Monthly</span>
+            <label class="switch">
+                <input type="checkbox" id="pricing-switch">
+                <span class="slider round"></span>
+            </label>
+            <span class="yearly">Yearly <span class="discount">Save 20%</span></span>
+        </div>
+
+        <div class="row">
+            <!-- Basic Plan -->
+            <div class="col-lg-4 col-md-6">
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Basic</h3>
+                        <div class="price">
+                            <span class="monthly-price">₹4,999<small>/month</small></span>
+                            <span class="yearly-price">₹47,990<small>/year</small></span>
+                        </div>
+                        <p>Perfect for small schools with up to 300 students</p>
+                    </div>
+                    <div class="pricing-body">
+                        <ul class="pricing-features">
+                            <li><i class="fas fa-check"></i> Student Management</li>
+                            <li><i class="fas fa-check"></i> Staff Management</li>
+                            <li><i class="fas fa-check"></i> Basic Fee Management</li>
+                            <li><i class="fas fa-check"></i> Attendance Tracking</li>
+                            <li><i class="fas fa-check"></i> Basic Examination System</li>
+                            <li><i class="fas fa-times"></i> Document Management</li>
+                            <li><i class="fas fa-times"></i> Advanced Reporting</li>
+                            <li><i class="fas fa-times"></i> API Access</li>
+                            <li><i class="fas fa-times"></i> Custom Branding</li>
+                        </ul>
+                    </div>
+                    <div class="pricing-footer">
+                        <a href="{% url 'contact' %}" class="btn btn-outline">Get Started</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Standard Plan -->
+            <div class="col-lg-4 col-md-6">
+                <div class="pricing-card popular">
+                    <div class="popular-badge">Most Popular</div>
+                    <div class="pricing-header">
+                        <h3>Standard</h3>
+                        <div class="price">
+                            <span class="monthly-price">₹9,999<small>/month</small></span>
+                            <span class="yearly-price">₹95,990<small>/year</small></span>
+                        </div>
+                        <p>Ideal for medium-sized schools with up to 800 students</p>
+                    </div>
+                    <div class="pricing-body">
+                        <ul class="pricing-features">
+                            <li><i class="fas fa-check"></i> Student Management</li>
+                            <li><i class="fas fa-check"></i> Staff Management</li>
+                            <li><i class="fas fa-check"></i> Advanced Fee Management</li>
+                            <li><i class="fas fa-check"></i> Attendance Tracking</li>
+                            <li><i class="fas fa-check"></i> Advanced Examination System</li>
+                            <li><i class="fas fa-check"></i> Document Management</li>
+                            <li><i class="fas fa-check"></i> Basic Reporting</li>
+                            <li><i class="fas fa-times"></i> API Access</li>
+                            <li><i class="fas fa-times"></i> Custom Branding</li>
+                        </ul>
+                    </div>
+                    <div class="pricing-footer">
+                        <a href="{% url 'contact' %}" class="btn btn-primary">Get Started</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Premium Plan -->
+            <div class="col-lg-4 col-md-6">
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Premium</h3>
+                        <div class="price">
+                            <span class="monthly-price">₹19,999<small>/month</small></span>
+                            <span class="yearly-price">₹191,990<small>/year</small></span>
+                        </div>
+                        <p>Perfect for large institutions with unlimited students</p>
+                    </div>
+                    <div class="pricing-body">
+                        <ul class="pricing-features">
+                            <li><i class="fas fa-check"></i> Student Management</li>
+                            <li><i class="fas fa-check"></i> Staff Management</li>
+                            <li><i class="fas fa-check"></i> Advanced Fee Management</li>
+                            <li><i class="fas fa-check"></i> Attendance Tracking</li>
+                            <li><i class="fas fa-check"></i> Advanced Examination System</li>
+                            <li><i class="fas fa-check"></i> Document Management</li>
+                            <li><i class="fas fa-check"></i> Advanced Reporting & Analytics</li>
+                            <li><i class="fas fa-check"></i> API Access</li>
+                            <li><i class="fas fa-check"></i> Custom Branding</li>
+                        </ul>
+                    </div>
+                    <div class="pricing-footer">
+                        <a href="{% url 'contact' %}" class="btn btn-outline">Get Started</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="pricing-faq-section">
+    <div class="container">
+        <div class="section-header text-center">
+            <h6>Frequently Asked Questions</h6>
+            <h2>Common Questions About Our Pricing</h2>
+            <p>Find answers to the most common questions about our pricing plans.</p>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="accordion" id="pricingFaqAccordion1">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="pricingHeadingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#pricingCollapseOne" aria-expanded="true" aria-controls="pricingCollapseOne">
+                                Can I upgrade or downgrade my plan later?
+                            </button>
+                        </h2>
+                        <div id="pricingCollapseOne" class="accordion-collapse collapse show" aria-labelledby="pricingHeadingOne" data-bs-parent="#pricingFaqAccordion1">
+                            <div class="accordion-body">
+                                Yes, you can upgrade or downgrade your plan at any time. When upgrading, you'll be charged the prorated difference for the remainder of your billing cycle. When downgrading, the new rate will apply at the start of your next billing cycle.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="pricingHeadingTwo">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#pricingCollapseTwo" aria-expanded="false" aria-controls="pricingCollapseTwo">
+                                Do you offer discounts for educational institutions?
+                            </button>
+                        </h2>
+                        <div id="pricingCollapseTwo" class="accordion-collapse collapse" aria-labelledby="pricingHeadingTwo" data-bs-parent="#pricingFaqAccordion1">
+                            <div class="accordion-body">
+                                Yes, we offer special discounts for government schools, non-profit educational institutions, and schools in rural areas. Please contact our sales team to learn more about our discount programs.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="pricingHeadingThree">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#pricingCollapseThree" aria-expanded="false" aria-controls="pricingCollapseThree">
+                                What payment methods do you accept?
+                            </button>
+                        </h2>
+                        <div id="pricingCollapseThree" class="accordion-collapse collapse" aria-labelledby="pricingHeadingThree" data-bs-parent="#pricingFaqAccordion1">
+                            <div class="accordion-body">
+                                We accept all major credit cards, debit cards, net banking, UPI, and bank transfers. For annual plans, we can also provide invoices for direct bank transfers.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="accordion" id="pricingFaqAccordion2">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="pricingHeadingFour">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#pricingCollapseFour" aria-expanded="false" aria-controls="pricingCollapseFour">
+                                Is there a free trial available?
+                            </button>
+                        </h2>
+                        <div id="pricingCollapseFour" class="accordion-collapse collapse" aria-labelledby="pricingHeadingFour" data-bs-parent="#pricingFaqAccordion2">
+                            <div class="accordion-body">
+                                Yes, we offer a 14-day free trial for all our plans. No credit card is required to start your trial. You can explore all the features and decide which plan is right for your institution.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="pricingHeadingFive">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#pricingCollapseFive" aria-expanded="false" aria-controls="pricingCollapseFive">
+                                What happens if we exceed our student limit?
+                            </button>
+                        </h2>
+                        <div id="pricingCollapseFive" class="accordion-collapse collapse" aria-labelledby="pricingHeadingFive" data-bs-parent="#pricingFaqAccordion2">
+                            <div class="accordion-body">
+                                If you exceed your student limit, we'll notify you and recommend upgrading to a higher plan. We provide a 10% buffer before requiring an upgrade, so you have time to make a decision.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="pricingHeadingSix">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#pricingCollapseSix" aria-expanded="false" aria-controls="pricingCollapseSix">
+                                Do you offer custom plans for very large institutions?
+                            </button>
+                        </h2>
+                        <div id="pricingCollapseSix" class="accordion-collapse collapse" aria-labelledby="pricingHeadingSix" data-bs-parent="#pricingFaqAccordion2">
+                            <div class="accordion-body">
+                                Yes, we offer custom enterprise plans for very large institutions or educational groups with multiple schools. Please contact our sales team to discuss your specific requirements and get a customized quote.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Comparison Table Section -->
+<section class="comparison-section">
+    <div class="container">
+        <div class="section-header text-center">
+            <h6>Plan Comparison</h6>
+            <h2>Detailed Feature Comparison</h2>
+            <p>Compare all features across our different plans to find the best fit for your institution.</p>
+        </div>
+        <div class="table-responsive">
+            <table class="table comparison-table">
+                <thead>
+                    <tr>
+                        <th>Features</th>
+                        <th>Basic</th>
+                        <th>Standard</th>
+                        <th>Premium</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Student Limit</td>
+                        <td>300</td>
+                        <td>800</td>
+                        <td>Unlimited</td>
+                    </tr>
+                    <tr>
+                        <td>Staff Limit</td>
+                        <td>50</td>
+                        <td>100</td>
+                        <td>Unlimited</td>
+                    </tr>
+                    <tr>
+                        <td>Student Management</td>
+                        <td><i class="fas fa-check text-success"></i></td>
+                        <td><i class="fas fa-check text-success"></i></td>
+                        <td><i class="fas fa-check text-success"></i></td>
+                    </tr>
+                    <tr>
+                        <td>Staff Management</td>
+                        <td><i class="fas fa-check text-success"></i></td>
+                        <td><i class="fas fa-check text-success"></i></td>
+                        <td><i class="fas fa-check text-success"></i></td>
+                    </tr>
+                    <tr>
+                        <td>Fee Management</td>
+                        <td>Basic</td>
+                        <td>Advanced</td>
+                        <td>Advanced</td>
+                    </tr>
+                    <tr>
+                        <td>Attendance Tracking</td>
+                        <td><i class="fas fa-check text-success"></i></td>
+                        <td><i class="fas fa-check text-success"></i></td>
+                        <td><i class="fas fa-check text-success"></i></td>
+                    </tr>
+                    <tr>
+                        <td>Examination System</td>
+                        <td>Basic</td>
+                        <td>Advanced</td>
+                        <td>Advanced</td>
+                    </tr>
+                    <tr>
+                        <td>Document Management</td>
+                        <td><i class="fas fa-times text-danger"></i></td>
+                        <td><i class="fas fa-check text-success"></i></td>
+                        <td><i class="fas fa-check text-success"></i></td>
+                    </tr>
+                    <tr>
+                        <td>Reporting & Analytics</td>
+                        <td><i class="fas fa-times text-danger"></i></td>
+                        <td>Basic</td>
+                        <td>Advanced</td>
+                    </tr>
+                    <tr>
+                        <td>API Access</td>
+                        <td><i class="fas fa-times text-danger"></i></td>
+                        <td><i class="fas fa-times text-danger"></i></td>
+                        <td><i class="fas fa-check text-success"></i></td>
+                    </tr>
+                    <tr>
+                        <td>Custom Branding</td>
+                        <td><i class="fas fa-times text-danger"></i></td>
+                        <td><i class="fas fa-times text-danger"></i></td>
+                        <td><i class="fas fa-check text-success"></i></td>
+                    </tr>
+                    <tr>
+                        <td>Support</td>
+                        <td>Email</td>
+                        <td>Email & Chat</td>
+                        <td>Priority Email, Chat & Phone</td>
+                    </tr>
+                    <tr>
+                        <td>Data Backup</td>
+                        <td>Weekly</td>
+                        <td>Daily</td>
+                        <td>Daily + On-demand</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td><a href="{% url 'contact' %}" class="btn btn-sm btn-outline">Get Started</a></td>
+                        <td><a href="{% url 'contact' %}" class="btn btn-sm btn-primary">Get Started</a></td>
+                        <td><a href="{% url 'contact' %}" class="btn btn-sm btn-outline">Get Started</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <div class="cta-content">
+                    <h2>Not Sure Which Plan is Right for You?</h2>
+                    <p>Contact our team for a personalized consultation and demo to find the perfect solution for your institution.</p>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="cta-btn text-lg-end">
+                    <a href="{% url 'contact' %}" class="btn btn-light">Contact Us</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Pricing toggle
+        const pricingSwitch = document.getElementById('pricing-switch');
+        const monthlySpan = document.querySelector('.pricing-toggle .monthly');
+        const yearlySpan = document.querySelector('.pricing-toggle .yearly');
+        const monthlyPrices = document.querySelectorAll('.monthly-price');
+        const yearlyPrices = document.querySelectorAll('.yearly-price');
+
+        // Initialize
+        monthlyPrices.forEach(price => price.style.display = 'block');
+        yearlyPrices.forEach(price => price.style.display = 'none');
+
+        if (pricingSwitch) {
+            pricingSwitch.addEventListener('change', function() {
+                if (this.checked) {
+                    // Yearly pricing
+                    monthlySpan.classList.remove('active');
+                    yearlySpan.classList.add('active');
+                    monthlyPrices.forEach(price => price.style.display = 'none');
+                    yearlyPrices.forEach(price => price.style.display = 'block');
+                } else {
+                    // Monthly pricing
+                    monthlySpan.classList.add('active');
+                    yearlySpan.classList.remove('active');
+                    monthlyPrices.forEach(price => price.style.display = 'block');
+                    yearlyPrices.forEach(price => price.style.display = 'none');
+                }
+            });
+        }
+
+        // Range sliders
+        const studentCount = document.getElementById('studentCount');
+        const studentCountValue = document.getElementById('studentCountValue');
+        const staffCount = document.getElementById('staffCount');
+        const staffCountValue = document.getElementById('staffCountValue');
+
+        if (studentCount && studentCountValue) {
+            studentCount.addEventListener('input', function() {
+                studentCountValue.textContent = this.value;
+            });
+        }
+
+        if (staffCount && staffCountValue) {
+            staffCount.addEventListener('input', function() {
+                staffCountValue.textContent = this.value;
+            });
+        }
+
+        // Calculator form
+        const calculatorForm = document.getElementById('calculatorForm');
+        const calculatorResult = document.getElementById('calculatorResult');
+        const resultPlan = document.querySelector('.result-plan');
+        const resultPrice = document.getElementById('resultPrice');
+        const resultBilling = document.getElementById('resultBilling');
+        const resultStudents = document.getElementById('resultStudents');
+        const resultStaff = document.getElementById('resultStaff');
+
+        if (calculatorForm) {
+            calculatorForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                // Get form values
+                const institutionType = document.getElementById('institutionType').value;
+                const students = parseInt(document.getElementById('studentCount').value);
+                const staff = parseInt(document.getElementById('staffCount').value);
+                const modules = document.querySelectorAll('.module-checkbox:checked').length;
+                const billingCycle = document.querySelector('input[name="billingCycle"]:checked').value;
+
+                // Determine plan based on inputs with improved logic
+                let plan = 'Basic Plan';
+                let price = 4999;
+                let planFeatures = [];
+
+                // Basic plan features
+                planFeatures = [
+                    'Student Management',
+                    'Staff Management',
+                    'Basic Fee Management',
+                    'Attendance Tracking',
+                    'Basic Examination System'
+                ];
+
+                // Check if Standard Plan is needed
+                if (students > 300 || staff > 50 || modules >= 3) {
+                    plan = 'Standard Plan';
+                    price = 9999;
+                    planFeatures = [
+                        'Student Management',
+                        'Staff Management',
+                        'Advanced Fee Management',
+                        'Attendance Tracking',
+                        'Advanced Examination System',
+                        'Document Management',
+                        'Basic Reporting'
+                    ];
+                }
+
+                // Check if Premium Plan is needed
+                if (students > 800 || staff > 100 || (modules >= 4 && (students > 500 || staff > 75))) {
+                    plan = 'Premium Plan';
+                    price = 19999;
+                    planFeatures = [
+                        'Student Management',
+                        'Staff Management',
+                        'Advanced Fee Management',
+                        'Attendance Tracking',
+                        'Advanced Examination System',
+                        'Document Management',
+                        'Advanced Reporting & Analytics',
+                        'API Access',
+                        'Custom Branding'
+                    ];
+                }
+
+                // Calculate and display price based on billing cycle
+                let displayPrice = price;
+                let annualPrice = price * 12;
+                let discountedAnnualPrice = Math.round(annualPrice * 0.8);
+                let monthlySavings = Math.round((annualPrice - discountedAnnualPrice) / 12);
+
+                if (billingCycle === 'yearly') {
+                    // For yearly billing, show the annual price
+                    displayPrice = discountedAnnualPrice;
+                    resultBilling.textContent = 'per year (save ₹' + (monthlySavings * 12).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ')';
+                } else {
+                    resultBilling.textContent = 'per month';
+                }
+
+                // Format price with commas
+                resultPrice.textContent = displayPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+                // Update all plan information in the result
+                resultPlan.textContent = plan;
+                document.querySelector('.result-plan-text').textContent = plan;
+
+                // Update input summary
+                document.getElementById('inputStudents').textContent = students + ' students';
+                document.getElementById('inputStaff').textContent = staff + ' staff members';
+                document.getElementById('inputModules').textContent = modules + ' modules';
+                document.getElementById('inputInstitution').textContent = institutionType.charAt(0).toUpperCase() + institutionType.slice(1);
+
+                // Update capacity information
+                if (plan === 'Basic Plan') {
+                    resultStudents.textContent = 'Up to 300 students';
+                    resultStaff.textContent = 'Up to 50 staff members';
+                    document.getElementById('planRecommendationReason').textContent =
+                        'This plan is suitable for small institutions with basic management needs.';
+                } else if (plan === 'Standard Plan') {
+                    resultStudents.textContent = 'Up to 800 students';
+                    resultStaff.textContent = 'Up to 100 staff members';
+                    document.getElementById('planRecommendationReason').textContent =
+                        'This plan is recommended based on your student count, staff size, and selected modules.';
+                } else {
+                    resultStudents.textContent = 'Unlimited students';
+                    resultStaff.textContent = 'Unlimited staff members';
+                    document.getElementById('planRecommendationReason').textContent =
+                        'This premium plan is recommended for large institutions with advanced requirements.';
+                }
+
+                // Update modules text
+                document.getElementById('resultModules').textContent =
+                    modules + ' selected module' + (modules > 1 ? 's' : '');
+
+                // Populate features list
+                const featuresList = document.getElementById('resultFeaturesList');
+                featuresList.innerHTML = ''; // Clear existing features
+
+                // Add each feature to the list
+                planFeatures.forEach(feature => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<i class="fas fa-check-circle text-success"></i> ${feature}`;
+                    featuresList.appendChild(li);
+                });
+
+                // Add support level based on plan
+                const supportLi = document.createElement('li');
+                if (plan === 'Basic Plan') {
+                    supportLi.innerHTML = '<i class="fas fa-check-circle text-success"></i> Email Support';
+                } else if (plan === 'Standard Plan') {
+                    supportLi.innerHTML = '<i class="fas fa-check-circle text-success"></i> Email & Chat Support';
+                } else {
+                    supportLi.innerHTML = '<i class="fas fa-check-circle text-success"></i> Priority Email, Chat & Phone Support';
+                }
+                featuresList.appendChild(supportLi);
+
+                // Show result
+                calculatorResult.classList.add('active');
+
+                // Scroll to result
+                calculatorResult.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+        }
+    });
+</script>
+{% endblock %}
