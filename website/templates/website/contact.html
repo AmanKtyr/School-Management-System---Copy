@@ -1,0 +1,240 @@
+{% extends 'website/base.html' %}
+{% load static %}
+
+{% block title %}Contact Us - Gurukul Setu{% endblock %}
+
+{% block content %}
+<!-- Page Banner -->
+<section class="page-banner">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="page-banner-content">
+                    <h1>Contact Us</h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{% url 'landing_page' %}">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Contact Us</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Info Section -->
+<section class="contact-info-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-md-6">
+                <div class="contact-info-item">
+                    <div class="icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="content">
+                        <h4>Our Location</h4>
+                        <p>123 Education Street, Tech Park, Bangalore - 560001, India</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="contact-info-item">
+                    <div class="icon">
+                        <i class="fas fa-phone-alt"></i>
+                    </div>
+                    <div class="content">
+                        <h4>Phone Number</h4>
+                        <p>+91 98765 43210</p>
+                        <p>+91 87654 32109</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="contact-info-item">
+                    <div class="icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="content">
+                        <h4>Email Address</h4>
+                        <p>info@gurukulsetu.com</p>
+                        <p>support@gurukulsetu.com</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Form Section -->
+<section class="contact-form-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="contact-form-wrapper">
+                    <div class="section-heading">
+                        <h6>Get In Touch</h6>
+                        <h2>Send Us a Message</h2>
+                        <p>Have questions about our services? Fill out the form below and our team will get back to you as soon as possible.</p>
+                    </div>
+                    <form id="contactForm" class="contact-form">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" id="name" placeholder="Your Name*" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="email" class="form-control" id="email" placeholder="Your Email*" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" id="phone" placeholder="Phone Number">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" id="subject" placeholder="Subject*" required>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <textarea class="form-control" id="message" rows="5" placeholder="Your Message*" required></textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <button type="submit" class="btn btn-primary">Send Message</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="contact-map">
+                    <img src="{% static 'img/contact-map.jpg' %}" alt="Our Location" class="img-fluid rounded shadow">
+                    <div class="map-overlay">
+                        <div class="map-pin">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Our Office</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="faq-section">
+    <div class="container">
+        <div class="section-header text-center">
+            <h6>Frequently Asked Questions</h6>
+            <h2>Have Questions? We've Got Answers</h2>
+            <p>Here are some common questions about Gurukul Setu and our services.</p>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="accordion" id="faqAccordion1">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                What is Gurukul Setu?
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion1">
+                            <div class="accordion-body">
+                                Gurukul Setu is a comprehensive School and College Management System designed specifically for Indian educational institutions. Our platform helps streamline administrative processes, enhance teaching methodologies, and improve overall student outcomes.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                How much does Gurukul Setu cost?
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion1">
+                            <div class="accordion-body">
+                                We offer flexible pricing plans based on the size of your institution and the features you need. Please contact our sales team for a customized quote that fits your specific requirements.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingThree">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                Is my data secure with Gurukul Setu?
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion1">
+                            <div class="accordion-body">
+                                Absolutely! We take data security very seriously. Gurukul Setu employs industry-standard encryption, regular security audits, and strict access controls to ensure your data remains safe and confidential.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="accordion" id="faqAccordion2">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingFour">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                Do you offer training for our staff?
+                            </button>
+                        </h2>
+                        <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion2">
+                            <div class="accordion-body">
+                                Yes, we provide comprehensive training for all staff members. Our training includes live sessions, video tutorials, and detailed documentation to ensure everyone can use the system effectively.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingFive">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                                Can Gurukul Setu be customized for our institution?
+                            </button>
+                        </h2>
+                        <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#faqAccordion2">
+                            <div class="accordion-body">
+                                Yes, Gurukul Setu is highly customizable. We understand that each educational institution has unique needs, and our platform can be tailored to meet your specific requirements, from branding to custom modules.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingSix">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+                                What kind of support do you offer?
+                            </button>
+                        </h2>
+                        <div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="headingSix" data-bs-parent="#faqAccordion2">
+                            <div class="accordion-body">
+                                We offer 24/7 customer support through multiple channels including phone, email, and live chat. Our dedicated support team is always ready to assist you with any questions or issues you may encounter.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <div class="cta-content">
+                    <h2>Ready to Get Started with Gurukul Setu?</h2>
+                    <p>Join hundreds of educational institutions that have transformed their management processes with our platform.</p>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="cta-btn text-lg-end">
+                    <a href="{% url 'login' %}" class="btn btn-light">Sign Up Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

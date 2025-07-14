@@ -1,0 +1,303 @@
+{% extends 'website/base.html' %}
+{% load static %}
+
+{% block title %}Features - Gurukul Setu{% endblock %}
+
+{% block content %}
+<!-- Page Banner -->
+<section class="page-banner">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="page-banner-content">
+                    <h1>Our Features</h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{% url 'landing_page' %}">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Features</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Overview Section -->
+<section class="features-overview-section">
+    <div class="container">
+        <div class="section-header text-center">
+            <h6>Powerful Features</h6>
+            <h2>Everything You Need to Manage Your Educational Institution</h2>
+            <p>Gurukul Setu offers a comprehensive suite of features designed specifically for Indian schools and colleges.</p>
+        </div>
+        <div class="row">
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-overview-card">
+                    <div class="icon">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <h3>Student Management</h3>
+                    <p>Efficiently manage student records, attendance, performance, and communication with parents.</p>
+                    <a href="#student-management" class="read-more">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-overview-card">
+                    <div class="icon">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <h3>Staff Management</h3>
+                    <p>Streamline staff records, attendance, performance evaluation, and payroll processing.</p>
+                    <a href="#staff-management" class="read-more">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-overview-card">
+                    <div class="icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <h3>Fee Management</h3>
+                    <p>Simplify fee collection, generate invoices, and track payments with comprehensive reporting.</p>
+                    <a href="#fee-management" class="read-more">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-overview-card">
+                    <div class="icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3>Examination System</h3>
+                    <p>Create and manage exams, record marks, and generate detailed result reports.</p>
+                    <a href="#examination-system" class="read-more">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-overview-card">
+                    <div class="icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <h3>Attendance Tracking</h3>
+                    <p>Track student and staff attendance with detailed reports and analytics.</p>
+                    <a href="#attendance-tracking" class="read-more">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-overview-card">
+                    <div class="icon">
+                        <i class="fas fa-folder-open"></i>
+                    </div>
+                    <h3>Document Management</h3>
+                    <p>Securely store and manage important documents and certificates.</p>
+                    <a href="#document-management" class="read-more">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Student Management Section -->
+<section id="student-management" class="feature-detail-section bg-light">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="feature-detail-content">
+                    <div class="section-heading">
+                        <h6>Student Management</h6>
+                        <h2>Comprehensive Student Information System</h2>
+                    </div>
+                    <p>Our student management module provides a complete solution for managing all aspects of student information and activities.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> Complete student profiles with academic and personal details</li>
+                        <li><i class="fas fa-check-circle"></i> Admission management with customizable forms</li>
+                        <li><i class="fas fa-check-circle"></i> Student attendance tracking and reporting</li>
+                        <li><i class="fas fa-check-circle"></i> Academic performance monitoring with progress reports</li>
+                        <li><i class="fas fa-check-circle"></i> Parent-teacher communication portal</li>
+                        <li><i class="fas fa-check-circle"></i> Student behavior and discipline tracking</li>
+                        <li><i class="fas fa-check-circle"></i> Health records and medical information management</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="feature-detail-image">
+                    <img src="{% static 'img/features/student-management.jpg' %}" alt="Student Management" class="img-fluid rounded shadow">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Staff Management Section -->
+<section id="staff-management" class="feature-detail-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="feature-detail-image">
+                    <img src="{% static 'img/features/staff-management.jpg' %}" alt="Staff Management" class="img-fluid rounded shadow">
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="feature-detail-content">
+                    <div class="section-heading">
+                        <h6>Staff Management</h6>
+                        <h2>Efficient Staff Administration System</h2>
+                    </div>
+                    <p>Our staff management module helps educational institutions efficiently manage their teaching and non-teaching staff.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> Comprehensive staff profiles and qualification records</li>
+                        <li><i class="fas fa-check-circle"></i> Staff attendance and leave management</li>
+                        <li><i class="fas fa-check-circle"></i> Performance evaluation and appraisal system</li>
+                        <li><i class="fas fa-check-circle"></i> Payroll processing and salary management</li>
+                        <li><i class="fas fa-check-circle"></i> Staff scheduling and workload distribution</li>
+                        <li><i class="fas fa-check-circle"></i> Professional development tracking</li>
+                        <li><i class="fas fa-check-circle"></i> Document management for staff certifications</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Fee Management Section -->
+<section id="fee-management" class="feature-detail-section bg-light">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="feature-detail-content">
+                    <div class="section-heading">
+                        <h6>Fee Management</h6>
+                        <h2>Streamlined Financial Operations</h2>
+                    </div>
+                    <p>Our fee management module simplifies the entire fee collection process, from setting up fee structures to generating reports.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> Customizable fee structures for different classes and categories</li>
+                        <li><i class="fas fa-check-circle"></i> Automated fee collection and receipt generation</li>
+                        <li><i class="fas fa-check-circle"></i> Multiple payment methods including online payments</li>
+                        <li><i class="fas fa-check-circle"></i> Fee defaulter tracking and reminders</li>
+                        <li><i class="fas fa-check-circle"></i> Scholarship and concession management</li>
+                        <li><i class="fas fa-check-circle"></i> Detailed financial reporting and analytics</li>
+                        <li><i class="fas fa-check-circle"></i> Integration with accounting systems</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="feature-detail-image">
+                    <img src="{% static 'img/features/fee-management.jpg' %}" alt="Fee Management" class="img-fluid rounded shadow">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Examination System Section -->
+<section id="examination-system" class="feature-detail-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="feature-detail-image">
+                    <img src="{% static 'img/features/exam-management.jpg' %}" alt="Examination System" class="img-fluid rounded shadow">
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="feature-detail-content">
+                    <div class="section-heading">
+                        <h6>Examination System</h6>
+                        <h2>Comprehensive Exam Management</h2>
+                    </div>
+                    <p>Our examination system module provides a complete solution for managing all aspects of examinations and assessments.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> Exam schedule creation and management</li>
+                        <li><i class="fas fa-check-circle"></i> Question paper generation and management</li>
+                        <li><i class="fas fa-check-circle"></i> Online and offline exam support</li>
+                        <li><i class="fas fa-check-circle"></i> Marks entry and grade calculation</li>
+                        <li><i class="fas fa-check-circle"></i> Detailed result analysis and reporting</li>
+                        <li><i class="fas fa-check-circle"></i> Report card generation with customizable templates</li>
+                        <li><i class="fas fa-check-circle"></i> Performance comparison and analytics</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Attendance Tracking Section -->
+<section id="attendance-tracking" class="feature-detail-section bg-light">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="feature-detail-content">
+                    <div class="section-heading">
+                        <h6>Attendance Tracking</h6>
+                        <h2>Efficient Attendance Management</h2>
+                    </div>
+                    <p>Our attendance tracking module helps educational institutions efficiently track and manage student and staff attendance.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> Daily attendance recording for students and staff</li>
+                        <li><i class="fas fa-check-circle"></i> Multiple attendance marking methods (manual, biometric, RFID)</li>
+                        <li><i class="fas fa-check-circle"></i> Automated SMS/email notifications for absences</li>
+                        <li><i class="fas fa-check-circle"></i> Detailed attendance reports and analytics</li>
+                        <li><i class="fas fa-check-circle"></i> Leave management for students and staff</li>
+                        <li><i class="fas fa-check-circle"></i> Attendance percentage calculation</li>
+                        <li><i class="fas fa-check-circle"></i> Integration with other modules for comprehensive reporting</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="feature-detail-image">
+                    <img src="{% static 'img/features/attendance-tracking.jpg' %}" alt="Attendance Tracking" class="img-fluid rounded shadow">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Document Management Section -->
+<section id="document-management" class="feature-detail-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="feature-detail-image">
+                    <img src="{% static 'img/features/document-management.jpg' %}" alt="Document Management" class="img-fluid rounded shadow">
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="feature-detail-content">
+                    <div class="section-heading">
+                        <h6>Document Management</h6>
+                        <h2>Secure Document Storage and Retrieval</h2>
+                    </div>
+                    <p>Our document management module provides a secure and efficient way to store, organize, and retrieve important documents.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> Centralized document repository for all institution documents</li>
+                        <li><i class="fas fa-check-circle"></i> Secure storage of student and staff documents</li>
+                        <li><i class="fas fa-check-circle"></i> Document categorization and tagging</li>
+                        <li><i class="fas fa-check-circle"></i> Quick search and retrieval functionality</li>
+                        <li><i class="fas fa-check-circle"></i> Document version control and history tracking</li>
+                        <li><i class="fas fa-check-circle"></i> Role-based access control for documents</li>
+                        <li><i class="fas fa-check-circle"></i> Document expiry notifications and reminders</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <div class="cta-content">
+                    <h2>Ready to Experience These Features?</h2>
+                    <p>Schedule a demo today to see how Gurukul Setu can transform your educational institution.</p>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="cta-btn text-lg-end">
+                    <a href="{% url 'contact' %}" class="btn btn-light">Request a Demo</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
