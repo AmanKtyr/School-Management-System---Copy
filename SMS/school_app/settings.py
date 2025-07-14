@@ -56,7 +56,8 @@ INSTALLED_APPS = [
     'apps.documents',
     'django_filters',
     'apps.transport',
-    "TeacherDashboard",  # Ensure this is present for teacher dashboard templates
+    "TeacherDashboard",
+    "website",  # Ensure this is present for website templates
 ]
 
 MIDDLEWARE = [

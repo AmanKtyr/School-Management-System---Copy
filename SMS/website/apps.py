@@ -3,4 +3,4 @@ from django.apps import AppConfig
 
 class WebsiteConfig(AppConfig):
     name = 'website'
-    verbose_name = 'Website'
+    verbose_name = 'website'
