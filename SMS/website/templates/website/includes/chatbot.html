@@ -7,8 +7,8 @@
     <div class="chatbot-container" id="chatbotContainer">
         <div class="chatbot-header">
             <div class="chatbot-title">
-                <img src="{% static 'img/logo-icon.png' %}" alt="Gurukul Setu" width="30">
-                <h4>Gurukul Setu Support</h4>
+                <img src="{% static 'img/logo-icon.png' %}" alt="SipherEdu" width="30">
+                <h4>SipherEdu Support</h4>
             </div>
             <div class="chatbot-actions">
                 <button class="minimize-btn" id="chatbotMinimize"><i class="fas fa-minus"></i></button>
@@ -30,7 +30,7 @@
                             <li>Our features and pricing</li>
                             <li>Implementation process</li>
                             <li>Technical support</li>
-                            <li>Or anything else about Gurukul Setu!</li>
+                            <li>Or anything else about SipherEdu!</li>
                         </ul>
                     </div>
                     <span class="message-time">Just now</span>
@@ -467,7 +467,7 @@
             message = message.toLowerCase();
 
             if (message.includes('feature') || message.includes('what can you do')) {
-                return `Gurukul Setu offers a comprehensive suite of features including:<br>
+                return `SipherEdu offers a comprehensive suite of features including:<br>
                 - Student Management<br>
                 - Staff Management<br>
                 - Fee Management<br>
@@ -478,7 +478,7 @@
             } else if (message.includes('price') || message.includes('cost') || message.includes('pricing')) {
                 return `Our pricing starts at ₹4,999 per month for the Basic plan. We also offer Standard (₹9,999/month) and Premium (₹19,999/month) plans with additional features. You can save 20% with annual billing. Check out our <a href="/pricing/">pricing page</a> for more details or use our pricing calculator to find the best plan for your institution.`;
             } else if (message.includes('get started') || message.includes('begin') || message.includes('start')) {
-                return `Getting started with Gurukul Setu is easy! Here's how:<br>
+                return `Getting started with SipherEdu is easy! Here's how:<br>
                 1. <a href="/demo/">Request a demo</a> to see the system in action<br>
                 2. Choose a plan that fits your needs<br>
                 3. Our team will help you with implementation and data migration<br>
@@ -495,7 +495,7 @@
             } else if (message.includes('demo') || message.includes('trial')) {
                 return `We offer a free 14-day trial and personalized demos. During the demo, our product specialists will walk you through all features and answer your questions. You can <a href="/demo/">request a demo here</a> and our team will contact you within 24 hours to schedule it.`;
             } else if (message.includes('hello') || message.includes('hi') || message.includes('hey')) {
-                return `Hello! How can I help you today? Feel free to ask me anything about Gurukul Setu.`;
+                return `Hello! How can I help you today? Feel free to ask me anything about SipherEdu.`;
             } else {
                 return `Thanks for your message. I'm not sure I understand completely. Could you please rephrase or choose one of the quick response options below? Alternatively, you can contact our human support team at support@gurukulsetu.com.`;
             }

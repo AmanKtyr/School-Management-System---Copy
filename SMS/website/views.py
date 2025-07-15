@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 def landing_page(request):
     """
-    View for the landing page of Gurukul Setu
+    View for the landing page of SipherEdu
     """
     # If user is already authenticated, redirect to dashboard
     if request.user.is_authenticated:

@@ -1,5 +1,5 @@
 /*
-* Gurukul Setu - Landing Page JavaScript
+* SipherEdu - Landing Page JavaScript
 */
 
 document.addEventListener('DOMContentLoaded', function() {

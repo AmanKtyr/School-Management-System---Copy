@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Gurukul Setu - School & College Management System{% endblock %}</title>
+    <title>{% block title %}SipherEdu - School & College Management System{% endblock %}</title>
 
     <!-- Favicon -->
     <link rel="icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
@@ -60,8 +60,8 @@
             <nav class="navbar navbar-expand-lg">
                 <div class="container-fluid">
                     <a class="navbar-brand" href="{% url 'landing_page' %}">
-                        <img src="{% static 'img/Gurukul_Setu.png' %}" alt="Gurukul Setu Logo" class="logo">
-                        <span>Gurukul Setu</span>
+                        <img src="{% static 'img/Gurukul_Setu.png' %}" alt="SipherEdu Logo" class="logo">
+                        <span>SipherEdu</span>
                     </a>
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
@@ -77,23 +77,14 @@
                             <li class="nav-item">
                                 <a class="nav-link {% if request.resolver_match.url_name == 'pricing' %}active{% endif %}" href="{% url 'pricing' %}">Pricing</a>
                             </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle {% if request.resolver_match.url_name == 'blog' or request.resolver_match.url_name == 'blog_detail' or request.resolver_match.url_name == 'testimonials' %}active{% endif %}" href="#" id="resourcesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Resources
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="resourcesDropdown">
-                                    <li><a class="dropdown-item {% if request.resolver_match.url_name == 'blog' or request.resolver_match.url_name == 'blog_detail' %}active{% endif %}" href="{% url 'blog' %}">Blog</a></li>
-                                    <li><a class="dropdown-item {% if request.resolver_match.url_name == 'testimonials' %}active{% endif %}" href="{% url 'testimonials' %}">Testimonials</a></li>
-                                    <li><a class="dropdown-item {% if request.resolver_match.url_name == 'faq' %}active{% endif %}" href="{% url 'faq' %}">FAQ</a></li>
-                                </ul>
-                            </li>
+                            
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle {% if request.resolver_match.url_name == 'about' or request.resolver_match.url_name == 'contact' or request.resolver_match.url_name == 'careers' %}active{% endif %}" href="#" id="companyDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     Company
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="companyDropdown">
                                     <li><a class="dropdown-item {% if request.resolver_match.url_name == 'about' %}active{% endif %}" href="{% url 'about' %}">About Us</a></li>
-                                    <li><a class="dropdown-item {% if request.resolver_match.url_name == 'careers' %}active{% endif %}" href="{% url 'careers' %}">Careers</a></li>
+                                    
                                     <li><a class="dropdown-item {% if request.resolver_match.url_name == 'contact' %}active{% endif %}" href="{% url 'contact' %}">Contact Us</a></li>
                                 </ul>
                             </li>
@@ -103,60 +94,7 @@
                             <li class="nav-item ms-2">
                                 <a class="btn btn-outline-primary" href="{% url 'demo' %}">Request Demo</a>
                             </li>
-                            <li class="nav-item ms-2">
-                                <div class="language-switcher">
-                                    <div class="dropdown">
-                                        <button class="btn dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="fas fa-globe"></i>
-                                            {% if LANGUAGE_CODE == 'en' %}
-                                                <span>EN</span>
-                                            {% elif LANGUAGE_CODE == 'hi' %}
-                                                <span>HI</span>
-                                            {% elif LANGUAGE_CODE == 'ta' %}
-                                                <span>TA</span>
-                                            {% elif LANGUAGE_CODE == 'te' %}
-                                                <span>TE</span>
-                                            {% elif LANGUAGE_CODE == 'kn' %}
-                                                <span>KN</span>
-                                            {% else %}
-                                                <span>EN</span>
-                                            {% endif %}
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
-                                            <form action="{% url 'set_language' %}" method="post" id="language-form">
-                                                {% csrf_token %}
-                                                <input name="next" type="hidden" value="{{ request.path }}">
-
-                                                <li>
-                                                    <button type="submit" name="language" value="en" class="dropdown-item {% if LANGUAGE_CODE == 'en' %}active{% endif %}">
-                                                        <i class="fas fa-language"></i> English
-                                                    </button>
-                                                </li>
-                                                <li>
-                                                    <button type="submit" name="language" value="hi" class="dropdown-item {% if LANGUAGE_CODE == 'hi' %}active{% endif %}">
-                                                        <i class="fas fa-language"></i> हिन्दी
-                                                    </button>
-                                                </li>
-                                                <li>
-                                                    <button type="submit" name="language" value="ta" class="dropdown-item {% if LANGUAGE_CODE == 'ta' %}active{% endif %}">
-                                                        <i class="fas fa-language"></i> தமிழ்
-                                                    </button>
-                                                </li>
-                                                <li>
-                                                    <button type="submit" name="language" value="te" class="dropdown-item {% if LANGUAGE_CODE == 'te' %}active{% endif %}">
-                                                        <i class="fas fa-language"></i> తెలుగు
-                                                    </button>
-                                                </li>
-                                                <li>
-                                                    <button type="submit" name="language" value="kn" class="dropdown-item {% if LANGUAGE_CODE == 'kn' %}active{% endif %}">
-                                                        <i class="fas fa-language"></i> ಕನ್ನಡ
-                                                    </button>
-                                                </li>
-                                            </form>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </li>
+                            
                         </ul>
                     </div>
                 </div>
@@ -176,8 +114,8 @@
                 <div class="col-lg-4 col-md-6">
                     <div class="footer-widget">
                         <div class="footer-logo">
-                            <img src="{% static 'img/Gurukul_Setu.png' %}" alt="Gurukul Setu Logo">
-                            <span>Gurukul Setu</span>
+                            <img src="{% static 'img/Gurukul_Setu.png' %}" alt="SipherEdu Logo">
+                            <span>SipherEdu</span>
                         </div>
                         <p>Empowering educational institutions with modern technology solutions for better administration and enhanced learning experiences.</p>
                         <div class="social-links">
@@ -195,15 +133,11 @@
                             <li><a href="{% url 'landing_page' %}"><i class="fas fa-angle-right"></i> Home</a></li>
                             <li><a href="{% url 'features' %}"><i class="fas fa-angle-right"></i> Features</a></li>
                             <li><a href="{% url 'pricing' %}"><i class="fas fa-angle-right"></i> Pricing</a></li>
-                            <li><a href="{% url 'blog' %}"><i class="fas fa-angle-right"></i> Blog</a></li>
-                            <li><a href="{% url 'testimonials' %}"><i class="fas fa-angle-right"></i> Testimonials</a></li>
-                            <li><a href="{% url 'faq' %}"><i class="fas fa-angle-right"></i> FAQ</a></li>
                             <li><a href="{% url 'about' %}"><i class="fas fa-angle-right"></i> About</a></li>
-                            <li><a href="{% url 'careers' %}"><i class="fas fa-angle-right"></i> Careers</a></li>
                             <li><a href="{% url 'contact' %}"><i class="fas fa-angle-right"></i> Contact</a></li>
                             <li><a href="{% url 'demo' %}"><i class="fas fa-angle-right"></i> Request Demo</a></li>
                             <li><a href="{% url 'login' %}"><i class="fas fa-angle-right"></i> Login</a></li>
-                            <li><a href="{% url 'sitemap' %}"><i class="fas fa-angle-right"></i> Sitemap</a></li>
+                            
                         </ul>
                     </div>
                 </div>
@@ -223,9 +157,9 @@
                     <div class="footer-widget">
                         <h4>Contact Info</h4>
                         <ul class="footer-links">
-                            <li><a href="#"><i class="fas fa-map-marker-alt"></i> 123 Education Street, Tech Park, Bangalore - 560001, India</a></li>
+                            <li><a href="#"><i class="fas fa-map-marker-alt"></i> Jankipuram, Lucknow - 226021, India</a></li>
                             <li><a href="tel:+919876543210"><i class="fas fa-phone-alt"></i> +91 98765 43210</a></li>
-                            <li><a href="mailto:info@gurukulsetu.com"><i class="fas fa-envelope"></i> info@gurukulsetu.com</a></li>
+                            <li><a href="mailto:info@SipherEdu.com"><i class="fas fa-envelope"></i> info@SipherEdu.com</a></li>
                         </ul>
                         <div class="newsletter-form">
                             <input type="email" placeholder="Your Email">
@@ -237,7 +171,11 @@
             <div class="copyright-area">
                 <div class="row">
                     <div class="col-md-6 d-flex align-items-center">
+<<<<<<< HEAD
                         <p class="mb-0">&copy; 2025 Gurukul Setu. All Rights Reserved.</p>
+=======
+                        <p class="mb-0">&copy; 2025 SipherEdu. All Rights Reserved.</p>
+>>>>>>> origin/Aman
                         {% comment %} <a href="{% url 'super_admin:login' %}" class="super-admin-badge">
                             <i class="fas fa-user-shield"></i> Super Admin
                         </a> {% endcomment %}
@@ -268,7 +206,6 @@
     <!-- Chatbot Widget -->
     {% include 'website/includes/chatbot.html' %}
 
-    <!-- Cookie Consent Banner -->
-    {% include 'website/includes/cookie_consent.html' %}
+  
 </body>
 </html>
