@@ -77,23 +77,14 @@
                             <li class="nav-item">
                                 <a class="nav-link {% if request.resolver_match.url_name == 'pricing' %}active{% endif %}" href="{% url 'pricing' %}">Pricing</a>
                             </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle {% if request.resolver_match.url_name == 'blog' or request.resolver_match.url_name == 'blog_detail' or request.resolver_match.url_name == 'testimonials' %}active{% endif %}" href="#" id="resourcesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Resources
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="resourcesDropdown">
-                                    <li><a class="dropdown-item {% if request.resolver_match.url_name == 'blog' or request.resolver_match.url_name == 'blog_detail' %}active{% endif %}" href="{% url 'blog' %}">Blog</a></li>
-                                    <li><a class="dropdown-item {% if request.resolver_match.url_name == 'testimonials' %}active{% endif %}" href="{% url 'testimonials' %}">Testimonials</a></li>
-                                    <li><a class="dropdown-item {% if request.resolver_match.url_name == 'faq' %}active{% endif %}" href="{% url 'faq' %}">FAQ</a></li>
-                                </ul>
-                            </li>
+                            
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle {% if request.resolver_match.url_name == 'about' or request.resolver_match.url_name == 'contact' or request.resolver_match.url_name == 'careers' %}active{% endif %}" href="#" id="companyDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     Company
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="companyDropdown">
                                     <li><a class="dropdown-item {% if request.resolver_match.url_name == 'about' %}active{% endif %}" href="{% url 'about' %}">About Us</a></li>
-                                    <li><a class="dropdown-item {% if request.resolver_match.url_name == 'careers' %}active{% endif %}" href="{% url 'careers' %}">Careers</a></li>
+                                    
                                     <li><a class="dropdown-item {% if request.resolver_match.url_name == 'contact' %}active{% endif %}" href="{% url 'contact' %}">Contact Us</a></li>
                                 </ul>
                             </li>
@@ -142,15 +133,11 @@
                             <li><a href="{% url 'landing_page' %}"><i class="fas fa-angle-right"></i> Home</a></li>
                             <li><a href="{% url 'features' %}"><i class="fas fa-angle-right"></i> Features</a></li>
                             <li><a href="{% url 'pricing' %}"><i class="fas fa-angle-right"></i> Pricing</a></li>
-                            <li><a href="{% url 'blog' %}"><i class="fas fa-angle-right"></i> Blog</a></li>
-                            <li><a href="{% url 'testimonials' %}"><i class="fas fa-angle-right"></i> Testimonials</a></li>
-                            <li><a href="{% url 'faq' %}"><i class="fas fa-angle-right"></i> FAQ</a></li>
                             <li><a href="{% url 'about' %}"><i class="fas fa-angle-right"></i> About</a></li>
-                            <li><a href="{% url 'careers' %}"><i class="fas fa-angle-right"></i> Careers</a></li>
                             <li><a href="{% url 'contact' %}"><i class="fas fa-angle-right"></i> Contact</a></li>
                             <li><a href="{% url 'demo' %}"><i class="fas fa-angle-right"></i> Request Demo</a></li>
                             <li><a href="{% url 'login' %}"><i class="fas fa-angle-right"></i> Login</a></li>
-                            <li><a href="{% url 'sitemap' %}"><i class="fas fa-angle-right"></i> Sitemap</a></li>
+                            
                         </ul>
                     </div>
                 </div>
