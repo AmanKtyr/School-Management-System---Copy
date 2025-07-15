@@ -103,60 +103,7 @@
                             <li class="nav-item ms-2">
                                 <a class="btn btn-outline-primary" href="{% url 'demo' %}">Request Demo</a>
                             </li>
-                            <li class="nav-item ms-2">
-                                <div class="language-switcher">
-                                    <div class="dropdown">
-                                        <button class="btn dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="fas fa-globe"></i>
-                                            {% if LANGUAGE_CODE == 'en' %}
-                                                <span>EN</span>
-                                            {% elif LANGUAGE_CODE == 'hi' %}
-                                                <span>HI</span>
-                                            {% elif LANGUAGE_CODE == 'ta' %}
-                                                <span>TA</span>
-                                            {% elif LANGUAGE_CODE == 'te' %}
-                                                <span>TE</span>
-                                            {% elif LANGUAGE_CODE == 'kn' %}
-                                                <span>KN</span>
-                                            {% else %}
-                                                <span>EN</span>
-                                            {% endif %}
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
-                                            <form action="{% url 'set_language' %}" method="post" id="language-form">
-                                                {% csrf_token %}
-                                                <input name="next" type="hidden" value="{{ request.path }}">
-
-                                                <li>
-                                                    <button type="submit" name="language" value="en" class="dropdown-item {% if LANGUAGE_CODE == 'en' %}active{% endif %}">
-                                                        <i class="fas fa-language"></i> English
-                                                    </button>
-                                                </li>
-                                                <li>
-                                                    <button type="submit" name="language" value="hi" class="dropdown-item {% if LANGUAGE_CODE == 'hi' %}active{% endif %}">
-                                                        <i class="fas fa-language"></i> हिन्दी
-                                                    </button>
-                                                </li>
-                                                <li>
-                                                    <button type="submit" name="language" value="ta" class="dropdown-item {% if LANGUAGE_CODE == 'ta' %}active{% endif %}">
-                                                        <i class="fas fa-language"></i> தமிழ்
-                                                    </button>
-                                                </li>
-                                                <li>
-                                                    <button type="submit" name="language" value="te" class="dropdown-item {% if LANGUAGE_CODE == 'te' %}active{% endif %}">
-                                                        <i class="fas fa-language"></i> తెలుగు
-                                                    </button>
-                                                </li>
-                                                <li>
-                                                    <button type="submit" name="language" value="kn" class="dropdown-item {% if LANGUAGE_CODE == 'kn' %}active{% endif %}">
-                                                        <i class="fas fa-language"></i> ಕನ್ನಡ
-                                                    </button>
-                                                </li>
-                                            </form>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </li>
+                            
                         </ul>
                     </div>
                 </div>

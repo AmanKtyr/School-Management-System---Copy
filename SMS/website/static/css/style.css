@@ -5,10 +5,10 @@
 
 /* ===== General Styles ===== */
 :root {
-    --primary-color: #309898;
-    --primary-dark: #257676;
-    --primary-light: #4BACA9;
-    --primary-gradient: linear-gradient(135deg, #309898 0%, #257676 100%);
+    --primary-color: #1E3C72;
+    --primary-dark: #16305a;
+    --primary-light: #3a5fa3;
+    --primary-gradient: linear-gradient(135deg, #1E3C72 0%, #16305a 100%);
     --secondary-color: #F5F5F5;
     --accent-color: #FF9F43;
     --accent-dark: #F7941D;
@@ -100,7 +100,7 @@ a:hover {
 }
 
 .btn-login:hover {
-    background-color: var(--primary-dark);
+    background-color: #1E3C72;
     color: var(--white);
 }
 
@@ -611,7 +611,7 @@ textarea.form-control {
 
 /* ===== Footer Section ===== */
 .footer-area {
-    background: linear-gradient(135deg, #257676 0%, #309898 100%);
+    background: linear-gradient(135deg, #1E3C72 0%, #232526 100%);
     color: var(--white);
     padding: 100px 0 0;
     position: relative;
