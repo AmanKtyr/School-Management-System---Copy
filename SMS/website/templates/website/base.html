@@ -49,6 +49,27 @@
         .super-admin-badge i {
             margin-right: 4px;
         }
+
+        .btn-primary {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: 2px solid var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+    color: var(--white);
+}
+
+.btn {
+    display: inline-block;
+    padding: 12px 30px;
+    font-weight: 500;
+    border-radius: 5px;
+    transition: var(--transition);
+    text-align: center;
+}
     </style>
 
     {% block extra_css %}{% endblock %}
@@ -89,7 +110,7 @@
                                 </ul>
                             </li>
                             <li class="nav-item">
-                                <a class="btn btn-login" href="{% url 'login' %}">Login</a>
+                                <a class="btn btn-login btn-primary text-white" href="{% url 'login' %}">Login</a>
                             </li>
                             <li class="nav-item ms-2">
                                 <a class="btn btn-outline-primary" href="{% url 'demo' %}">Request Demo</a>
@@ -106,7 +127,14 @@
     <main>
         {% block content %}{% endblock %}
     </main>
-
+<style>
+    li a{
+        text-decoration: none !important;
+    }
+    .icons {
+        text-decoration: none;
+    }
+</style>
     <!-- Footer Section -->
     <footer class="footer-area">
         <div class="container">
@@ -119,10 +147,10 @@
                         </div>
                         <p>Empowering educational institutions with modern technology solutions for better administration and enhanced learning experiences.</p>
                         <div class="social-links">
-                            <a href="#"><i class="fab fa-facebook-f"></i></a>
-                            <a href="#"><i class="fab fa-twitter"></i></a>
-                            <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                            <a href="#"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="icons"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="icons"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="icons"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" class="icons"><i class="fab fa-instagram"></i></a>
                         </div>
                     </div>
                 </div>
