@@ -236,7 +236,8 @@ section {
 /* ===== Hero Section ===== */
 .hero-section {
     padding: 180px 0 100px;
-    background: var(--primary-gradient);
+    /* background: var(--primary-gradient); */
+      background: linear-gradient(to right, #374c73ff, #879ecaff);
     position: relative;
     overflow: hidden;
 }
