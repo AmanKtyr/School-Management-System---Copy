@@ -54,3 +54,28 @@ Add secondrory color
 
 Add mail, Blood group in student profile 
 
+
+
+
+views.py 
+
+from django.http import HttpResponseForbidden
+
+def student_list(request):
+    role = request.user.profile.role
+    if role not in ['student', 'teacher', 'admin']:
+        return HttpResponseForbidden()
+    # ...existing code...
+
+
+urls.py 
+
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('student/list/', views.student_list, name='student_list'),
+    path('teacher/student/list/', views.student_list, name='teacher_student_list'),
+    path('admin/student/list/', views.student_list, name='admin_student_list'),
+    # ...other URLs...
+]
