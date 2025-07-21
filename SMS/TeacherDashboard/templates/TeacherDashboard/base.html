@@ -133,7 +133,7 @@
               class="fas fa-bars"></i></a>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
-          <a href="{% url 'home' %} " class="nav-link"><i class="fa fa-home"></i></a>
+          <a href="{% url 'teacher_dashboard' %} " class="nav-link"><i class="fa fa-home"></i></a>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
           <a href="{% url 'current-session' %}" class="nav-link">Session: {{ current_session }}</a>
@@ -231,15 +231,15 @@
   <nav class="mt-2">
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <li class="nav-item">
-              <a href="{% url 'home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+              <a href="{% url 'teacher_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'teacher_dashboard' %}active{% endif %}">
                   <i class="nav-icon fas fa-tachometer-alt" style="color: #ff5733; text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);"></i>
                   <p>Teacher Dashboard</p>
               </a>
           </li>
 
-          <li class="nav-header">My Students</li>
-          <li class="nav-item has-treeview  {% if request.resolver_match.url_name in 'teacher_students_list teacher_student_detail' %}menu-open{% endif %}">
-              <a href="#" class="nav-link">
+          <li class="nav-header">Students</li>
+          <li class="nav-item has-treeview  {% if request.resolver_match.url_name in 'teacher_students_list teacher_student_create teacher_student_create_udise teacher_student_update_udise teacher_student_detail' %}menu-open{% endif %}">
+              <a href="#" class="nav-link  " >
                   <i class="nav-icon fas fa-user-graduate" style="color: #3399ff; text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);"></i>
                   <p>Students<i class="fas fa-angle-left right"></i></p>
               </a>
@@ -247,72 +247,165 @@
                   <li class="nav-item">
                       <a href="{% url 'teacher_students_list' %}" class="nav-link {% if request.resolver_match.url_name == 'teacher_students_list' %}active{% endif %}" >
                           <i class="fas fa-list nav-icon" style="color: #33cc33;"></i>
-                          <p>My Students</p>
+                          <p>Student List</p>
+                      </a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="{% url 'teacher_student_create' %}" class="nav-link {% if request.resolver_match.url_name == 'teacher_student_create' %}active{% endif %}">
+                          <i class="fas fa-user-plus nav-icon" style="color: #ffcc00;"></i>
+                          <p>Admissions</p>
+                      </a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="{% url 'teacher_student_create_udise' %}" class="nav-link {% if request.resolver_match.url_name == 'teacher_student_create_udise' %}active{% endif %}">
+                          <i class="fas fa-id-card nav-icon" style="color: #ff6600;"></i>
+                          <p>UDISE+ Student Form</p>
                       </a>
                   </li>
               </ul>
           </li>
 
           <li class="nav-header">Attendance</li>
-            <li class="nav-item has-treeview {% if request.resolver_match.url_name in 'teacher_attendance_list teacher_attendance_mark' %}menu-open{% endif %}">
-                <a href="#" class="nav-link">
-                    <i class="nav-icon fas fa-calendar-check" style="color: #ffcc00; text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);"></i>
-                    <p>Attendance<i class="fas fa-angle-left right"></i></p>
-                </a>
-                <ul class="nav nav-treeview">
-                    <li class="nav-item">
-                      <a href="{% url 'teacher_attendance_list' %}" class="nav-link {% if request.resolver_match.url_name == 'teacher_attendance_list' %}active{% endif %}">
-                            <i class="fas fa-user-check nav-icon" style="color: #33ccff;"></i>
-                            <p>View Attendance</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                      <a href="{% url 'teacher_attendance_mark' %}" class="nav-link {% if request.resolver_match.url_name == 'teacher_attendance_mark' %}active{% endif %}">
-                            <i class="fas fa-calendar-plus nav-icon" style="color: #17a2b8;"></i>
-                            <p>Mark Attendance</p>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-
-          <li class="nav-header">Examinations</li>
-          <li class="nav-item has-treeview {% if request.resolver_match.url_name in 'teacher_exams_list teacher_marks_entry' %}menu-open{% endif %}">
+          <li class="nav-item has-treeview {% if request.resolver_match.url_name in 'teacher_attendance_management teacher_attendance_list teacher_attendance_mark teacher_attendance_reports' %}menu-open{% endif %}">
               <a href="#" class="nav-link">
-                  <i class="nav-icon fas fa-graduation-cap" style="color: #ff9900; text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);"></i>
-                  <p>
-                      Examinations
-                      <i class="fas fa-angle-left right"></i>
-                  </p>
+                  <i class="nav-icon fas fa-calendar-check" style="color: #ffcc00; text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);"></i>
+                  <p>Attendance<i class="fas fa-angle-left right"></i></p>
               </a>
               <ul class="nav nav-treeview">
                   <li class="nav-item">
-                      <a href="{% url 'teacher_exams_list' %}" class="nav-link {% if request.resolver_match.url_name == 'teacher_exams_list' %}active{% endif %}">
+                      <a href="{% url 'teacher_attendance_management' %}" class="nav-link {% if request.resolver_match.url_name == 'teacher_attendance_management' %}active{% endif %}">
+                          <i class="fas fa-user-check nav-icon" style="color: #33ccff;"></i>
+                          <p>Student Attendance</p>
+                      </a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="{% url 'teacher_attendance_reports' %}" class="nav-link {% if request.resolver_match.url_name == 'teacher_attendance_reports' %}active{% endif %}">
+                          <i class="fas fa-chart-bar nav-icon" style="color: #28a745;"></i>
+                          <p>Attendance Reports</p>
+                      </a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="{% url 'teacher_attendance_list' %}" class="nav-link {% if request.resolver_match.url_name == 'teacher_attendance_list' %}active{% endif %}">
+                          <i class="fas fa-eye nav-icon" style="color: #6c757d;"></i>
+                          <p>View Attendance (Old)</p>
+                      </a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="{% url 'teacher_attendance_mark' %}" class="nav-link {% if request.resolver_match.url_name == 'teacher_attendance_mark' %}active{% endif %}">
+                          <i class="fas fa-calendar-plus nav-icon" style="color: #6c757d;"></i>
+                          <p>Mark Attendance (Old)</p>
+                      </a>
+                  </li>
+              </ul>
+          </li>
+
+
+
+          <li class="nav-header">Examinations</li>
+          <li class="nav-item has-treeview {% if request.resolver_match.url_name in 'teacher_exams_list teacher_marks_entry' or 'exams' in request.path %}menu-open{% endif %}">
+              <a href="{% url 'exams:dashboard' %}" class="nav-link {% if 'exams' in request.path %}active{% endif %}">
+                  <i class="nav-icon fas fa-graduation-cap" style="color: #ff9900; text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);"></i>
+                  <p>Examinations<i class="fas fa-angle-left right"></i></p>
+              </a>
+              <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                      <a href="{% url 'exams:dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' and 'exams' in request.path %}active{% endif %}">
+                          <i class="fas fa-tachometer-alt nav-icon" style="color: #ff9900;"></i>
+                          <p>Dashboard</p>
+                      </a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="{% url 'exams:exam_list' %}" class="nav-link {% if request.resolver_match.url_name == 'exam_list' %}active{% endif %}">
                           <i class="fas fa-list-alt nav-icon" style="color: #ff6600;"></i>
-                          <p>View Exams</p>
+                          <p>Manage Exams</p>
+                      </a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="{% url 'exams:exam_schedule_list' %}" class="nav-link {% if request.resolver_match.url_name == 'exam_schedule_list' %}active{% endif %}">
+                          <i class="fas fa-calendar-alt nav-icon" style="color: #ff6600;"></i>
+                          <p>Exam Schedule</p>
+                      </a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="{% url 'exams:admit_card_list' %}" class="nav-link {% if request.resolver_match.url_name == 'admit_card_list' %}active{% endif %}">
+                          <i class="fas fa-id-card nav-icon" style="color: #cc3300;"></i>
+                          <p>Admit Cards</p>
+                      </a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="{% url 'exams:marks_entry' %}" class="nav-link {% if request.resolver_match.url_name == 'marks_entry' %}active{% endif %}">
+                          <i class="fas fa-clipboard-check nav-icon" style="color: #33cc33;"></i>
+                          <p>Marks Entry</p>
+                      </a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="{% url 'exams:results' %}" class="nav-link {% if request.resolver_match.url_name == 'results' %}active{% endif %}">
+                          <i class="fas fa-chart-bar nav-icon" style="color: #3399ff;"></i>
+                          <p>Results & Reports</p>
+                      </a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="{% url 'teacher_exams_list' %}" class="nav-link {% if request.resolver_match.url_name == 'teacher_exams_list' %}active{% endif %}">
+                          <i class="fas fa-eye nav-icon" style="color: #6c757d;"></i>
+                          <p>View Exams (Old)</p>
                       </a>
                   </li>
                   <li class="nav-item">
                       <a href="{% url 'teacher_marks_entry' %}" class="nav-link {% if request.resolver_match.url_name == 'teacher_marks_entry' %}active{% endif %}">
-                          <i class="fas fa-clipboard-check nav-icon" style="color: #33cc33;"></i>
-                          <p>Marks Entry</p>
+                          <i class="fas fa-edit nav-icon" style="color: #6c757d;"></i>
+                          <p>Marks Entry (Old)</p>
                       </a>
                   </li>
               </ul>
           </li>
 
           <li class="nav-header">Documents</li>
-          <li class="nav-item">
-              <a href="{% url 'teacher_documents_list' %}" class="nav-link {% if request.resolver_match.url_name == 'teacher_documents_list' %}active{% endif %}">
+          <li class="nav-item has-treeview {% if 'documents' in request.path or request.resolver_match.url_name == 'teacher_documents_list' %}menu-open{% endif %}">
+              <a href="{% url 'documents:dashboard' %}" class="nav-link {% if 'documents' in request.path %}active{% endif %}">
                   <i class="nav-icon fas fa-folder-open" style="color: #9933ff; text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);"></i>
-                  <p>Documents</p>
+                  <p>Documents<i class="fas fa-angle-left right"></i></p>
               </a>
+              <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                      <a href="{% url 'documents:dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' and 'documents' in request.path %}active{% endif %}">
+                          <i class="fas fa-tachometer-alt nav-icon" style="color: #9933ff;"></i>
+                          <p>Dashboard</p>
+                      </a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="{% url 'documents:document_list' %}" class="nav-link {% if request.resolver_match.url_name == 'document_list' %}active{% endif %}">
+                          <i class="fas fa-file nav-icon" style="color: #33cc33;"></i>
+                          <p>All Documents</p>
+                      </a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="{% url 'documents:document_upload' %}" class="nav-link {% if request.resolver_match.url_name == 'document_upload' %}active{% endif %}">
+                          <i class="fas fa-upload nav-icon" style="color: #3399ff;"></i>
+                          <p>Upload Document</p>
+                      </a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="{% url 'documents:student_documents' %}" class="nav-link {% if request.resolver_match.url_name == 'student_documents' or request.resolver_match.url_name == 'student_documents_detail' %}active{% endif %}">
+                          <i class="fas fa-user-graduate nav-icon" style="color: #ff9900;"></i>
+                          <p>Student Documents</p>
+                      </a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="{% url 'teacher_documents_list' %}" class="nav-link {% if request.resolver_match.url_name == 'teacher_documents_list' %}active{% endif %}">
+                          <i class="fas fa-eye nav-icon" style="color: #6c757d;"></i>
+                          <p>Documents (Old)</p>
+                      </a>
+                  </li>
+              </ul>
           </li>
+
+
 
           <li class="nav-header">Account</li>
           <li class="nav-item">
               <a href="{% url 'teacher_profile' %}" class="nav-link {% if request.resolver_match.url_name == 'teacher_profile' %}active{% endif %}">
                   <i class="nav-icon fas fa-user-cog" style="color: #007bff;"></i>
-                  <p>Profile</p>
+                  <p>My Profile</p>
               </a>
           </li>
           <li class="nav-item">

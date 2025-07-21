@@ -5,6 +5,7 @@ from django.db.models import Q, Sum, F, DecimalField, Value
 from django.db.models.functions import Coalesce
 from django.utils import timezone
 from django.http import HttpResponse
+from functools import wraps
 from django.template.loader import get_template
 from xhtml2pdf import pisa
 from django.core.paginator import Paginator
@@ -13,7 +14,19 @@ from apps.corecode.filters import ClassSectionFilterForm
 from apps.students.models import Student
 from apps.corecode.models import FeeSettings, FeeStructure
 
+
+# Custom decorator to restrict access to admin users only
+def admin_required(view_func):
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        if not request.user.is_superuser:
+            messages.error(request, "Access denied. Only administrators can access this page.")
+            return render(request, '403.html', status=403)
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view
+
 @login_required
+@admin_required
 def fee_list(request):
     filter_form = ClassSectionFilterForm(request.GET)
 
@@ -90,6 +103,7 @@ def fee_list(request):
     return render(request, 'fees/fee_list.html', context)
 
 @login_required
+@admin_required
 def add_fee_payment(request, student_id):
     student = get_object_or_404(Student, id=student_id)
 
@@ -167,6 +181,7 @@ def add_fee_payment(request, student_id):
     return render(request, 'fees/add_fee_payment.html', context)
 
 @login_required
+@admin_required
 def student_fee_history(request, student_id):
     student = get_object_or_404(Student, id=student_id)
     payments = FeePayment.objects.filter(student=student).order_by('-date')
@@ -181,6 +196,7 @@ def student_fee_history(request, student_id):
 
 
 @login_required
+@admin_required
 def generate_receipt(request, payment_id):
     payment = get_object_or_404(FeePayment, id=payment_id)
 
@@ -242,6 +258,7 @@ def generate_receipt(request, payment_id):
         return HttpResponse(f'Error generating PDF: {str(e)}', status=500)
 
 @login_required
+@admin_required
 def generate_complete_history(request, student_id):
     student = get_object_or_404(Student, id=student_id)
     payments = FeePayment.objects.filter(student=student).order_by('-date')
@@ -292,6 +309,7 @@ def generate_complete_history(request, student_id):
         return HttpResponse(f'Error generating PDF: {str(e)}', status=500)
 
 @login_required
+@admin_required
 def all_transactions(request):
     # Start with all transactions
     transactions = FeePayment.objects.all().select_related('student').order_by('-date')

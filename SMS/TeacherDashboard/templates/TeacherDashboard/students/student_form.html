@@ -1,0 +1,691 @@
+{% extends 'TeacherDashboard/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block extrastyle %}
+<style>
+  /* Professional form styling */
+  .card-header.bg-gradient-primary {
+    background: linear-gradient(135deg, #1a237e, #283593, #3949ab);
+  }
+
+  .form-label {
+    font-weight: 500;
+    color: #495057;
+  }
+
+  .form-control:focus, .form-select:focus {
+    border-color: #3949ab;
+    box-shadow: 0 0 0 0.2rem rgba(57, 73, 171, 0.25);
+  }
+
+  .card {
+    transition: all 0.3s ease;
+  }
+
+  .card:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  .card-header {
+    border-bottom: none;
+    padding: 0.75rem 1.25rem;
+  }
+
+  .card-header h6 {
+    font-weight: 600;
+  }
+
+  .text-danger {
+    font-size: 0.8rem;
+  }
+
+  .form-text {
+    font-size: 0.75rem;
+    color: #6c757d;
+  }
+
+  .btn-primary {
+    background-color: #3949ab;
+    border-color: #3949ab;
+  }
+
+  .btn-primary:hover {
+    background-color: #283593;
+    border-color: #283593;
+  }
+
+  .section-card {
+    border: 1px solid #e3f2fd;
+    border-radius: 8px;
+  }
+
+  .section-card .card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e3f2fd;
+  }
+
+  .form-navigation-container {
+    border: 1px solid #e3f2fd;
+  }
+
+  .form-navigation-wrapper {
+    background-color: #f8f9fa;
+  }
+
+  .btn-outline-primary {
+    border-color: #3949ab;
+    color: #3949ab;
+  }
+
+  .btn-outline-primary:hover {
+    background-color: #3949ab;
+    border-color: #3949ab;
+  }
+
+  .btn-outline-primary.active {
+    background-color: #3949ab;
+    border-color: #3949ab;
+    color: white;
+  }
+
+  .progress-bar {
+    background-color: #4caf50;
+  }
+
+  .badge.bg-primary {
+    background-color: #3949ab !important;
+  }
+
+  .invalid-feedback {
+    display: block;
+  }
+
+  .form-control.is-invalid, .form-select.is-invalid {
+    border-color: #dc3545;
+  }
+
+  .form-control.is-valid, .form-select.is-valid {
+    border-color: #28a745;
+  }
+
+  .passport-preview {
+    max-width: 150px;
+    max-height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid #dee2e6;
+  }
+
+  .upload-area {
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .upload-area:hover {
+    border-color: #3949ab;
+    background-color: #f8f9fa;
+  }
+
+  .upload-area.dragover {
+    border-color: #3949ab;
+    background-color: #e3f2fd;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .form-navigation-wrapper .btn {
+      font-size: 0.8rem;
+      padding: 0.5rem;
+    }
+
+    .card-body {
+      padding: 1rem;
+    }
+  }
+
+  /* Section visibility */
+  .section-card {
+    display: none;
+  }
+
+  .section-card.active {
+    display: block;
+  }
+
+  /* Form validation styling */
+  .was-validated .form-control:valid {
+    border-color: #28a745;
+    padding-right: calc(1.5em + 0.75rem);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='m2.3 6.73.94-.94 1.38 1.38 3.72-3.72.94.94-4.66 4.66z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+  }
+
+  .was-validated .form-control:invalid {
+    border-color: #dc3545;
+    padding-right: calc(1.5em + 0.75rem);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='m5.8 4.6 1.4 1.4 1.4-1.4M8.6 7.4 7.2 6 5.8 7.4'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+  }
+</style>
+{% endblock extrastyle %}
+
+{% block title %}
+  {% if object %}
+    Update {{ object }}
+  {% else %}
+    Add New Student
+  {% endif %}
+{% endblock title %}
+
+{% block content %}
+<div class="container-fluid px-0">
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-gradient-primary text-white">
+      <h5 class="mb-0">
+        <i class="fas {% if object %}fa-edit{% else %}fa-user-plus{% endif %} me-2"></i>
+        {% if object %}
+          Update Student Information
+        {% else %}
+          New Student Registration
+        {% endif %}
+      </h5>
+    </div>
+    <div class="card-body">
+      <form action="" method="POST" enctype="multipart/form-data" id="studentForm" class="needs-validation" novalidate>
+        {% csrf_token %}
+
+        <!-- Form Sections -->
+        <div class="row mb-4">
+          <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div>
+                <span class="text-muted small">Fill in the form fields below. Fields marked with <span class="text-danger">*</span> are required.</span>
+              </div>
+              <div>
+                <span class="text-muted small me-2">Form completion:</span>
+                <span class="badge bg-primary" id="progressPercentage">0%</span>
+              </div>
+            </div>
+            <div class="progress" style="height: 5px;">
+              <div class="progress-bar bg-success" role="progressbar" style="width: 0%;"
+                   aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="formProgress"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Navigation -->
+        <div class="row mb-4">
+          <div class="col-md-12">
+            <div class="form-navigation-container p-3 bg-white rounded shadow-sm border">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="mb-0 text-primary fw-bold"><i class="fas fa-map-signs me-2"></i>Form Sections</h6>
+                <div class="badge bg-primary p-2"><i class="fas fa-info-circle me-1"></i> Navigate between sections</div>
+              </div>
+              <div class="form-navigation-wrapper p-2 bg-light rounded">
+                <div class="d-flex flex-wrap justify-content-between" id="formNavigation">
+                  <button type="button" class="btn btn-outline-primary active mb-2 mb-md-0 flex-grow-1 mx-1 py-2" data-section="personal">
+                    <i class="fas fa-user me-1"></i> Personal
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">1</span>
+                  </button>
+                  <button type="button" class="btn btn-outline-primary mb-2 mb-md-0 flex-grow-1 mx-1 py-2" data-section="academic">
+                    <i class="fas fa-graduation-cap me-1"></i> Academic
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">2</span>
+                  </button>
+                  <button type="button" class="btn btn-outline-primary mb-2 mb-md-0 flex-grow-1 mx-1 py-2" data-section="contact">
+                    <i class="fas fa-address-book me-1"></i> Contact
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">3</span>
+                  </button>
+                  <button type="button" class="btn btn-outline-primary mb-2 mb-md-0 flex-grow-1 mx-1 py-2" data-section="family">
+                    <i class="fas fa-users me-1"></i> Family
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">4</span>
+                  </button>
+                  <button type="button" class="btn btn-outline-primary mb-2 mb-md-0 flex-grow-1 mx-1 py-2" data-section="additional">
+                    <i class="fas fa-info-circle me-1"></i> Additional
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">5</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Personal Information Section -->
+        <div id="personal" class="card mb-4 border-0 shadow-sm section-card">
+          <div class="card-header bg-light">
+            <h6 class="mb-0"><i class="fas fa-user me-2"></i>Personal Information</h6>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-9">
+                <div class="row">
+                  <!-- Fullname Field -->
+                  <div class="col-md-6 mb-3">
+                    <label for="{{ form.fullname.id_for_label }}" class="form-label">
+                      <i class="fas fa-user-tag me-1"></i> {{ form.fullname.label }} <span class="text-danger">*</span>
+                    </label>
+                    {{ form.fullname|add_class:"form-control" }}
+                    <div class="invalid-feedback" id="fullname-error"></div>
+                    {% if form.fullname.errors %}
+                      <div class="text-danger small">{{ form.fullname.errors }}</div>
+                    {% endif %}
+                  </div>
+
+                  <!-- Gender Field -->
+                  <div class="col-md-6 mb-3">
+                    <label for="{{ form.gender.id_for_label }}" class="form-label">
+                      <i class="fas fa-venus-mars me-1"></i> {{ form.gender.label }}
+                    </label>
+                    {{ form.gender|add_class:"form-select" }}
+                    {% if form.gender.errors %}
+                      <div class="text-danger small">{{ form.gender.errors }}</div>
+                    {% endif %}
+                  </div>
+
+                  <!-- Date of Birth Field -->
+                  <div class="col-md-6 mb-3">
+                    <label for="{{ form.date_of_birth.id_for_label }}" class="form-label">
+                      <i class="fas fa-birthday-cake me-1"></i> {{ form.date_of_birth.label }}
+                    </label>
+                    {{ form.date_of_birth|add_class:"form-control" }}
+                    <div class="invalid-feedback" id="date_of_birth-error"></div>
+                    {% if form.date_of_birth.errors %}
+                      <div class="text-danger small">{{ form.date_of_birth.errors }}</div>
+                    {% endif %}
+                  </div>
+
+                  <!-- Category Field -->
+                  <div class="col-md-6 mb-3">
+                    <label for="{{ form.category.id_for_label }}" class="form-label">
+                      <i class="fas fa-tag me-1"></i> {{ form.category.label }}
+                    </label>
+                    {{ form.category|add_class:"form-select" }}
+                    {% if form.category.errors %}
+                      <div class="text-danger small">{{ form.category.errors }}</div>
+                    {% endif %}
+                  </div>
+
+                  <!-- Aadhar Field -->
+                  <div class="col-md-6 mb-3">
+                    <label for="{{ form.aadhar.id_for_label }}" class="form-label">
+                      <i class="fas fa-id-card me-1"></i> {{ form.aadhar.label }}
+                    </label>
+                    {{ form.aadhar|add_class:"form-control" }}
+                    <div class="form-text">12-digit Aadhar number without spaces</div>
+                    <div class="invalid-feedback" id="aadhar-error"></div>
+                    {% if form.aadhar.errors %}
+                      <div class="text-danger small">{{ form.aadhar.errors }}</div>
+                    {% endif %}
+                  </div>
+
+                  <!-- Current Status Field -->
+                  <div class="col-md-6 mb-3">
+                    <label for="{{ form.current_status.id_for_label }}" class="form-label">
+                      <i class="fas fa-toggle-on me-1"></i> {{ form.current_status.label }}
+                    </label>
+                    {{ form.current_status|add_class:"form-select" }}
+                    {% if form.current_status.errors %}
+                      <div class="text-danger small">{{ form.current_status.errors }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Photo Upload -->
+              <div class="col-md-3">
+                <div class="text-center mb-3">
+                  <div class="mb-3">
+                    <label for="{{ form.passport.id_for_label }}" class="form-label d-block">
+                      <i class="fas fa-camera me-1"></i> Student Photo
+                    </label>
+                    <div class="photo-preview mb-2">
+                      {% if object and object.passport %}
+                        <img src="{{ object.passport.url }}" alt="Student Photo" class="img-thumbnail" style="height: 150px; width: 150px; object-fit: cover;">
+                      {% else %}
+                        <div class="placeholder-image d-flex align-items-center justify-content-center bg-light" style="height: 150px; width: 150px; border-radius: 5px;">
+                          <i class="fas fa-user fa-4x text-secondary"></i>
+                        </div>
+                      {% endif %}
+                    </div>
+                    {{ form.passport|add_class:"form-control" }}
+                    <div class="form-text">Upload passport size photo</div>
+                    {% if form.passport.errors %}
+                      <div class="text-danger small">{{ form.passport.errors }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Academic Information Section -->
+        <div id="academic" class="card mb-4 border-0 shadow-sm section-card">
+          <div class="card-header bg-light">
+            <h6 class="mb-0"><i class="fas fa-graduation-cap me-2"></i>Academic Information</h6>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <!-- Class Field -->
+              <div class="col-md-4 mb-3">
+                <label for="{{ form.current_class.id_for_label }}" class="form-label">
+                  <i class="fas fa-chalkboard me-1"></i> CLASS <span class="text-danger">*</span>
+                </label>
+                {{ form.current_class|add_class:"form-select" }}
+                <div class="invalid-feedback" id="current_class-error"></div>
+                {% if form.current_class.errors %}
+                  <div class="text-danger small">{{ form.current_class.errors }}</div>
+                {% endif %}
+              </div>
+
+              <!-- Section Field -->
+              <div class="col-md-4 mb-3">
+                <label for="{{ form.section.id_for_label }}" class="form-label">
+                  <i class="fas fa-puzzle-piece me-1"></i> {{ form.section.label }}
+                </label>
+                {{ form.section|add_class:"form-select" }}
+                <div class="invalid-feedback" id="section-error"></div>
+                {% if form.section.errors %}
+                  <div class="text-danger small">{{ form.section.errors }}</div>
+                {% endif %}
+              </div>
+
+              <!-- Date of Admission Field -->
+              <div class="col-md-4 mb-3">
+                <label for="{{ form.date_of_admission.id_for_label }}" class="form-label">
+                  <i class="fas fa-calendar-check me-1"></i> {{ form.date_of_admission.label }}
+                </label>
+                {{ form.date_of_admission|add_class:"form-control" }}
+                {% if form.date_of_admission.errors %}
+                  <div class="text-danger small">{{ form.date_of_admission.errors }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Information Section -->
+        <div id="contact" class="card mb-4 border-0 shadow-sm section-card">
+          <div class="card-header bg-light">
+            <h6 class="mb-0"><i class="fas fa-address-book me-2"></i>Contact Information</h6>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <!-- Mobile Number Field -->
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.mobile_number.id_for_label }}" class="form-label">
+                  <i class="fas fa-mobile-alt me-1"></i> {{ form.mobile_number.label }}
+                </label>
+                {{ form.mobile_number|add_class:"form-control" }}
+                <div class="invalid-feedback" id="mobile_number-error"></div>
+                {% if form.mobile_number.errors %}
+                  <div class="text-danger small">{{ form.mobile_number.errors }}</div>
+                {% endif %}
+              </div>
+
+              <!-- Email Field -->
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.email_id.id_for_label }}" class="form-label">
+                  <i class="fas fa-envelope me-1"></i> {{ form.email_id.label }}
+                </label>
+                {{ form.email_id|add_class:"form-control" }}
+                <div class="invalid-feedback" id="email_id-error"></div>
+                {% if form.email_id.errors %}
+                  <div class="text-danger small">{{ form.email_id.errors }}</div>
+                {% endif %}
+              </div>
+
+              <!-- Address Field -->
+              <div class="col-md-12 mb-3">
+                <label for="{{ form.address.id_for_label }}" class="form-label">
+                  <i class="fas fa-map-marker-alt me-1"></i> {{ form.address.label }} <span class="text-danger">*</span>
+                </label>
+                {{ form.address|add_class:"form-control" }}
+                <div class="invalid-feedback" id="address-error"></div>
+                {% if form.address.errors %}
+                  <div class="text-danger small">{{ form.address.errors }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Family Information Section -->
+        <div id="family" class="card mb-4 border-0 shadow-sm section-card">
+          <div class="card-header bg-light">
+            <h6 class="mb-0"><i class="fas fa-users me-2"></i>Family Information</h6>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <!-- Father's Name Field -->
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.Father_name.id_for_label }}" class="form-label">
+                  <i class="fas fa-user me-1"></i> {{ form.Father_name.label }} <span class="text-danger">*</span>
+                </label>
+                {{ form.Father_name|add_class:"form-control" }}
+                <div class="invalid-feedback" id="Father_name-error"></div>
+                {% if form.Father_name.errors %}
+                  <div class="text-danger small">{{ form.Father_name.errors }}</div>
+                {% endif %}
+              </div>
+
+              <!-- Father's Mobile Number Field -->
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.Father_mobile_number.id_for_label }}" class="form-label">
+                  <i class="fas fa-phone me-1"></i> {{ form.Father_mobile_number.label }} <span class="text-danger">*</span>
+                </label>
+                {{ form.Father_mobile_number|add_class:"form-control" }}
+                <div class="invalid-feedback" id="Father_mobile_number-error"></div>
+                {% if form.Father_mobile_number.errors %}
+                  <div class="text-danger small">{{ form.Father_mobile_number.errors }}</div>
+                {% endif %}
+              </div>
+
+              <!-- Father's Aadhar Field -->
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.Father_aadhar.id_for_label }}" class="form-label">
+                  <i class="fas fa-id-card me-1"></i> {{ form.Father_aadhar.label }}
+                </label>
+                {{ form.Father_aadhar|add_class:"form-control" }}
+                <div class="form-text">12-digit Aadhar number without spaces</div>
+                <div class="invalid-feedback" id="Father_aadhar-error"></div>
+                {% if form.Father_aadhar.errors %}
+                  <div class="text-danger small">{{ form.Father_aadhar.errors }}</div>
+                {% endif %}
+              </div>
+
+              <!-- Mother's Name Field -->
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.Mother_name.id_for_label }}" class="form-label">
+                  <i class="fas fa-user me-1"></i> {{ form.Mother_name.label }}
+                </label>
+                {{ form.Mother_name|add_class:"form-control" }}
+                {% if form.Mother_name.errors %}
+                  <div class="text-danger small">{{ form.Mother_name.errors }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Information Section -->
+        <div id="additional" class="card mb-4 border-0 shadow-sm section-card">
+          <div class="card-header bg-light">
+            <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Additional Information</h6>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <!-- Others Field -->
+              <div class="col-md-12 mb-3">
+                <label for="{{ form.others.id_for_label }}" class="form-label">
+                  <i class="fas fa-sticky-note me-1"></i> {{ form.others.label }}
+                </label>
+                {{ form.others|add_class:"form-control" }}
+                {% if form.others.errors %}
+                  <div class="text-danger small">{{ form.others.errors }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="row">
+          <div class="col-md-12">
+            <div class="d-flex justify-content-between">
+              <a href="{% url 'teacher_students_list' %}" class="btn btn-secondary">
+                <i class="fas fa-times me-1"></i> Cancel
+              </a>
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-1"></i>
+                {% if object %}Update Student{% else %}Save Student{% endif %}
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block extrajs %}
+<script>
+// Section navigation functionality
+document.addEventListener('DOMContentLoaded', function() {
+  // Hide all sections except the first one
+  const sections = document.querySelectorAll('.section-card');
+  sections.forEach((section, index) => {
+    if (index === 0) {
+      section.style.display = 'block';
+    } else {
+      section.style.display = 'none';
+    }
+  });
+
+  // Section navigation
+  const navButtons = document.querySelectorAll('[data-section]');
+  navButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const targetSection = this.dataset.section;
+
+      // Update navigation buttons
+      navButtons.forEach(btn => btn.classList.remove('active'));
+      this.classList.add('active');
+
+      // Update sections
+      sections.forEach(section => {
+        section.style.display = 'none';
+      });
+      document.getElementById(targetSection).style.display = 'block';
+    });
+  });
+
+  // Form progress tracking
+  function updateFormProgress() {
+    const form = document.getElementById('studentForm');
+    const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
+    let filledInputs = 0;
+
+    inputs.forEach(input => {
+      if (input.value.trim() !== '') {
+        filledInputs++;
+      }
+    });
+
+    const progress = Math.round((filledInputs / inputs.length) * 100);
+    document.getElementById('formProgress').style.width = progress + '%';
+    document.getElementById('progressPercentage').textContent = progress + '%';
+  }
+
+  // Update progress on input change
+  document.addEventListener('input', updateFormProgress);
+  document.addEventListener('change', updateFormProgress);
+
+  // Initial progress update
+  updateFormProgress();
+
+  // Form validation
+  const form = document.getElementById('studentForm');
+  form.addEventListener('submit', function(event) {
+    if (!form.checkValidity()) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    form.classList.add('was-validated');
+  });
+});
+</script>
+{% endblock extrajs %}
+
+{% block morejs %}
+<script>
+// Load sections when class changes
+function loadSections(classId) {
+    if (classId) {
+        fetch(`/teacher-dashboard/students/api/class/${classId}/sections/`)
+            .then(response => response.json())
+            .then(data => {
+                const sectionSelect = document.getElementById('id_section');
+                sectionSelect.innerHTML = '<option value="">---------</option>';
+                
+                if (data.sections) {
+                    data.sections.forEach(section => {
+                        const option = document.createElement('option');
+                        option.value = section.value;
+                        option.textContent = section.text;
+                        sectionSelect.appendChild(option);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error loading sections:', error);
+            });
+    }
+}
+
+// Form validation
+document.getElementById('studentForm').addEventListener('submit', function(e) {
+    const requiredFields = this.querySelectorAll('[required]');
+    let isValid = true;
+    
+    requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+            field.classList.add('is-invalid');
+            isValid = false;
+        } else {
+            field.classList.remove('is-invalid');
+        }
+    });
+    
+    if (!isValid) {
+        e.preventDefault();
+        alert('Please fill in all required fields.');
+    }
+});
+
+// Date picker setup
+document.addEventListener('DOMContentLoaded', function() {
+    // Set max date for date of birth (not in future)
+    const dobField = document.getElementById('id_date_of_birth');
+    if (dobField) {
+        const today = new Date().toISOString().split('T')[0];
+        dobField.setAttribute('max', today);
+    }
+    
+    // Set default date for admission date
+    const admissionField = document.getElementById('id_date_of_admission');
+    if (admissionField && !admissionField.value) {
+        const today = new Date().toISOString().split('T')[0];
+        admissionField.value = today;
+    }
+});
+</script>
+{% endblock morejs %}

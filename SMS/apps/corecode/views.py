@@ -6,6 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import HttpResponseRedirect, redirect, render, get_object_or_404, HttpResponse
 from django.http import JsonResponse
+from functools import wraps
 from django.urls import reverse_lazy
 from django.views.generic import ListView, TemplateView, View
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
@@ -42,7 +43,27 @@ from .models import (
 )
 
 
-class IndexView(LoginRequiredMixin, TemplateView):
+# Custom decorator to restrict access to admin users only
+def admin_required(view_func):
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        if not request.user.is_superuser:
+            messages.error(request, "Access denied. Only administrators can access this page.")
+            return render(request, '403.html', status=403)
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view
+
+
+# Custom mixin for class-based views to restrict access to admin users only
+class AdminRequiredMixin:
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_superuser:
+            messages.error(request, "Access denied. Only administrators can access this page.")
+            return render(request, '403.html', status=403)
+        return super().dispatch(request, *args, **kwargs)
+
+
+class IndexView(LoginRequiredMixin, AdminRequiredMixin, TemplateView):
     template_name = "index.html"
 
     def get_context_data(self, **kwargs):
@@ -187,6 +208,8 @@ class IndexView(LoginRequiredMixin, TemplateView):
 
 
 
+@login_required
+@admin_required
 def site_config_view(request):
     profile = CollegeProfile.objects.first()
     if request.method == 'POST':
@@ -199,7 +222,7 @@ def site_config_view(request):
     return render(request, 'corecode/siteconfig.html', {'form': form, 'title': 'Site Configuration'})
 
 
-class SessionListView(LoginRequiredMixin, SuccessMessageMixin, ListView):
+class SessionListView(LoginRequiredMixin, AdminRequiredMixin, SuccessMessageMixin, ListView):
     model = AcademicSession
     template_name = "corecode/session_list.html"
 
@@ -209,7 +232,7 @@ class SessionListView(LoginRequiredMixin, SuccessMessageMixin, ListView):
         return context
 
 
-class SessionCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+class SessionCreateView(LoginRequiredMixin, AdminRequiredMixin, SuccessMessageMixin, CreateView):
     model = AcademicSession
     form_class = AcademicSessionForm
     template_name = "corecode/mgt_form.html"
@@ -225,7 +248,7 @@ class SessionCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
 # SessionUpdateView removed - now using AJAX update
 
 
-class SessionDeleteView(LoginRequiredMixin, DeleteView):
+class SessionDeleteView(LoginRequiredMixin, AdminRequiredMixin, DeleteView):
     model = AcademicSession
     success_url = reverse_lazy("sessions")
     template_name = "corecode/core_confirm_delete.html"
@@ -240,7 +263,7 @@ class SessionDeleteView(LoginRequiredMixin, DeleteView):
         return super(SessionDeleteView, self).delete(request, *args, **kwargs)
 
 
-class TermListView(LoginRequiredMixin, SuccessMessageMixin, ListView):
+class TermListView(LoginRequiredMixin, AdminRequiredMixin, SuccessMessageMixin, ListView):
     model = AcademicTerm
     template_name = "corecode/term_list.html"
 
@@ -250,7 +273,7 @@ class TermListView(LoginRequiredMixin, SuccessMessageMixin, ListView):
         return context
 
 
-class TermCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+class TermCreateView(LoginRequiredMixin, AdminRequiredMixin, SuccessMessageMixin, CreateView):
     model = AcademicTerm
     form_class = AcademicTermForm
     template_name = "corecode/mgt_form.html"
@@ -261,7 +284,7 @@ class TermCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
 # TermUpdateView removed - now using AJAX update
 
 
-class TermDeleteView(LoginRequiredMixin, DeleteView):
+class TermDeleteView(LoginRequiredMixin, AdminRequiredMixin, DeleteView):
     model = AcademicTerm
     success_url = reverse_lazy("terms")
     template_name = "corecode/core_confirm_delete.html"
@@ -276,7 +299,7 @@ class TermDeleteView(LoginRequiredMixin, DeleteView):
         return super(TermDeleteView, self).delete(request, *args, **kwargs)
 
 
-class ClassListView(LoginRequiredMixin, SuccessMessageMixin, ListView):
+class ClassListView(LoginRequiredMixin, AdminRequiredMixin, SuccessMessageMixin, ListView):
     model = StudentClass
     template_name = "corecode/class_list.html"
 
@@ -286,7 +309,7 @@ class ClassListView(LoginRequiredMixin, SuccessMessageMixin, ListView):
         return context
 
 
-class ClassCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+class ClassCreateView(LoginRequiredMixin, AdminRequiredMixin, SuccessMessageMixin, CreateView):
     model = StudentClass
     form_class = StudentClassForm
     template_name = "corecode/mgt_form.html"
@@ -297,7 +320,7 @@ class ClassCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
 # ClassUpdateView removed - now using AJAX update
 
 
-class ClassDeleteView(LoginRequiredMixin, DeleteView):
+class ClassDeleteView(LoginRequiredMixin, AdminRequiredMixin, DeleteView):
     model = StudentClass
     success_url = reverse_lazy("classes")
     template_name = "corecode/core_confirm_delete.html"
@@ -310,7 +333,7 @@ class ClassDeleteView(LoginRequiredMixin, DeleteView):
         return super(ClassDeleteView, self).delete(request, *args, **kwargs)
 
 
-class SubjectListView(LoginRequiredMixin, SuccessMessageMixin, ListView):
+class SubjectListView(LoginRequiredMixin, AdminRequiredMixin, SuccessMessageMixin, ListView):
     model = Subject
     template_name = "corecode/subject_list.html"
 
@@ -320,15 +343,14 @@ class SubjectListView(LoginRequiredMixin, SuccessMessageMixin, ListView):
         return context
 
 
-class SubjectCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+class SubjectCreateView(LoginRequiredMixin, AdminRequiredMixin, SuccessMessageMixin, CreateView):
     model = Subject
     form_class = SubjectForm
     template_name = "corecode/mgt_form.html"
     success_url = reverse_lazy("subjects")
     success_message = "New subject successfully added"
-
-
-class SubjectUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+    
+class SubjectUpdateView(LoginRequiredMixin, AdminRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Subject
     fields = ["name"]
     success_url = reverse_lazy("subjects")
@@ -336,7 +358,7 @@ class SubjectUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     template_name = "corecode/mgt_form.html"
 
 
-class SubjectDeleteView(LoginRequiredMixin, DeleteView):
+class SubjectDeleteView(LoginRequiredMixin, AdminRequiredMixin, DeleteView):
     model = Subject
     success_url = reverse_lazy("subjects")
     template_name = "corecode/core_confirm_delete.html"
@@ -348,7 +370,7 @@ class SubjectDeleteView(LoginRequiredMixin, DeleteView):
         return super(SubjectDeleteView, self).delete(request, *args, **kwargs)
 
 
-class CurrentSessionAndTermView(LoginRequiredMixin, View):
+class CurrentSessionAndTermView(LoginRequiredMixin, AdminRequiredMixin, View):
     """Current SEssion and Term"""
 
     form_class = CurrentSessionForm
@@ -375,6 +397,8 @@ class CurrentSessionAndTermView(LoginRequiredMixin, View):
         return render(request, self.template_name, {"form": form})
 
 
+@login_required
+@admin_required
 def college_profile_view(request):
     profile = get_object_or_404(CollegeProfile)
     return render(request, 'corecode/college_profile.html', {'profile': profile})
@@ -391,6 +415,7 @@ def custom_logout_view(request):
 
 
 @login_required
+@admin_required
 def general_settings(request):
     """General Settings view"""
     profile = get_object_or_404(CollegeProfile)
@@ -411,6 +436,7 @@ def general_settings(request):
 
 
 @login_required
+@admin_required
 def academic_settings(request):
     """Academic Settings view"""
     if request.method == 'POST':
@@ -440,6 +466,7 @@ def academic_settings(request):
 
 
 @login_required
+@admin_required
 def database_management(request):
     """Database Management view"""
     context = {
@@ -453,6 +480,7 @@ def database_management(request):
 
 
 @login_required
+@admin_required
 def backup_restore(request):
     """Backup & Restore view"""
     context = {
@@ -463,6 +491,7 @@ def backup_restore(request):
 
 
 @login_required
+@admin_required
 def user_permissions(request):
     """User Permissions view"""
     context = {
@@ -473,6 +502,7 @@ def user_permissions(request):
 
 
 @login_required
+@admin_required
 def security_logs(request):
     """Security & Logs view"""
     context = {
@@ -482,6 +512,7 @@ def security_logs(request):
 
 
 @login_required
+@admin_required
 def system_settings_dashboard(request):
     """System Settings Dashboard"""
     context = {
@@ -558,6 +589,7 @@ def database_management(request):
 
 
 @login_required
+@admin_required
 def backup_restore(request):
     """Backup & Restore Page"""
     from .models import Backup, AutomatedBackupSettings
@@ -587,6 +619,7 @@ def backup_restore(request):
 
 
 @login_required
+@admin_required
 def user_permissions(request):
     """User Permissions Page"""
     User = get_user_model()
@@ -599,6 +632,7 @@ def user_permissions(request):
 
 
 @login_required
+@admin_required
 def security_logs(request):
     """Security & Logs Page"""
     context = {
@@ -607,6 +641,8 @@ def security_logs(request):
     return render(request, 'corecode/security_logs.html', context)
 
 
+@login_required
+@admin_required
 def site_config(request):
     try:
         profile = CollegeProfile.objects.first()
@@ -1633,6 +1669,7 @@ def delete_section(request, section_id):
 
 
 @login_required
+@admin_required
 def create_backup_ajax(request):
     """API endpoint to create a backup"""
     if request.method != 'POST':
@@ -1787,6 +1824,7 @@ def create_backup_ajax(request):
 
 
 @login_required
+@admin_required
 def restore_backup_ajax(request, backup_id):
     """API endpoint to restore from a backup"""
     if request.method != 'POST':
@@ -1854,6 +1892,7 @@ def restore_backup_ajax(request, backup_id):
 
 
 @login_required
+@admin_required
 def delete_backup_ajax(request, backup_id):
     """API endpoint to delete a backup"""
     if request.method != 'POST':
@@ -1880,6 +1919,7 @@ def delete_backup_ajax(request, backup_id):
 
 
 @login_required
+@admin_required
 def download_backup_ajax(request, backup_id):
     """API endpoint to download a backup"""
     from .models import Backup
@@ -1916,6 +1956,7 @@ def download_backup_ajax(request, backup_id):
 
 
 @login_required
+@admin_required
 def save_automated_backup_settings(request):
     """API endpoint to save automated backup settings"""
     if request.method != 'POST':

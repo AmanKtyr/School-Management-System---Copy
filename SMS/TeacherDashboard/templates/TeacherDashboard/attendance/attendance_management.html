@@ -1,0 +1,428 @@
+{% extends 'TeacherDashboard/base.html' %}
+{% load static %}
+
+{% block title %}Attendance Management - Teacher Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .attendance-card {
+        border-left: 4px solid #007bff;
+        transition: all 0.3s ease;
+    }
+    .attendance-card:hover {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .student-row {
+        border-bottom: 1px solid #dee2e6;
+        padding: 10px 0;
+    }
+    .student-row:last-child {
+        border-bottom: none;
+    }
+    .attendance-btn {
+        margin: 2px;
+        min-width: 80px;
+    }
+    .stats-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+    }
+    .holiday-indicator {
+        background: #ffc107;
+        color: #000;
+        border-radius: 20px;
+        padding: 5px 15px;
+        font-size: 0.9em;
+        font-weight: bold;
+    }
+    .sunday-indicator {
+        background: #6c757d;
+        color: white;
+        border-radius: 20px;
+        padding: 5px 15px;
+        font-size: 0.9em;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-0">
+                        <i class="fas fa-calendar-check text-primary"></i>
+                        Attendance Management
+                    </h2>
+                    <p class="text-muted mb-0">Mark and manage student attendance</p>
+                </div>
+                <div>
+                    <a href="{% url 'teacher_attendance_reports' %}" class="btn btn-info">
+                        <i class="fas fa-chart-bar"></i> Reports
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label for="class_id" class="form-label">Select Class</label>
+                    <select name="class_id" id="class_id" class="form-select" onchange="loadSections(this.value)">
+                        <option value="">Select Class</option>
+                        {% for class in classes %}
+                            <option value="{{ class.id }}" {% if class.id|stringformat:"s" == selected_class_id %}selected{% endif %}>
+                                {{ class.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="section" class="form-label">Select Section</label>
+                    <select name="section" id="section" class="form-select">
+                        <option value="">All Sections</option>
+                        {% for section in sections %}
+                            <option value="{{ section }}" {% if section == selected_section %}selected{% endif %}>
+                                {{ section }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="attendance_date" class="form-label">Attendance Date</label>
+                    <input type="date" name="attendance_date" id="attendance_date" class="form-control" 
+                           value="{{ attendance_date|date:'Y-m-d' }}" min="{{ one_week_ago|date:'Y-m-d' }}" max="{{ today|date:'Y-m-d' }}">
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="fas fa-search"></i> Load Students
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="clearFilters()">
+                        <i class="fas fa-times"></i> Clear
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if selected_class_id %}
+    <!-- Attendance Date Info -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="alert alert-info d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>Attendance for:</strong> {{ attendance_date|date:"l, F d, Y" }}
+                    {% if selected_class_name %}
+                        | <strong>Class:</strong> {{ selected_class_name }}
+                        {% if selected_section %}| <strong>Section:</strong> {{ selected_section }}{% endif %}
+                    {% endif %}
+                </div>
+                <div>
+                    {% if is_sunday %}
+                        <span class="sunday-indicator">
+                            <i class="fas fa-calendar-times"></i> Sunday
+                        </span>
+                    {% elif holiday %}
+                        <span class="holiday-indicator">
+                            <i class="fas fa-calendar-alt"></i> Holiday: {{ holiday.name }}
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card stats-card">
+                <div class="card-body text-center">
+                    <i class="fas fa-users fa-2x mb-2"></i>
+                    <h4>{{ students.count }}</h4>
+                    <p class="mb-0">Total Students</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-check-circle fa-2x mb-2"></i>
+                    <h4>{{ present_leave }}</h4>
+                    <p class="mb-0">Present/Leave</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-times-circle fa-2x mb-2"></i>
+                    <h4>{{ absent }}</h4>
+                    <p class="mb-0">Absent</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body text-center">
+                    <i class="fas fa-calendar-alt fa-2x mb-2"></i>
+                    <h4>{{ holiday_count }}</h4>
+                    <p class="mb-0">Holiday/Sunday</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attendance Form -->
+    {% if students %}
+    <div class="card attendance-card">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-list-check"></i> Mark Attendance
+                <span class="badge bg-primary ms-2">{{ students.count }} Students</span>
+            </h5>
+        </div>
+        <div class="card-body">
+            <form id="attendanceForm" method="post" action="{% url 'teacher_submit_attendance' %}">
+                {% csrf_token %}
+                <input type="hidden" name="attendance_date" value="{{ attendance_date|date:'Y-m-d' }}">
+                
+                <!-- Bulk Actions -->
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-success" onclick="markAll('Present')">
+                                <i class="fas fa-check"></i> Mark All Present
+                            </button>
+                            <button type="button" class="btn btn-outline-danger" onclick="markAll('Absent')">
+                                <i class="fas fa-times"></i> Mark All Absent
+                            </button>
+                            <button type="button" class="btn btn-outline-warning" onclick="markAll('Leave')">
+                                <i class="fas fa-calendar-minus"></i> Mark All Leave
+                            </button>
+                            {% if is_sunday %}
+                            <button type="button" class="btn btn-outline-secondary" onclick="markAll('Sunday')">
+                                <i class="fas fa-calendar-times"></i> Mark All Sunday
+                            </button>
+                            {% elif holiday %}
+                            <button type="button" class="btn btn-outline-warning" onclick="markAll('Holiday')">
+                                <i class="fas fa-calendar-alt"></i> Mark All Holiday
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Students List -->
+                <div class="row">
+                    {% for student in students %}
+                    <div class="col-12 student-row">
+                        <div class="row align-items-center">
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center">
+                                    {% if student.passport %}
+                                        <img src="{{ student.passport.url }}" alt="{{ student.fullname }}" 
+                                             class="rounded-circle me-3" width="40" height="40">
+                                    {% else %}
+                                        <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center me-3" 
+                                             style="width: 40px; height: 40px;">
+                                            <i class="fas fa-user text-white"></i>
+                                        </div>
+                                    {% endif %}
+                                    <div>
+                                        <strong>{{ student.fullname }}</strong>
+                                        <br><small class="text-muted">{{ student.registration_number|default:"No Reg. No." }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="btn-group" role="group" data-student-id="{{ student.id }}">
+                                    <input type="radio" class="btn-check" name="attendance_{{ student.id }}" 
+                                           id="present_{{ student.id }}" value="Present" 
+                                           {% if student.attendance_status == 'Present' %}checked{% endif %}>
+                                    <label class="btn btn-outline-success attendance-btn" for="present_{{ student.id }}">
+                                        <i class="fas fa-check"></i> Present
+                                    </label>
+
+                                    <input type="radio" class="btn-check" name="attendance_{{ student.id }}" 
+                                           id="absent_{{ student.id }}" value="Absent" 
+                                           {% if student.attendance_status == 'Absent' %}checked{% endif %}>
+                                    <label class="btn btn-outline-danger attendance-btn" for="absent_{{ student.id }}">
+                                        <i class="fas fa-times"></i> Absent
+                                    </label>
+
+                                    <input type="radio" class="btn-check" name="attendance_{{ student.id }}" 
+                                           id="leave_{{ student.id }}" value="Leave" 
+                                           {% if student.attendance_status == 'Leave' %}checked{% endif %}>
+                                    <label class="btn btn-outline-warning attendance-btn" for="leave_{{ student.id }}">
+                                        <i class="fas fa-calendar-minus"></i> Leave
+                                    </label>
+
+                                    {% if is_sunday %}
+                                    <input type="radio" class="btn-check" name="attendance_{{ student.id }}" 
+                                           id="sunday_{{ student.id }}" value="Sunday" 
+                                           {% if student.attendance_status == 'Sunday' %}checked{% endif %}>
+                                    <label class="btn btn-outline-secondary attendance-btn" for="sunday_{{ student.id }}">
+                                        <i class="fas fa-calendar-times"></i> Sunday
+                                    </label>
+                                    {% elif holiday %}
+                                    <input type="radio" class="btn-check" name="attendance_{{ student.id }}" 
+                                           id="holiday_{{ student.id }}" value="Holiday" 
+                                           {% if student.attendance_status == 'Holiday' %}checked{% endif %}>
+                                    <label class="btn btn-outline-warning attendance-btn" for="holiday_{{ student.id }}">
+                                        <i class="fas fa-calendar-alt"></i> Holiday
+                                    </label>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="text" name="comment_{{ student.id }}" class="form-control form-control-sm" 
+                                       placeholder="Comment (optional)" value="{{ student.attendance_comment|default:'' }}">
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Submit Button -->
+                <div class="row mt-4">
+                    <div class="col-12 text-center">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-save"></i> Save Attendance
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-users fa-4x text-muted mb-3"></i>
+            <h4 class="text-muted">No Students Found</h4>
+            <p class="text-muted">Please select a class to view students for attendance marking.</p>
+        </div>
+    </div>
+    {% endif %}
+    {% endif %}
+
+    <!-- Weekly Attendance Summary -->
+    {% if weekly_attendance %}
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-chart-line"></i> Weekly Attendance Summary
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Day</th>
+                            <th>Present</th>
+                            <th>Absent</th>
+                            <th>Leave</th>
+                            <th>Holiday/Sunday</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for day in weekly_attendance %}
+                        <tr {% if day.is_sunday or day.is_holiday %}class="table-warning"{% endif %}>
+                            <td>{{ day.date|date:"M d" }}</td>
+                            <td>
+                                {{ day.date|date:"D" }}
+                                {% if day.is_sunday %}
+                                    <span class="badge bg-secondary">Sunday</span>
+                                {% elif day.is_holiday %}
+                                    <span class="badge bg-warning">Holiday</span>
+                                {% endif %}
+                            </td>
+                            <td><span class="badge bg-success">{{ day.present }}</span></td>
+                            <td><span class="badge bg-danger">{{ day.absent }}</span></td>
+                            <td><span class="badge bg-warning">{{ day.leave }}</span></td>
+                            <td><span class="badge bg-secondary">{{ day.holiday }}</span></td>
+                            <td><strong>{{ day.total }}</strong></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Load sections when class changes
+function loadSections(classId) {
+    const sectionSelect = document.getElementById('section');
+    sectionSelect.innerHTML = '<option value="">All Sections</option>';
+    
+    if (classId) {
+        // You can implement AJAX call to load sections here
+        // For now, we'll submit the form to reload with class filter
+    }
+}
+
+// Clear all filters
+function clearFilters() {
+    document.getElementById('class_id').value = '';
+    document.getElementById('section').value = '';
+    document.getElementById('attendance_date').value = '{{ today|date:"Y-m-d" }}';
+}
+
+// Mark all students with specific status
+function markAll(status) {
+    const radioButtons = document.querySelectorAll(`input[type="radio"][value="${status}"]`);
+    radioButtons.forEach(radio => {
+        radio.checked = true;
+    });
+}
+
+// Form submission with AJAX
+document.getElementById('attendanceForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    fetch('{% url "teacher_submit_attendance" %}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            alert(data.message);
+            // Optionally reload the page to show updated statistics
+            location.reload();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while saving attendance.');
+    });
+});
+
+// Set today's date as default
+document.addEventListener('DOMContentLoaded', function() {
+    const dateField = document.getElementById('attendance_date');
+    if (!dateField.value) {
+        dateField.value = '{{ today|date:"Y-m-d" }}';
+    }
+});
+</script>
+{% endblock %}

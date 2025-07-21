@@ -1,0 +1,418 @@
+{% extends 'TeacherDashboard/base.html' %}
+{% load static %}
+
+{% block title %}Attendance Reports - Teacher Dashboard{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'css/datatables.min.css' %}" rel="stylesheet">
+<style>
+    .report-card {
+        border-left: 4px solid #17a2b8;
+        transition: all 0.3s ease;
+    }
+    .report-card:hover {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+    .stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 20px;
+        text-align: center;
+    }
+    .stat-card.success {
+        background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+    }
+    .stat-card.danger {
+        background: linear-gradient(135deg, #cb2d3e 0%, #ef473a 100%);
+    }
+    .stat-card.warning {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    .stat-card.info {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    .chart-container {
+        position: relative;
+        height: 300px;
+        margin-bottom: 20px;
+    }
+    .filter-section {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .daily-attendance-table {
+        font-size: 0.9em;
+    }
+    .attendance-percentage {
+        font-weight: bold;
+        padding: 5px 10px;
+        border-radius: 20px;
+    }
+    .percentage-excellent {
+        background: #d4edda;
+        color: #155724;
+    }
+    .percentage-good {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+    .percentage-average {
+        background: #fff3cd;
+        color: #856404;
+    }
+    .percentage-poor {
+        background: #f8d7da;
+        color: #721c24;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-0">
+                        <i class="fas fa-chart-bar text-info"></i>
+                        Attendance Reports
+                    </h2>
+                    <p class="text-muted mb-0">Analyze student attendance patterns and statistics</p>
+                </div>
+                <div>
+                    <button class="btn btn-success" onclick="exportReport()">
+                        <i class="fas fa-download"></i> Export Report
+                    </button>
+                    <a href="{% url 'teacher_attendance_management' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Attendance
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filter-section">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label for="class_id" class="form-label">Select Class</label>
+                <select name="class_id" id="class_id" class="form-select">
+                    <option value="">Select Class</option>
+                    {% for class in classes %}
+                        <option value="{{ class.id }}" {% if class.id|stringformat:"s" == selected_class_id %}selected{% endif %}>
+                            {{ class.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="section" class="form-label">Select Section</label>
+                <select name="section" id="section" class="form-select">
+                    <option value="">All Sections</option>
+                    {% for section in sections %}
+                        <option value="{{ section }}" {% if section == selected_section %}selected{% endif %}>
+                            {{ section }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="date_from" class="form-label">From Date</label>
+                <input type="date" name="date_from" id="date_from" class="form-control" 
+                       value="{{ date_from|date:'Y-m-d' }}">
+            </div>
+            <div class="col-md-2">
+                <label for="date_to" class="form-label">To Date</label>
+                <input type="date" name="date_to" id="date_to" class="form-control" 
+                       value="{{ date_to|date:'Y-m-d' }}">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search"></i> Generate Report
+                </button>
+            </div>
+        </form>
+    </div>
+
+    {% if selected_class_id and attendance_data %}
+    <!-- Report Header -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <strong>Report Period:</strong> {{ date_from|date:"M d, Y" }} to {{ date_to|date:"M d, Y" }}
+                {% if selected_class_id %}
+                    | <strong>Class:</strong> 
+                    {% for class in classes %}
+                        {% if class.id|stringformat:"s" == selected_class_id %}{{ class.name }}{% endif %}
+                    {% endfor %}
+                    {% if selected_section %}| <strong>Section:</strong> {{ selected_section }}{% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <div class="stat-card success">
+            <i class="fas fa-check-circle fa-2x mb-2"></i>
+            <h3>{{ attendance_data.stats.total_present|default:0 }}</h3>
+            <p class="mb-0">Total Present</p>
+        </div>
+        <div class="stat-card danger">
+            <i class="fas fa-times-circle fa-2x mb-2"></i>
+            <h3>{{ attendance_data.stats.total_absent|default:0 }}</h3>
+            <p class="mb-0">Total Absent</p>
+        </div>
+        <div class="stat-card warning">
+            <i class="fas fa-calendar-minus fa-2x mb-2"></i>
+            <h3>{{ attendance_data.stats.total_leave|default:0 }}</h3>
+            <p class="mb-0">Total Leave</p>
+        </div>
+        <div class="stat-card info">
+            <i class="fas fa-calendar-alt fa-2x mb-2"></i>
+            <h3>{{ attendance_data.stats.total_holiday|default:0 }}</h3>
+            <p class="mb-0">Holidays/Sundays</p>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card report-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-pie-chart text-info"></i>
+                        Attendance Distribution
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="attendanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card report-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-line-chart text-info"></i>
+                        Daily Attendance Trend
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Attendance Table -->
+    {% if attendance_data.daily %}
+    <div class="card report-card">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-table text-info"></i>
+                Daily Attendance Summary
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="dailyAttendanceTable" class="table table-striped daily-attendance-table">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Date</th>
+                            <th>Day</th>
+                            <th>Present</th>
+                            <th>Absent</th>
+                            <th>Leave</th>
+                            <th>Holiday/Sunday</th>
+                            <th>Total</th>
+                            <th>Attendance %</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for date, data in attendance_data.daily.items %}
+                        {% with total=data.Present|add:data.Absent|add:data.Leave %}
+                        {% with percentage=data.Present|floatformat:0|add:0 %}
+                        {% if total > 0 %}
+                            {% widthratio data.Present total 100 as attendance_percentage %}
+                        {% else %}
+                            {% widthratio 0 1 100 as attendance_percentage %}
+                        {% endif %}
+                        <tr>
+                            <td>{{ date|date:"M d, Y" }}</td>
+                            <td>{{ date|date:"D" }}</td>
+                            <td><span class="badge bg-success">{{ data.Present|default:0 }}</span></td>
+                            <td><span class="badge bg-danger">{{ data.Absent|default:0 }}</span></td>
+                            <td><span class="badge bg-warning">{{ data.Leave|default:0 }}</span></td>
+                            <td><span class="badge bg-secondary">{{ data.Holiday|default:0 }}{{ data.Sunday|default:0 }}</span></td>
+                            <td><strong>{{ total }}</strong></td>
+                            <td>
+                                {% if total > 0 %}
+                                    <span class="attendance-percentage 
+                                        {% if attendance_percentage >= 90 %}percentage-excellent
+                                        {% elif attendance_percentage >= 75 %}percentage-good
+                                        {% elif attendance_percentage >= 60 %}percentage-average
+                                        {% else %}percentage-poor{% endif %}">
+                                        {{ attendance_percentage }}%
+                                    </span>
+                                {% else %}
+                                    <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endwith %}
+                        {% endwith %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- No Data Message -->
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-chart-bar fa-4x text-muted mb-3"></i>
+            <h4 class="text-muted">No Data Available</h4>
+            <p class="text-muted">Please select a class and date range to generate attendance reports.</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/datatables.min.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    {% if attendance_data %}
+    // Attendance Distribution Pie Chart
+    const attendanceCtx = document.getElementById('attendanceChart').getContext('2d');
+    new Chart(attendanceCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Present', 'Absent', 'Leave', 'Holiday/Sunday'],
+            datasets: [{
+                data: [
+                    {{ attendance_data.stats.total_present|default:0 }},
+                    {{ attendance_data.stats.total_absent|default:0 }},
+                    {{ attendance_data.stats.total_leave|default:0 }},
+                    {{ attendance_data.stats.total_holiday|default:0 }}
+                ],
+                backgroundColor: [
+                    '#28a745',
+                    '#dc3545',
+                    '#ffc107',
+                    '#6c757d'
+                ],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // Daily Trend Line Chart
+    const trendCtx = document.getElementById('trendChart').getContext('2d');
+    const dailyData = {{ attendance_data.daily|safe }};
+    
+    const dates = Object.keys(dailyData).sort();
+    const presentData = dates.map(date => dailyData[date].Present || 0);
+    const absentData = dates.map(date => dailyData[date].Absent || 0);
+    
+    new Chart(trendCtx, {
+        type: 'line',
+        data: {
+            labels: dates.map(date => new Date(date).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})),
+            datasets: [{
+                label: 'Present',
+                data: presentData,
+                borderColor: '#28a745',
+                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                tension: 0.4
+            }, {
+                label: 'Absent',
+                data: absentData,
+                borderColor: '#dc3545',
+                backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+    {% endif %}
+
+    // Initialize DataTable
+    {% if attendance_data.daily %}
+    $('#dailyAttendanceTable').DataTable({
+        "pageLength": 15,
+        "order": [[ 0, "desc" ]],
+        "columnDefs": [
+            { "orderable": false, "targets": [7] }
+        ]
+    });
+    {% endif %}
+});
+
+// Export report function
+function exportReport() {
+    // You can implement CSV export or PDF generation here
+    alert('Export functionality will be implemented here');
+}
+
+// Set default dates
+document.addEventListener('DOMContentLoaded', function() {
+    const dateFrom = document.getElementById('date_from');
+    const dateTo = document.getElementById('date_to');
+    
+    if (!dateFrom.value) {
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        dateFrom.value = thirtyDaysAgo.toISOString().split('T')[0];
+    }
+    
+    if (!dateTo.value) {
+        const today = new Date();
+        dateTo.value = today.toISOString().split('T')[0];
+    }
+});
+</script>
+{% endblock %}
