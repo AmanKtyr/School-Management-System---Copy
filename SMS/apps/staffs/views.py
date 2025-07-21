@@ -5,19 +5,23 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
+from django.http import JsonResponse
+from django.contrib import messages
 
 from .models import Staff
-
 
 class StaffListView(LoginRequiredMixin, ListView):
     model = Staff
 
-
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Clear staff credentials from session if present
+        if 'show_staff_credentials' in self.request.session:
+            del self.request.session['show_staff_credentials']
+        return context
 class StaffDetailView(LoginRequiredMixin,DetailView):
     model = Staff
     template_name = "staffs/staff_detail.html"
-
-
 class StaffCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Staff
     fields = "__all__"
@@ -32,10 +36,25 @@ class StaffCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         )
         form.fields["Subject_specification"].widget = widgets.Textarea(attrs={"rows": 1})
         form.fields["address"].widget = widgets.Textarea(attrs={"rows": 1})
-       
         form.fields["others"].widget = widgets.Textarea(attrs={"rows": 1})
         return form
 
+    def form_valid(self, form):
+        """Override form_valid to handle login credentials popup"""
+        response = super().form_valid(form)
+
+        # Get the created staff object
+        staff = self.object
+
+        # Store credentials in session for popup display
+        self.request.session['show_staff_credentials'] = {
+            'staff_name': staff.fullname,
+            'login_id': staff.staff_login_id,
+            'password': staff.staff_password,
+            'registration_number': staff.registration_number
+        }
+
+        return response
 
 class StaffUpdateView( LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Staff

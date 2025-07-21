@@ -44,6 +44,10 @@ When you run the migration, a default superuser is created:
 Username: Admin
 Password: Admin@#12
 ```
+Teacher Id Password
+Id : UID
+Password : UID@#12
+
 You can log in to the admin panel at:  
 [http://127.0.0.1:8000/admin](http://127.0.0.1:8000/admin)
 
