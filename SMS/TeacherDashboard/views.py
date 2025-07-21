@@ -58,10 +58,10 @@ def teacher_students_list(request):
             'students': students,
             'staff': staff,
         }
-        return render(request, 'TeacherDashboard/students_list.html', context)
+        return render(request, 'TeacherDashboard/students/students_list.html', context)
     except Staff.DoesNotExist:
         messages.error(request, 'Staff profile not found.')
-        return render(request, 'TeacherDashboard/students_list.html', {})
+        return render(request, 'TeacherDashboard/students/students_list.html', {})
 
 
 @login_required
@@ -74,10 +74,10 @@ def teacher_student_detail(request, pk):
             'student': student,
             'staff': staff,
         }
-        return render(request, 'TeacherDashboard/student_detail.html', context)
+        return render(request, 'TeacherDashboard/students/student_detail.html', context)
     except Staff.DoesNotExist:
         messages.error(request, 'Staff profile not found.')
-        return render(request, 'TeacherDashboard/student_detail.html', {'student': student})
+        return render(request, 'TeacherDashboard/students/student_detail.html', {'student': student})
 
 
 @login_required
@@ -92,10 +92,10 @@ def teacher_attendance_list(request):
             'attendance_records': attendance_records,
             'staff': staff,
         }
-        return render(request, 'TeacherDashboard/attendance_list.html', context)
+        return render(request, 'TeacherDashboard/attendance/attendance_list.html', context)
     except Staff.DoesNotExist:
         messages.error(request, 'Staff profile not found.')
-        return render(request, 'TeacherDashboard/attendance_list.html', {})
+        return render(request, 'TeacherDashboard/attendance/attendance_list.html', {})
 
 
 @login_required
@@ -109,10 +109,10 @@ def teacher_attendance_mark(request):
             'students': students,
             'staff': staff,
         }
-        return render(request, 'TeacherDashboard/attendance_mark.html', context)
+        return render(request, 'TeacherDashboard/attendance/attendance_mark.html', context)
     except Staff.DoesNotExist:
         messages.error(request, 'Staff profile not found.')
-        return render(request, 'TeacherDashboard/attendance_mark.html', {})
+        return render(request, 'TeacherDashboard/attendance/attendance_mark.html', {})
 
 
 @login_required
@@ -126,10 +126,10 @@ def teacher_exams_list(request):
             'exams': exams,
             'staff': staff,
         }
-        return render(request, 'TeacherDashboard/exams_list.html', context)
+        return render(request, 'TeacherDashboard/exams/exams_list.html', context)
     except Staff.DoesNotExist:
         messages.error(request, 'Staff profile not found.')
-        return render(request, 'TeacherDashboard/exams_list.html', {})
+        return render(request, 'TeacherDashboard/exams/exams_list.html', {})
 
 
 @login_required
@@ -145,10 +145,10 @@ def teacher_marks_entry(request):
             'students': students,
             'staff': staff,
         }
-        return render(request, 'TeacherDashboard/marks_entry.html', context)
+        return render(request, 'TeacherDashboard/marks/marks_entry.html', context)
     except Staff.DoesNotExist:
         messages.error(request, 'Staff profile not found.')
-        return render(request, 'TeacherDashboard/marks_entry.html', {})
+        return render(request, 'TeacherDashboard/marks/marks_entry.html', {})
 
 
 @login_required
@@ -162,10 +162,10 @@ def teacher_documents_list(request):
             'documents': documents,
             'staff': staff,
         }
-        return render(request, 'TeacherDashboard/documents_list.html', context)
+        return render(request, 'TeacherDashboard/documents/documents_list.html', context)
     except Staff.DoesNotExist:
         messages.error(request, 'Staff profile not found.')
-        return render(request, 'TeacherDashboard/documents_list.html', {})
+        return render(request, 'TeacherDashboard/documents/documents_list.html', {})
 
 
 @login_required

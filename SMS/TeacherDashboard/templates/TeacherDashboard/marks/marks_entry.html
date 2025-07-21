@@ -1,0 +1,181 @@
+{% extends 'TeacherDashboard/base.html' %}
+{% load humanize %}
+
+{% block breadcrumb-left %}
+<div class="breadcrumb-container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-chevron">
+      <li class="breadcrumb-item">
+        <a href="{% url 'teacher_dashboard' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-home"></i> Dashboard
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'teacher_exams_list' %}" class="text-decoration-none">
+          <i class="fas fa-clipboard-list"></i> Exams
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <i class="fas fa-edit"></i> Marks Entry
+      </li>
+    </ol>
+  </nav>
+</div>
+{% endblock breadcrumb-left %}
+
+{% block title-icon %}fas fa-edit{% endblock title-icon %}
+{% block title %}Marks Entry{% endblock title %}
+{% block subtitle %}Enter and manage student marks{% endblock subtitle %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Enter Student Marks</h5>
+        </div>
+        <div class="card-body">
+          <form method="post" id="marksForm">
+            {% csrf_token %}
+            
+            <!-- Exam Selection -->
+            <div class="row mb-4">
+              <div class="col-md-6">
+                <label for="exam_select" class="form-label">Select Exam</label>
+                <select class="form-select" id="exam_select" name="exam" required>
+                  <option value="">Choose an exam...</option>
+                  {% for exam in exams %}
+                    <option value="{{ exam.id }}">{{ exam.name }} - {{ exam.session }} {{ exam.term }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="subject_select" class="form-label">Subject</label>
+                <select class="form-select" id="subject_select" name="subject" required>
+                  <option value="">Choose a subject...</option>
+                  <!-- Subjects will be loaded dynamically -->
+                </select>
+              </div>
+            </div>
+
+            <!-- Students Marks Table -->
+            <div class="table-responsive">
+              <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                  <tr>
+                    <th>S/N</th>
+                    <th>Registration No.</th>
+                    <th>Student Name</th>
+                    <th>Class</th>
+                    <th>Section</th>
+                    <th>Marks Obtained</th>
+                    <th>Total Marks</th>
+                    <th>Grade</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for student in students %}
+                  <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ student.registration_number }}</td>
+                    <td>{{ student.fullname }}</td>
+                    <td>{{ student.current_class }}</td>
+                    <td>{{ student.section }}</td>
+                    <td>
+                      <input type="number" 
+                             class="form-control marks-input" 
+                             name="marks_{{ student.id }}" 
+                             min="0" 
+                             max="100" 
+                             placeholder="0"
+                             data-student-id="{{ student.id }}">
+                    </td>
+                    <td>
+                      <input type="number" 
+                             class="form-control total-marks" 
+                             name="total_marks_{{ student.id }}" 
+                             value="100" 
+                             min="1" 
+                             max="100">
+                    </td>
+                    <td>
+                      <span class="grade-display badge bg-secondary" id="grade_{{ student.id }}">-</span>
+                    </td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                    <td colspan="8" class="text-center">
+                      <div class="py-4">
+                        <i class="fas fa-users fa-2x text-muted mb-2"></i>
+                        <p class="text-muted">No students found. Please select an exam first.</p>
+                      </div>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Submit Button -->
+            {% if students %}
+            <div class="text-center mt-4">
+              <button type="submit" class="btn btn-success btn-lg">
+                <i class="fas fa-save me-2"></i>Save Marks
+              </button>
+            </div>
+            {% endif %}
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Calculate grade based on marks
+    function calculateGrade(marks, totalMarks) {
+        const percentage = (marks / totalMarks) * 100;
+        if (percentage >= 90) return { grade: 'A+', class: 'bg-success' };
+        if (percentage >= 80) return { grade: 'A', class: 'bg-success' };
+        if (percentage >= 70) return { grade: 'B+', class: 'bg-info' };
+        if (percentage >= 60) return { grade: 'B', class: 'bg-info' };
+        if (percentage >= 50) return { grade: 'C+', class: 'bg-warning' };
+        if (percentage >= 40) return { grade: 'C', class: 'bg-warning' };
+        if (percentage >= 33) return { grade: 'D', class: 'bg-danger' };
+        return { grade: 'F', class: 'bg-danger' };
+    }
+
+    // Update grade when marks change
+    document.querySelectorAll('.marks-input').forEach(input => {
+        input.addEventListener('input', function() {
+            const studentId = this.dataset.studentId;
+            const marks = parseFloat(this.value) || 0;
+            const totalMarks = parseFloat(document.querySelector(`input[name="total_marks_${studentId}"]`).value) || 100;
+            
+            const gradeInfo = calculateGrade(marks, totalMarks);
+            const gradeElement = document.getElementById(`grade_${studentId}`);
+            
+            gradeElement.textContent = gradeInfo.grade;
+            gradeElement.className = `grade-display badge ${gradeInfo.class}`;
+        });
+    });
+
+    // Update grade when total marks change
+    document.querySelectorAll('.total-marks').forEach(input => {
+        input.addEventListener('input', function() {
+            const studentId = this.name.replace('total_marks_', '');
+            const marks = parseFloat(document.querySelector(`input[name="marks_${studentId}"]`).value) || 0;
+            const totalMarks = parseFloat(this.value) || 100;
+            
+            const gradeInfo = calculateGrade(marks, totalMarks);
+            const gradeElement = document.getElementById(`grade_${studentId}`);
+            
+            gradeElement.textContent = gradeInfo.grade;
+            gradeElement.className = `grade-display badge ${gradeInfo.class}`;
+        });
+    });
+});
+</script>
+{% endblock content %}
