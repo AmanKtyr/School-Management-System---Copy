@@ -382,7 +382,10 @@ def teacher_profile(request):
         }
         return render(request, 'TeacherDashboard/profile.html', context)
     except Staff.DoesNotExist:
-        messages.error(request, 'Staff profile not found.')
+        messages.error(request, f'Staff profile not found for user: {request.user.username}')
+        return render(request, 'TeacherDashboard/profile.html', {})
+    except Exception as e:
+        messages.error(request, f'Error loading profile: {str(e)}')
         return render(request, 'TeacherDashboard/profile.html', {})
 
 
