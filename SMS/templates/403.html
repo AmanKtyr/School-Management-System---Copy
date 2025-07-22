@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid access-denied-container">
+    <div class="row justify-content-center align-items-center min-vh-100">
+        <div class="col-md-8 text-center">
+            <div class="card border-0 shadow-lg">
+                <div class="card-body p-5">
+                    <!-- Access Denied Icon -->
+                    <div class="access-denied-icon-container mb-4">
+                        <div class="access-denied-icon">
+                            <i class="fas fa-lock fa-4x text-warning"></i>
+                        </div>
+                    </div>
+
+                    <!-- Error Message -->
+                    <h1 class="display-3 text-gradient fw-bold">403</h1>
+                    <h2 class="h3 mb-4 text-warning">Access Denied</h2>
+                    
+                    <!-- Custom Message -->
+                    <div class="error-message mb-4">
+                        <p class="lead text-muted">
+                            Only administrators can access this page.
+                        </p>
+                        <p class="text-muted">
+                            Please login with an administrator account or contact your system administrator for access.
+                        </p>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        {% if user.is_authenticated %}
+                            <!-- User is logged in but doesn't have permission -->
+                            <a href="{% url 'login' %}" class="btn btn-warning me-3 mb-2">
+                                <i class="fas fa-sign-in-alt me-2"></i>Login as Admin
+                            </a>
+                            <a href="{% url 'home' %}" class="btn btn-outline-primary me-3 mb-2">
+                                <i class="fas fa-home me-2"></i>Back to Dashboard
+                            </a>
+                        {% else %}
+                            <!-- User is not logged in -->
+                            <a href="{% url 'login' %}" class="btn btn-warning me-3 mb-2">
+                                <i class="fas fa-sign-in-alt me-2"></i>Login
+                            </a>
+                        {% endif %}
+                        
+                        <button type="button" class="btn btn-outline-secondary mb-2" onclick="history.back()">
+                            <i class="fas fa-arrow-left me-2"></i>Go Back
+                        </button>
+                    </div>
+
+                    <!-- Additional Help -->
+                    <div class="help-section mt-4">
+                        <p class="text-muted small">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Need help? Contact your system administrator or IT support.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add custom styles -->
+{% block extracss %}
+<style>
+    .access-denied-icon {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto;
+        background: linear-gradient(135deg, #FFC107, #FF8F00);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 20px rgba(255, 193, 7, 0.3);
+        animation: pulse 2s infinite ease-in-out;
+    }
+
+    .access-denied-icon i {
+        color: #fff;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+
+    .text-gradient {
+        background: linear-gradient(135deg, #FFC107, #FF8F00);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .access-denied-container {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: 100vh;
+    }
+
+    .card {
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.95);
+    }
+
+    .btn {
+        border-radius: 25px;
+        padding: 10px 25px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .help-section {
+        border-top: 1px solid #dee2e6;
+        padding-top: 20px;
+    }
+</style>
+{% endblock %}
+{% endblock %}

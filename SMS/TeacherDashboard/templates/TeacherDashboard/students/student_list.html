@@ -1,0 +1,99 @@
+{% extends 'TeacherDashboard/base.html' %}
+
+{% block title-icon %}fas fa-user-graduate{% endblock title-icon %}
+
+{% block title %}Student List{% endblock title %}
+
+{% block subtitle %}View and manage all students enrolled in the school{% endblock subtitle %}
+{% block breadcrumb-left %}
+<div class="breadcrumb-container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-chevron">
+      <li class="breadcrumb-item">
+        <a href="{% url 'teacher_dashboard' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-home"></i> Home
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'teacher_students_list' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-user-graduate"></i> Students
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <i class="fas fa-list"></i> List
+      </li>
+    </ol>
+  </nav>
+</div>
+{% endblock breadcrumb-left %}
+
+{% block breadcrumb %}
+{% endblock breadcrumb %}
+
+{% block page-actions %}
+<div class="dropdown d-inline-block me-2">
+  <button class="btn btn-primary dropdown-toggle" type="button" id="addStudentDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+    <i class="fas fa-plus"></i> New Student
+  </button>
+  <ul class="dropdown-menu" aria-labelledby="addStudentDropdown">
+    <li><a class="dropdown-item" href="{% url 'teacher_student_create' %}">Standard Form</a></li>
+    <li><a class="dropdown-item" href="{% url 'teacher_student_create_udise' %}">UDISE+ Format</a></li>
+  </ul>
+</div>
+<a class="btn btn-outline-primary" href="{% url 'teacher_student_upload' %}">
+  <i class="fas fa-upload"></i> Upload Students
+</a>
+{% endblock page-actions %}
+
+{% block content %}
+
+{% include 'includes/class_section_filter.html' with filter_form=filter_form show_search=True %}
+
+  <div class="table-responsive">
+    <table id="studenttable" class="table table-bordered table-hover" data-page-length='10'>
+      <thead class="thead-dark">
+        <tr>
+          <th>S/N</th>
+          <th>Fullname</th>
+          <th>Registration Number</th>
+          <th>Current Class</th>
+          <th>Section</th>
+          <th>Gender</th>
+          <th>Mobile Number</th>
+          <th>Father Phone Number</th>
+          <th>Aadhar Number</th>
+          <th>Status</th>
+          {% comment %} <th>Barcode</th> {% endcomment %}
+        </tr>
+      </thead>
+      <tbody>
+
+        {% for student in students %}
+          <tr class='clickable-row' data-href="{% url 'teacher_student_detail' student.id %}">
+            <td>{{ forloop.counter}}</td>
+            <td>{{student.fullname }}  </td>
+            <td>{{ student.registration_number}}</td>
+            <td>{{ student.current_class}}</td>
+            <td>{{ student.section}}</td>
+            <td>{{ student.get_gender_display}}</td>
+            <td>{{ student.mobile_number}}</td>
+            <td>{{ student.Father_mobile_number}}</td>
+            <td>{{ student.aadhar}}</td>
+            <td>{{ student.get_current_status_display}}</td>
+            {% comment %} <td>{{ student.barcode_image() }}</td> {% endcomment %}
+          </tr>
+        {% endfor %}
+
+      </tbody>
+    </table>
+  </div>
+{% endblock content %}
+
+
+{% block morejs %}
+<script>
+  $('#studenttable').DataTable({
+  });
+</script>
+
+{% endblock morejs %}

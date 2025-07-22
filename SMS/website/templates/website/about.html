@@ -1,0 +1,283 @@
+{% extends 'website/base.html' %}
+{% load static %}
+
+{% block title %}About Us - SipherEdu{% endblock %}
+
+{% block content %}
+<!-- Page Banner -->
+<section class="page-banner">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="page-banner-content">
+                    <h1>About Us</h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{% url 'landing_page' %}">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">About Us</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="about-page-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="about-image">
+                    <img src="{% static 'img/about/education-management-system.jpg' %}" alt="About SipherEdu" class="img-fluid rounded shadow">
+                    <div class="experience-badge">
+                        <span class="number">5+</span>
+                        <span class="text">Years of Experience</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="about-content">
+                    <div class="section-heading">
+                        <h6>About Our Company</h6>
+                        <h2>We're Transforming Education Management in India</h2>
+                    </div>
+                    <p>SipherEdu was founded in 2018 with a mission to revolutionize how educational institutions in India manage their operations. We recognized the challenges faced by schools and colleges in maintaining records, tracking student progress, and managing administrative tasks efficiently.</p>
+                    <p>Our team of education experts and technology professionals came together to create a comprehensive SaaS solution that addresses these challenges, making education management simpler, more efficient, and more effective.</p>
+                    <div class="about-features">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="about-feature-item">
+                                    <div class="icon">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <div class="content">
+                                        <h4>User-Friendly</h4>
+                                        <p>Intuitive interface designed for ease of use by all staff members.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="about-feature-item">
+                                    <div class="icon">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <div class="content">
+                                        <h4>Comprehensive</h4>
+                                        <p>All-in-one solution for student, staff, and financial management.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="about-feature-item">
+                                    <div class="icon">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <div class="content">
+                                        <h4>Secure</h4>
+                                        <p>Advanced security measures to protect sensitive data.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="about-feature-item">
+                                    <div class="icon">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <div class="content">
+                                        <h4>Customizable</h4>
+                                        <p>Tailored to meet the specific needs of your institution.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Our Mission Section -->
+<section class="mission-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="mission-card">
+                    <div class="icon">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <h3>Our Mission</h3>
+                    <p>To empower educational institutions with technology solutions that enhance administrative efficiency, improve teaching effectiveness, and elevate student outcomes.</p>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="mission-card">
+                    <div class="icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <h3>Our Vision</h3>
+                    <p>To be the leading education management platform in India, serving 10,000+ institutions and positively impacting the educational journey of millions of students.</p>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="mission-card">
+                    <div class="icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h3>Our Values</h3>
+                    <p>Excellence, innovation, integrity, and customer-centricity guide everything we do. We believe in creating solutions that truly make a difference.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Team Section -->
+<section class="team-section">
+    <div class="container">
+        <div class="section-header text-center">
+            <h6>Meet Our Team</h6>
+            <h2>The Experts Behind SipherEdu</h2>
+            <p>Our diverse team brings together expertise in education, technology, and business to create the perfect solution for educational institutions.</p>
+        </div>
+        <div class="row">
+            <div class="col-lg-3 col-md-6">
+                <div class="team-member">
+                    <div class="team-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="content">
+                        <h4>Dr. Infan Khan</h4>
+                        <p>Founder & CEO</p>
+                    </div>
+                    <div class="social-links-bottom">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="team-member">
+                    <div class="team-icon">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <div class="content">
+                        <h4>Sadiya Anjum</h4>
+                        <p>Education Director</p>
+                    </div>
+                    <div class="social-links-bottom">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="team-member">
+                    <div class="team-icon">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <div class="content">
+                        <h4>Aman Ktyr</h4>
+                        <p>CTO</p>
+                    </div>
+                    <div class="social-links-bottom">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="team-member">
+                    <div class="team-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <div class="content">
+                        <h4>Amisha Yadav</h4>
+                        <p>Customer Success Manager</p>
+                    </div>
+                    <div class="social-links-bottom">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Counter Section -->
+<section class="counter-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 col-md-6">
+                <div class="counter-item">
+                    <div class="icon">
+                        <i class="fas fa-school"></i>
+                    </div>
+                    <div class="content">
+                        <h3><span class="counter">500</span>+</h3>
+                        <p>Schools & Colleges</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="counter-item">
+                    <div class="icon">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <div class="content">
+                        <h3><span class="counter">100</span>K+</h3>
+                        <p>Students Managed</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="counter-item">
+                    <div class="icon">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <div class="content">
+                        <h3><span class="counter">10</span>K+</h3>
+                        <p>Teachers</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="counter-item">
+                    <div class="icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="content">
+                        <h3><span class="counter">15</span>+</h3>
+                        <p>Awards Won</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <div class="cta-content">
+                    <h2>Ready to Transform Your Educational Institution?</h2>
+                    <p>Join hundreds of schools and colleges that have already improved their management processes with SipherEdu.</p>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="cta-btn text-lg-end">
+                    <a href="{% url 'contact' %}" class="btn btn-light">Contact Us Today</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

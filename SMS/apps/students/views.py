@@ -4,6 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.forms import widgets, modelform_factory
 from django.http import HttpResponse, JsonResponse
+from functools import wraps
 from django.urls import reverse_lazy
 from django.views.generic import DetailView, ListView, View
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
@@ -18,9 +19,29 @@ from apps.corecode.models import Section
 
 from .models import Student, StudentBulkUpload, StudentDocument, StudentUDISEInfo
 from .filters import StudentFilter
+
+
+# Custom decorator to restrict access to admin users only
+def admin_required(view_func):
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        if not request.user.is_superuser:
+            messages.error(request, "Access denied. Only administrators can access this page.")
+            return render(request, '403.html', status=403)
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view
+
+
+# Custom mixin for class-based views to restrict access to admin users only
+class AdminRequiredMixin:
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_superuser:
+            messages.error(request, "Access denied. Only administrators can access this page.")
+            return render(request, '403.html', status=403)
+        return super().dispatch(request, *args, **kwargs)
 from .forms import StudentForm
 
-class StudentListView(LoginRequiredMixin, ListView):
+class StudentListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
     model = Student
     template_name = "students/student_list.html"
     context_object_name = "students"
@@ -42,7 +63,7 @@ class StudentListView(LoginRequiredMixin, ListView):
         context["filter_form"] = self.filter_form
         return context
 
-class StudentDetailView(LoginRequiredMixin, DetailView):
+class StudentDetailView(LoginRequiredMixin, AdminRequiredMixin, DetailView):
     model = Student
     template_name = "students/student_detail.html"
 
@@ -87,7 +108,7 @@ class StudentDetailView(LoginRequiredMixin, DetailView):
 
 
 
-class StudentCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+class StudentCreateView(LoginRequiredMixin, AdminRequiredMixin, SuccessMessageMixin, CreateView):
     model = Student
     form_class = StudentForm
     success_message = "New student successfully added."
@@ -108,7 +129,7 @@ class StudentCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         return reverse_lazy('student-detail', kwargs={'pk': self.object.pk})
 
 
-class StudentUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+class StudentUpdateView(LoginRequiredMixin, AdminRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Student
     form_class = StudentForm
     success_message = "Record successfully updated."
@@ -125,7 +146,7 @@ class StudentUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
         return form
 
 
-class StudentDeleteView(LoginRequiredMixin, View):
+class StudentDeleteView(LoginRequiredMixin, AdminRequiredMixin, View):
     """
     Custom view for student deletion that handles all related records
     """
@@ -199,7 +220,7 @@ class StudentDeleteView(LoginRequiredMixin, View):
             return redirect('student-detail', pk=student_id)
 
 
-class StudentBulkUploadView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+class StudentBulkUploadView(LoginRequiredMixin, AdminRequiredMixin, SuccessMessageMixin, CreateView):
     model = StudentBulkUpload
     template_name = "students/students_upload.html"
     fields = ["csv_file"]
@@ -228,6 +249,7 @@ class DownloadCSVViewdownloadcsv(LoginRequiredMixin, View):
 
 
 @login_required
+@admin_required
 def upload_student_documents(request, pk):
     """Upload documents with their numbers"""
     student = get_object_or_404(Student, pk=pk)
@@ -377,6 +399,7 @@ def get_sections_for_class(request, class_id):
 
 
 @login_required
+@admin_required
 @require_POST
 def create_udise_info(request, pk):
     """Create UDISE information for a student"""
@@ -406,7 +429,7 @@ def create_udise_info(request, pk):
     return redirect('student-detail', pk=student.pk)
 
 
-class StudentUDISECreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+class StudentUDISECreateView(LoginRequiredMixin, AdminRequiredMixin, SuccessMessageMixin, CreateView):
     """UDISE+ style form for creating a new student"""
     model = Student
     form_class = StudentForm
@@ -613,7 +636,7 @@ class StudentUDISECreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView
         return context
 
 
-class StudentUDISEUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+class StudentUDISEUpdateView(LoginRequiredMixin, AdminRequiredMixin, SuccessMessageMixin, UpdateView):
     """UDISE+ style form for updating an existing student"""
     model = Student
     form_class = StudentForm

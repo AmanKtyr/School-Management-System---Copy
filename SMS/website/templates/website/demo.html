@@ -1,0 +1,380 @@
+{% extends 'website/base.html' %}
+{% load static %}
+
+{% block title %}Request a Demo - SipherEdu{% endblock %}
+
+{% block content %}
+<!-- Page Banner -->
+<section class="page-banner">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="page-banner-content">
+                    <h1>Request a Demo</h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{% url 'landing_page' %}">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Request a Demo</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Demo Request Section -->
+<section class="demo-request-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="demo-content">
+                    <div class="section-heading">
+                        <h6>See SipherEdu in Action</h6>
+                        <h2>Experience the Power of Our School Management System</h2>
+                        <p>Schedule a personalized demo to see how SipherEdu can transform your educational institution's management processes.</p>
+                    </div>
+                    <div class="demo-features">
+                        <div class="feature-item">
+                            <div class="icon">
+                                <i class="fas fa-laptop"></i>
+                            </div>
+                            <div class="content">
+                                <h4>Live Product Demonstration</h4>
+                                <p>Our product specialists will walk you through all the features and functionalities of SipherEdu.</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="icon">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            <div class="content">
+                                <h4>Q&A Session</h4>
+                                <p>Get answers to all your questions about implementation, pricing, and customization options.</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="icon">
+                                <i class="fas fa-cogs"></i>
+                            </div>
+                            <div class="content">
+                                <h4>Tailored to Your Needs</h4>
+                                <p>We'll focus on the features most relevant to your institution's specific requirements.</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="content">
+                                <h4>Free Resources</h4>
+                                <p>Receive helpful resources and documentation to share with your team after the demo.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="demo-testimonial">
+                        <div class="quote">
+                            <i class="fas fa-quote-left"></i>
+                        </div>
+                        <p>"The demo session was incredibly informative and helped us understand exactly how SipherEdu could address our institution's challenges. The team was knowledgeable and responsive to all our questions."</p>
+                        <div class="author">
+                            <img src="{% static 'img/testimonial-1.jpg' %}" alt="Principal">
+                            <div class="info">
+                                <h5>Rajesh Kumar</h5>
+                                <span>Principal, Delhi Public School</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="demo-form-wrapper">
+                    <h3>Schedule Your Free Demo</h3>
+                    <p>Fill out the form below and our team will contact you within 24 hours to schedule your personalized demo.</p>
+                    <form id="demoRequestForm" class="demo-form">
+                        <div class="form-group">
+                            <label for="name">Full Name*</label>
+                            <input type="text" class="form-control" id="name" placeholder="Enter your full name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address*</label>
+                            <input type="email" class="form-control" id="email" placeholder="Enter your email address" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number*</label>
+                            <input type="tel" class="form-control" id="phone" placeholder="Enter your phone number" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="institution">Institution Name*</label>
+                            <input type="text" class="form-control" id="institution" placeholder="Enter your institution name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="role">Your Role*</label>
+                            <select class="form-control" id="role" required>
+                                <option value="" selected disabled>Select your role</option>
+                                <option value="Principal">Principal</option>
+                                <option value="Administrator">Administrator</option>
+                                <option value="Teacher">Teacher</option>
+                                <option value="IT Manager">IT Manager</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="institution_type">Institution Type*</label>
+                            <select class="form-control" id="institution_type" required>
+                                <option value="" selected disabled>Select institution type</option>
+                                <option value="Primary School">Primary School</option>
+                                <option value="Secondary School">Secondary School</option>
+                                <option value="K-12 School">K-12 School</option>
+                                <option value="College">College</option>
+                                <option value="University">University</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="student_count">Number of Students*</label>
+                            <select class="form-control" id="student_count" required>
+                                <option value="" selected disabled>Select student count</option>
+                                <option value="Less than 300">Less than 300</option>
+                                <option value="300-800">300-800</option>
+                                <option value="801-1500">801-1500</option>
+                                <option value="1501-3000">1501-3000</option>
+                                <option value="More than 3000">More than 3000</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="preferred_date">Preferred Demo Date</label>
+                            <input type="date" class="form-control" id="preferred_date" min="{{ tomorrow_date }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="preferred_time">Preferred Demo Time</label>
+                            <select class="form-control" id="preferred_time">
+                                <option value="" selected disabled>Select preferred time</option>
+                                <option value="Morning (9 AM - 12 PM)">Morning (9 AM - 12 PM)</option>
+                                <option value="Afternoon (12 PM - 3 PM)">Afternoon (12 PM - 3 PM)</option>
+                                <option value="Evening (3 PM - 6 PM)">Evening (3 PM - 6 PM)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Additional Information</label>
+                            <textarea class="form-control" id="message" rows="4" placeholder="Tell us about your specific requirements or questions"></textarea>
+                        </div>
+                        <div class="form-check mb-4">
+                            <input type="checkbox" class="form-check-input" id="consent" required>
+                            <label class="form-check-label" for="consent">I agree to receive communications from SipherEdu regarding my demo request and related information.*</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Request Demo</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How Demo Works Section -->
+<section class="how-demo-works-section">
+    <div class="container">
+        <div class="section-header text-center">
+            <h6>Simple Process</h6>
+            <h2>How Our Demo Process Works</h2>
+            <p>We've made it easy to get started with SipherEdu</p>
+        </div>
+        <div class="row">
+            <div class="col-lg-3 col-md-6">
+                <div class="process-card">
+                    <div class="process-icon">
+                        <i class="fas fa-wpforms"></i>
+                        <span class="number">01</span>
+                    </div>
+                    <h3>Submit Request</h3>
+                    <p>Fill out the demo request form with your information and requirements.</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="process-card">
+                    <div class="process-icon">
+                        <i class="fas fa-calendar-check"></i>
+                        <span class="number">02</span>
+                    </div>
+                    <h3>Schedule Demo</h3>
+                    <p>Our team will contact you to confirm a convenient date and time.</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="process-card">
+                    <div class="process-icon">
+                        <i class="fas fa-laptop"></i>
+                        <span class="number">03</span>
+                    </div>
+                    <h3>Attend Demo</h3>
+                    <p>Join the online demo session to see SipherEdu in action.</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="process-card">
+                    <div class="process-icon">
+                        <i class="fas fa-handshake"></i>
+                        <span class="number">04</span>
+                    </div>
+                    <h3>Get Proposal</h3>
+                    <p>Receive a customized proposal based on your institution's needs.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="demo-faq-section">
+    <div class="container">
+        <div class="section-header text-center">
+            <h6>Frequently Asked Questions</h6>
+            <h2>Common Questions About Our Demo</h2>
+            <p>Find answers to the most common questions about our demo process.</p>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="accordion" id="demoFaqAccordion1">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="demoHeadingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#demoCollapseOne" aria-expanded="true" aria-controls="demoCollapseOne">
+                                How long does the demo typically last?
+                            </button>
+                        </h2>
+                        <div id="demoCollapseOne" class="accordion-collapse collapse show" aria-labelledby="demoHeadingOne" data-bs-parent="#demoFaqAccordion1">
+                            <div class="accordion-body">
+                                Our standard demo session lasts approximately 45-60 minutes, including time for questions and answers. However, we can adjust the duration based on your availability and specific requirements.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="demoHeadingTwo">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#demoCollapseTwo" aria-expanded="false" aria-controls="demoCollapseTwo">
+                                Is there any cost for the demo?
+                            </button>
+                        </h2>
+                        <div id="demoCollapseTwo" class="accordion-collapse collapse" aria-labelledby="demoHeadingTwo" data-bs-parent="#demoFaqAccordion1">
+                            <div class="accordion-body">
+                                No, our demo sessions are completely free of charge. We believe in showcasing the value of our product without any obligation or cost to you.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="demoHeadingThree">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#demoCollapseThree" aria-expanded="false" aria-controls="demoCollapseThree">
+                                How is the demo conducted?
+                            </button>
+                        </h2>
+                        <div id="demoCollapseThree" class="accordion-collapse collapse" aria-labelledby="demoHeadingThree" data-bs-parent="#demoFaqAccordion1">
+                            <div class="accordion-body">
+                                Our demos are conducted online via video conferencing platforms like Zoom or Google Meet. This allows for screen sharing, interactive discussions, and the ability to record the session for your future reference if desired.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="accordion" id="demoFaqAccordion2">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="demoHeadingFour">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#demoCollapseFour" aria-expanded="false" aria-controls="demoCollapseFour">
+                                Can I invite multiple team members to the demo?
+                            </button>
+                        </h2>
+                        <div id="demoCollapseFour" class="accordion-collapse collapse" aria-labelledby="demoHeadingFour" data-bs-parent="#demoFaqAccordion2">
+                            <div class="accordion-body">
+                                Absolutely! We encourage you to invite all relevant stakeholders from your institution, such as administrators, IT staff, and key decision-makers. This ensures everyone gets a firsthand look at the system and can ask questions specific to their roles.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="demoHeadingFive">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#demoCollapseFive" aria-expanded="false" aria-controls="demoCollapseFive">
+                                Will the demo be customized for our institution?
+                            </button>
+                        </h2>
+                        <div id="demoCollapseFive" class="accordion-collapse collapse" aria-labelledby="demoHeadingFive" data-bs-parent="#demoFaqAccordion2">
+                            <div class="accordion-body">
+                                Yes, we tailor each demo to focus on the features and functionalities most relevant to your institution's specific needs and challenges. The information you provide in the request form helps us prepare a personalized demonstration.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="demoHeadingSix">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#demoCollapseSix" aria-expanded="false" aria-controls="demoCollapseSix">
+                                What happens after the demo?
+                            </button>
+                        </h2>
+                        <div id="demoCollapseSix" class="accordion-collapse collapse" aria-labelledby="demoHeadingSix" data-bs-parent="#demoFaqAccordion2">
+                            <div class="accordion-body">
+                                After the demo, our team will follow up with a customized proposal based on your institution's size and requirements. We'll also provide additional resources and be available to answer any further questions you may have.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <div class="cta-content">
+                    <h2>Ready to Transform Your Institution?</h2>
+                    <p>Join hundreds of educational institutions across India that have already improved their management processes with SipherEdu.</p>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="cta-btn text-lg-end">
+                    <a href="#" class="btn btn-light" onclick="document.getElementById('demoRequestForm').scrollIntoView({behavior: 'smooth'}); return false;">Request Demo Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set minimum date for demo request to tomorrow
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowFormatted = tomorrow.toISOString().split('T')[0];
+        document.getElementById('preferred_date').setAttribute('min', tomorrowFormatted);
+
+        // Form submission handling
+        const demoForm = document.getElementById('demoRequestForm');
+        if (demoForm) {
+            demoForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                // Simple form validation
+                let isValid = true;
+                const formInputs = this.querySelectorAll('input[required], select[required]');
+
+                formInputs.forEach(input => {
+                    if (!input.value.trim()) {
+                        isValid = false;
+                        input.classList.add('is-invalid');
+                    } else {
+                        input.classList.remove('is-invalid');
+                    }
+                });
+
+                if (isValid) {
+                    // Here you would typically send the form data to a server
+                    // For now, we'll just show a success message
+                    alert('Thank you for requesting a demo! Our team will contact you within 24 hours to schedule your personalized demo session.');
+                    demoForm.reset();
+                } else {
+                    alert('Please fill in all required fields.');
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

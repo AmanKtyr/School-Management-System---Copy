@@ -327,6 +327,68 @@
     </div>
   </div>
 </div>
+
+<!-- Staff Credentials Popup Modal -->
+<div class="modal fade" id="staffCredentialsModal" tabindex="-1" aria-labelledby="staffCredentialsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="staffCredentialsModalLabel">
+          <i class="fas fa-check-circle me-2"></i>Staff Registration Successful!
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="text-center mb-4">
+          <i class="fas fa-user-check text-success" style="font-size: 3rem;"></i>
+          <h4 class="mt-3 text-success">Login Credentials Generated</h4>
+          <p class="text-muted">Please save these credentials for teacher login</p>
+        </div>
+
+        <div class="credential-info">
+          <div class="row mb-3">
+            <div class="col-4"><strong>Staff Name:</strong></div>
+            <div class="col-8" id="staffName">-</div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-4"><strong>Registration No:</strong></div>
+            <div class="col-8" id="registrationNumber">-</div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-4"><strong>Login ID:</strong></div>
+            <div class="col-8">
+              <span id="loginId" class="badge bg-primary fs-6">-</span>
+              <button class="btn btn-sm btn-outline-secondary ms-2" onclick="copyToClipboard('loginId')" title="Copy Login ID">
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-4"><strong>Password:</strong></div>
+            <div class="col-8">
+              <span id="password" class="badge bg-warning fs-6">-</span>
+              <button class="btn btn-sm btn-outline-secondary ms-2" onclick="copyToClipboard('password')" title="Copy Password">
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert-info mt-4">
+          <i class="fas fa-info-circle me-2"></i>
+          <strong>Important:</strong> Please save these credentials securely. The teacher can use these to login to the system.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="printCredentials()">
+          <i class="fas fa-print me-2"></i>Print Credentials
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock content %}
 
 {% block morejs %}
@@ -619,5 +681,99 @@
       showToast('Form has been reset', 'info');
     }
   }
+
+  // Function to copy text to clipboard
+  function copyToClipboard(elementId) {
+    const element = document.getElementById(elementId);
+    const text = element.textContent;
+
+    navigator.clipboard.writeText(text).then(function() {
+      showToast('Copied to clipboard!', 'success');
+    }, function(err) {
+      console.error('Could not copy text: ', err);
+      showToast('Failed to copy to clipboard', 'error');
+    });
+  }
+
+  // Function to print credentials
+  function printCredentials() {
+    const staffName = document.getElementById('staffName').textContent;
+    const registrationNumber = document.getElementById('registrationNumber').textContent;
+    const loginId = document.getElementById('loginId').textContent;
+    const password = document.getElementById('password').textContent;
+
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Staff Login Credentials</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 20px; }
+            .header { text-align: center; margin-bottom: 30px; }
+            .credentials { border: 2px solid #007bff; padding: 20px; border-radius: 10px; }
+            .row { margin-bottom: 15px; }
+            .label { font-weight: bold; display: inline-block; width: 150px; }
+            .value { color: #007bff; font-weight: bold; }
+            .footer { margin-top: 30px; text-align: center; color: #666; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h2>Staff Login Credentials</h2>
+            <p>School Management System</p>
+          </div>
+          <div class="credentials">
+            <div class="row">
+              <span class="label">Staff Name:</span>
+              <span class="value">${staffName}</span>
+            </div>
+            <div class="row">
+              <span class="label">Registration No:</span>
+              <span class="value">${registrationNumber}</span>
+            </div>
+            <div class="row">
+              <span class="label">Login ID:</span>
+              <span class="value">${loginId}</span>
+            </div>
+            <div class="row">
+              <span class="label">Password:</span>
+              <span class="value">${password}</span>
+            </div>
+          </div>
+          <div class="footer">
+            <p>Please keep these credentials secure and confidential.</p>
+            <p>Generated on: ${new Date().toLocaleDateString()}</p>
+          </div>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+  }
+
+  // Check if we need to show staff credentials popup
+  {% if request.session.show_staff_credentials %}
+    document.addEventListener('DOMContentLoaded', function() {
+      // Populate modal with credentials
+      document.getElementById('staffName').textContent = '{{ request.session.show_staff_credentials.staff_name }}';
+      document.getElementById('registrationNumber').textContent = '{{ request.session.show_staff_credentials.registration_number }}';
+      document.getElementById('loginId').textContent = '{{ request.session.show_staff_credentials.login_id }}';
+      document.getElementById('password').textContent = '{{ request.session.show_staff_credentials.password }}';
+
+      // Show the modal
+      const modal = new bootstrap.Modal(document.getElementById('staffCredentialsModal'));
+      modal.show();
+
+      // Clear the session data by making an AJAX call
+      modal._element.addEventListener('hidden.bs.modal', function() {
+        fetch('{% url "staff-list" %}', {
+          method: 'GET',
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+          }
+        });
+      });
+    });
+  {% endif %}
 </script>
 {% endblock morejs %}

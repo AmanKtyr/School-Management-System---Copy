@@ -1,5 +1,6 @@
 from django import forms
 from django.forms import widgets
+from django.core.exceptions import ValidationError
 from .models import Student
 from apps.corecode.models import Section
 
@@ -37,3 +38,30 @@ class StudentForm(forms.ModelForm):
             # add it to the choices
             if self.instance.section and self.instance.section not in sections:
                 self.fields['section'].choices += [(self.instance.section, self.instance.section)]
+
+    def clean(self):
+        """Additional form validation"""
+        cleaned_data = super().clean()
+
+        # Validate that required fields are present
+        current_class = cleaned_data.get('current_class')
+        fullname = cleaned_data.get('fullname')
+        date_of_admission = cleaned_data.get('date_of_admission')
+
+        if not fullname:
+            raise ValidationError("Student name is required.")
+
+        if not current_class:
+            raise ValidationError("Please select a class for the student.")
+
+        if not date_of_admission:
+            raise ValidationError("Date of admission is required.")
+
+        # Additional validation for mobile numbers
+        mobile_number = cleaned_data.get('mobile_number')
+        father_mobile = cleaned_data.get('Father_mobile_number')
+
+        if mobile_number and father_mobile and mobile_number == father_mobile:
+            raise ValidationError("Student mobile number and father's mobile number cannot be the same.")
+
+        return cleaned_data

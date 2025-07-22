@@ -1,0 +1,1156 @@
+{% extends 'TeacherDashboard/base.html' %}
+{% load static %}
+
+{% block breadcrumb-left %}
+<div class="breadcrumb-container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-chevron">
+      <li class="breadcrumb-item">
+        <a href="{% url 'home' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-home"></i> Home
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'attendance:attendance_list' %}" class="text-decoration-none fw-bold">
+          <i class="fas fa-calendar-check"></i> Attendance
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+      </li>
+    </ol>
+  </nav>
+</div>
+{% endblock breadcrumb-left %}
+
+{% block title-icon %}fas fa-calendar-check{% endblock title-icon %}
+
+{% block title %}TEACHER DASHBOARD - Student Attendance{% endblock title %}
+
+{% block subtitle %}Track and manage daily attendance records for students{% endblock subtitle %}
+
+{% block page-actions %}
+<div class="d-flex align-items-center">
+  <div class="date-display me-3">
+    <div class="date-container">
+      <div class="date-icon">
+        <i class="fas fa-calendar-day"></i>
+      </div>
+      <div class="date-text">
+        <span id="header-current-date">{{ attendance_date|date:"l, d F Y" }}</span>
+      </div>
+    </div>
+  </div>
+  {% if selected_class_id %}
+  <button type="submit" form="attendance-form" class="btn btn-primary">
+    <i class="fas fa-save me-2"></i> Save Attendance
+  </button>
+  {% endif %}
+</div>
+{% endblock page-actions %}
+
+{% block content %}
+<div class="container mt-4">
+ 
+
+  <!-- Attendance Stats -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="card border-0 h-100">
+        <div class="card-body p-0">
+          <div class="p-4 rounded-3 shadow-sm h-100 d-flex flex-column justify-content-between" style="background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%); color: white;">
+            <div class="d-flex justify-content-between">
+              <h5 class="mb-0">Total Students</h5>
+              <div class="rounded-circle bg-white p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                <i class="fas fa-users text-warning"></i>
+              </div>
+            </div>
+            <div>
+              <p class="display-5 mb-0">{{ students|length }}</p>
+              <small class="text-white-50">Enrolled in selected class</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 h-100">
+        <div class="card-body p-0">
+          <div class="p-4 rounded-3 shadow-sm h-100 d-flex flex-column justify-content-between" style="background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%); color: white;">
+            <div class="d-flex justify-content-between">
+              <h5 class="mb-0">Present/Leave</h5>
+              <div class="rounded-circle bg-white p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                <i class="fas fa-user-check text-success"></i>
+              </div>
+            </div>
+            <div>
+              <p class="display-5 mb-0">{{ present_leave }}</p>
+              <small class="text-white-50">Students present today</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 h-100">
+        <div class="card-body p-0">
+          <div class="p-4 rounded-3 shadow-sm h-100 d-flex flex-column justify-content-between" style="background: linear-gradient(135deg, #ff512f 0%, #dd2476 100%); color: white;">
+            <div class="d-flex justify-content-between">
+              <h5 class="mb-0">Absent</h5>
+              <div class="rounded-circle bg-white p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                <i class="fas fa-user-times text-danger"></i>
+              </div>
+            </div>
+            <div>
+              <p class="display-5 mb-0">{{ absent }}</p>
+              <small class="text-white-50">Students absent today</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 h-100">
+        <div class="card-body p-0">
+          {% if is_sunday %}
+          <div class="p-4 rounded-3 shadow-sm h-100 d-flex flex-column justify-content-between" style="background: linear-gradient(135deg, #6c757d 0%, #495057 100%); color: white;">
+            <div class="d-flex justify-content-between">
+              <h5 class="mb-0">Sunday</h5>
+              <div class="rounded-circle bg-white p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                <i class="fas fa-calendar-day text-secondary"></i>
+              </div>
+            </div>
+            <div>
+              <p class="display-5 mb-0">{{ holiday_count|default:'0' }}</p>
+              <small class="text-white-50">Weekend holiday</small>
+            </div>
+          </div>
+          {% elif holiday %}
+          <div class="p-4 rounded-3 shadow-sm h-100 d-flex flex-column justify-content-between" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); color: white;">
+            <div class="d-flex justify-content-between">
+              <h5 class="mb-0">Holiday</h5>
+              <div class="rounded-circle bg-white p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                <i class="fas fa-calendar-minus text-info"></i>
+              </div>
+            </div>
+            <div>
+              <p class="display-5 mb-0">{{ holiday_count|default:'0' }}</p>
+              <small class="text-white-50">{{ holiday.name }}</small>
+            </div>
+          </div>
+          {% else %}
+          <div class="p-4 rounded-3 shadow-sm h-100 d-flex flex-column justify-content-between" style="background: linear-gradient(135deg, #36d1dc 0%, #5b86e5 100%); color: white;">
+            <div class="d-flex justify-content-between">
+              <h5 class="mb-0">Class Teacher</h5>
+              <div class="rounded-circle bg-white p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                <i class="fas fa-chalkboard-teacher text-info"></i>
+              </div>
+            </div>
+            <div>
+              <p class="display-5 mb-0">{{ class_teacher|default:'N/A' }}</p>
+              <small class="text-white-50">In charge of this class</small>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Class, Section and Date Selection -->
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white border-bottom">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-filter me-2 text-primary"></i>Filter Students</h5>
+        <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="true">
+          <i class="fas fa-sliders-h me-1"></i> Filters
+        </button>
+      </div>
+    </div>
+    <div class="card-body collapse show" id="filterCollapse">
+      <form method="GET" action="" id="filter-form" class="row g-3">
+        <div class="col-md-3">
+          <label for="class-filter" class="form-label fw-bold">
+            <i class="fas fa-chalkboard text-primary me-1"></i> Select Class:
+          </label>
+       
+
+          <select id="class-filter" name="class_id" class="form-select">
+            <option value="" class="fw-bold text-secondary">Choose a Class</option>
+            <!-- DEBUG: Classes count: {{ classes|length }} -->
+            {% for class in classes %}
+            <option value="{{ class.id }}" class="fw-bold text-dark"
+              {% if class.id|stringformat:"s" == selected_class_id %}selected{% endif %}>
+              {{ class.name }}
+            </option>
+            {% empty %}
+            <option disabled>No classes found</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-2">
+          <label for="section-filter" class="form-label fw-bold">
+            <i class="fas fa-door-open text-primary me-1"></i> Select Section:
+          </label>
+          <select id="section-filter" name="section" class="form-select">
+            <option value="" class="fw-bold text-secondary">Choose a Section</option>
+            {% if sections %}
+              {% for section in sections %}
+              <option value="{{ section }}" class="fw-bold text-dark"
+                {% if section == selected_section %}selected{% endif %}>
+                {{ section }}
+              </option>
+              {% endfor %}
+            {% endif %}
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label fw-bold">&nbsp;</label>
+          <button type="submit" class="btn btn-primary w-70">
+              <i class="fas fa-filter me-2"></i>Apply Filter
+          </button>
+        </div>
+
+        <div class="col-md-4">
+            <label for="attendance-date" class="form-label fw-bold">
+              <i class="fas fa-calendar-alt text-primary me-1"></i> Attendance Date:
+            </label>
+            <div class="input-group">
+              <input type="date" id="attendance-date" name="attendance_date"
+                     class="form-control"
+                     value="{{ attendance_date|date:'Y-m-d' }}">
+              <button type="button" id="today-btn" class="btn btn-primary">
+                <i class="fas fa-calendar-day me-1"></i> Today
+              </button>
+            </div>
+            <small class="text-muted mt-1 d-block"><i class="fas fa-info-circle me-1"></i> You can only take attendance for today or update the past week's attendance</small>
+          </div>
+
+
+      </form>
+    </div>
+    <div class="card-footer bg-light">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <span class="me-2">Showing attendance for:</span>
+          <span class="badge bg-primary rounded-pill"><i class="fas fa-chalkboard me-1"></i> {{ selected_class_name|default:'All Classes' }}</span>
+          <span class="badge bg-secondary rounded-pill"><i class="fas fa-door-open me-1"></i> {{ selected_section|default:'All Sections' }}</span>
+          <span class="badge bg-info rounded-pill"><i class="fas fa-calendar-alt me-1"></i> {{ attendance_date|date:'d M, Y' }}</span>
+        </div>
+        <div>
+          {% if selected_class_id %}
+          <span class="badge bg-success rounded-pill">
+            <i class="fas fa-percentage me-1"></i>
+            {% if students|length > 0 %}
+              {% widthratio present_leave students|length 100 %}% Present
+            {% else %}
+              0% Present
+            {% endif %}
+          </span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if selected_class_id %}
+  <!-- Alert Messages -->
+  <div id="alert-container" class="position-fixed top-0 end-0 p-3" style="z-index: 1050;">
+    <!-- Success Message -->
+    <div id="success-message" class="toast align-items-center text-white bg-success border-0 d-none" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+      <div class="d-flex">
+        <div class="toast-body">
+          <i class="fas fa-check-circle me-2"></i> <span id="success-text">Attendance has been saved successfully.</span>
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div id="error-message" class="toast align-items-center text-white bg-danger border-0 d-none" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+      <div class="d-flex">
+        <div class="toast-body">
+          <i class="fas fa-exclamation-circle me-2"></i> <span id="error-text">There was a problem saving attendance.</span>
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Weekly Attendance Summary -->
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+      <h5 class="mb-0 "><i class="fas fa-calendar-week me-2"></i>Weekly Attendance Summary</h5>
+      <div>
+        <span class="badge bg-light text-dark me-2">
+          <i class="fas fa-calendar-alt me-1"></i> {{ today|date:"d M" }} - {{ one_week_ago|date:"d M Y" }}
+        </span>
+        <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#weeklyAttendanceCollapse" aria-expanded="true">
+          <i class="fas fa-chevron-down"></i>
+        </button>
+      </div>
+    </div>
+    <div class="card-body collapse show" id="weeklyAttendanceCollapse">
+      <div class="row g-4">
+        <div class="col-lg-8">
+          <div class="table-responsive">
+            <table class="table table-sm table-hover border">
+              <thead class="table-light">
+                <tr>
+                  <th class="border-end">Date</th>
+                  <th class="text-center text-success border-end">Present</th>
+                  <th class="text-center text-warning border-end">Leave</th>
+                  <th class="text-center text-danger border-end">Absent</th>
+                  <th class="text-center border-end">Total</th>
+                  <th class="text-center border-end">Percentage</th>
+                  <th class="text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for day in weekly_attendance %}
+                <tr {% if day.date == attendance_date %}class="table-active"{% endif %}
+                    {% if day.is_sunday %}class="table-secondary"{% endif %}
+                    {% if day.is_holiday %}class="table-info"{% endif %}>
+                  <td class="border-end">
+                    <div class="d-flex align-items-center">
+                      <div class="calendar-icon me-2 text-center" style="min-width: 40px;">
+                        <div class="bg-light rounded-top px-1" style="font-size: 10px; border: 1px solid #ddd; border-bottom: none;">
+                          {{ day.date|date:"M" }}
+                        </div>
+                        <div class="bg-white rounded-bottom fw-bold" style="font-size: 16px; border: 1px solid #ddd; border-top: none;">
+                          {{ day.date|date:"d" }}
+                        </div>
+                      </div>
+                      <div>
+                        <div class="fw-bold">{{ day.date|date:"l" }}</div>
+                        <div class="small text-muted">{{ day.date|date:"Y" }}</div>
+                        {% if day.date == today %}
+                          <span class="badge bg-info rounded-pill">Today</span>
+                        {% endif %}
+                        {% if day.is_sunday %}
+                          <span class="badge bg-secondary rounded-pill">Sunday</span>
+                        {% endif %}
+                        {% if day.is_holiday and day.holiday_name and not day.is_sunday %}
+                          <span class="badge bg-info rounded-pill">{{ day.holiday_name }}</span>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </td>
+                  <td class="text-center align-middle border-end">
+                    <span class="badge bg-success rounded-pill px-3 py-2 fs-6">{{ day.present }}</span>
+                  </td>
+                  <td class="text-center align-middle border-end">
+                    <span class="badge bg-warning rounded-pill px-3 py-2 fs-6">{{ day.leave }}</span>
+                  </td>
+                  <td class="text-center align-middle border-end">
+                    <span class="badge bg-danger rounded-pill px-3 py-2 fs-6">{{ day.absent }}</span>
+                  </td>
+                  <td class="text-center align-middle fw-bold border-end">{{ day.total }}</td>
+                  <td class="text-center align-middle border-end">
+                    {% if day.is_sunday or day.is_holiday %}
+                      <span class="badge {% if day.is_sunday %}bg-secondary{% else %}bg-info{% endif %} rounded-pill px-3">
+                        {% if day.is_sunday %}Sunday{% else %}Holiday{% endif %}
+                      </span>
+                    {% elif day.total > 0 %}
+                      {% with present_leave=day.present|add:day.leave %}
+                        {% widthratio present_leave day.total 100 as percent %}
+                        <div class="d-flex align-items-center">
+                          <div class="progress flex-grow-1 me-2" style="height: 10px;">
+                            <div class="progress-bar bg-success" role="progressbar"
+                                 style="width: {{ percent }}%"
+                                 aria-valuenow="{{ percent }}"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100">
+                            </div>
+                          </div>
+                          <span class="badge bg-light text-dark">{{ percent }}%</span>
+                        </div>
+                      {% endwith %}
+                    {% else %}
+                      <span class="text-muted">N/A</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-center align-middle">
+                    <a href="?class_id={{ selected_class_id }}&section={{ selected_section }}&attendance_date={{ day.date|date:'Y-m-d' }}"
+                       class="btn btn-sm {% if day.date == attendance_date %}btn-primary{% else %}btn-outline-primary{% endif %} rounded-pill">
+                      <i class="fas {% if day.date == attendance_date %}fa-eye{% else %}fa-edit{% endif %} me-1"></i>
+                      {% if day.date == attendance_date %}View{% else %}Edit{% endif %}
+                    </a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="7" class="text-center py-5">
+                    <div class="py-5">
+                      <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                      <h5>No Attendance Records</h5>
+                      <p class="text-muted">No attendance records found for the past week</p>
+                      <button id="take-attendance-btn" class="btn btn-primary mt-2">
+                        <i class="fas fa-plus-circle me-1"></i> Take Today's Attendance
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-header bg-primary text-white">
+              <h5 class="card-title mb-0"><i class="fas fa-chart-bar me-2"></i>Attendance Trends</h5>
+            </div>
+            <div class="card-body">
+              <div class="attendance-chart-container" style="position: relative; height: 250px;">
+                <canvas id="attendanceChart"></canvas>
+              </div>
+              {% if weekly_attendance|length > 0 %}
+              <div class="text-center mt-3">
+                <div class="d-flex justify-content-center flex-wrap">
+                  <div class="px-2 d-flex align-items-center">
+                    <span class="badge bg-success me-1">&nbsp;</span> Present
+                  </div>
+                  <div class="px-2 d-flex align-items-center">
+                    <span class="badge bg-warning me-1">&nbsp;</span> Leave
+                  </div>
+                  <div class="px-2 d-flex align-items-center">
+                    <span class="badge bg-danger me-1">&nbsp;</span> Absent
+                  </div>
+                  <div class="px-2 d-flex align-items-center">
+                    <span class="badge bg-secondary me-1">&nbsp;</span> Sunday
+                  </div>
+                  <div class="px-2 d-flex align-items-center">
+                    <span class="badge bg-info me-1">&nbsp;</span> Holiday
+                  </div>
+                </div>
+                <small class="text-muted d-block mt-2">Showing data for the past {{ weekly_attendance|length }} days</small>
+              </div>
+              {% else %}
+              <div class="text-center py-5">
+                <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                <h5>No Data Available</h5>
+                <p class="text-muted">Start taking attendance to see trends</p>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Attendance Form -->
+  <form id="attendance-form" method="POST" action="{% url 'attendance:submit_attendance' %}">
+    {% csrf_token %}
+    <input type="hidden" name="attendance_date" value="{{ attendance_date|date:'Y-m-d' }}">
+
+    <!-- Student Attendance Table -->
+    <div class="card shadow-sm border-0 mb-4">
+      <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+          <div class="bg-primary rounded-circle p-2 me-3 text-white">
+            <i class="fas fa-user-check"></i>
+          </div>
+          <div>
+            <h5 class="mb-0 text-primary">Student Attendance</h5>
+            <small class="text-muted">{{ attendance_date|date:"l, d F Y" }}</small>
+          </div>
+        </div>
+        <div class="d-flex align-items-center">
+          <div class="me-3">
+            <span class="badge bg-primary rounded-pill me-2">{{ students|length }} Students</span>
+            {% if students|length > 0 %}
+              <span class="badge bg-success rounded-pill">
+                <i class="fas fa-percentage me-1"></i>
+                {% widthratio present_leave students|length 100 %}% Present
+              </span>
+            {% endif %}
+          </div>
+          <div class="search-box position-relative">
+            <input type="text" id="student-search" class="form-control form-control-sm" placeholder="Search students..." style="width: 200px; padding-left: 30px;">
+            <i class="fas fa-search position-absolute" style="left: 10px; top: 9px; color: #aaa;"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions Bar -->
+      <div class="bg-light border-bottom py-2 px-3">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="quick-actions">
+            <button type="button" id="mark-all-present" class="btn btn-sm btn-outline-success me-2">
+              <i class="fas fa-check-circle me-1"></i> Mark All Present
+            </button>
+            <button type="button" id="mark-all-absent" class="btn btn-sm btn-outline-danger me-2">
+              <i class="fas fa-times-circle me-1"></i> Mark All Absent
+            </button>
+            <button type="button" id="clear-all" class="btn btn-sm btn-outline-secondary">
+              <i class="fas fa-eraser me-1"></i> Clear All
+            </button>
+          </div>
+          <div class="attendance-legend d-flex align-items-center flex-wrap">
+            <div class="d-flex align-items-center me-3">
+              <span class="badge bg-success rounded-circle me-1">&nbsp;</span>
+              <small>Present</small>
+            </div>
+            <div class="d-flex align-items-center me-3">
+              <span class="badge bg-warning rounded-circle me-1">&nbsp;</span>
+              <small>Leave</small>
+            </div>
+            <div class="d-flex align-items-center me-3">
+              <span class="badge bg-danger rounded-circle me-1">&nbsp;</span>
+              <small>Absent</small>
+            </div>
+            <div class="d-flex align-items-center me-3">
+              <span class="badge bg-secondary rounded-circle me-1">&nbsp;</span>
+              <small>Sunday</small>
+            </div>
+            <div class="d-flex align-items-center">
+              <span class="badge bg-info rounded-circle me-1">&nbsp;</span>
+              <small>Holiday</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table id="studenttable" class="table table-hover mb-0" data-page-length='25'>
+            <thead class="table-light">
+              <tr>
+                <th class="text-center" style="width: 50px;">S/N</th>
+                <th style="min-width: 200px;">Student Name</th>
+                <th>Unique ID</th>
+                <th>Father Name</th>
+                <th>Class/Section</th>
+                <th class="text-center" style="min-width: 250px;">Attendance Status</th>
+                <th style="min-width: 200px;">Comment</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for student in students %}
+              <tr class="student-row align-middle">
+                <td class="text-center fw-bold">{{ forloop.counter }}</td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    {% if student.passport %}
+                      <img src="{{ student.passport.url }}" class="rounded-circle me-2" width="40" height="40" alt="{{ student.fullname }}">
+                    {% else %}
+                      <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                        {{ student.fullname|slice:"0:1" }}
+                      </div>
+                    {% endif %}
+                    <div>
+                      <div class="fw-bold">{{ student.fullname }}</div>
+                      <div class="d-flex align-items-center">
+                        <span class="badge rounded-pill {% if student.gender == 'male' %}bg-info{% else %}bg-danger{% endif %} me-1" style="font-size: 8px;">
+                          <i class="fas {% if student.gender == 'male' %}fa-mars{% else %}fa-venus{% endif %}"></i>
+                        </span>
+                        <small class="text-muted">{{ student.gender|title }}</small>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="badge bg-light text-dark">{{ student.registration_number }}</span></td>
+                <td>{{ student.Father_name }}</td>
+                <td>
+                  <span class="badge bg-primary">{{ student.current_class }}</span>
+                  <span class="badge bg-secondary">{{ student.section }}</span>
+                </td>
+                <td>
+                  {% if is_sunday or holiday %}
+                  <div class="btn-group attendance-buttons w-100" data-student="{{ student.id }}">
+                    <button type="button" class="btn btn-sm attendance-btn btn-outline-secondary {% if student.attendance_status == 'Sunday' %}active btn-secondary text-white{% endif %}" data-value="Sunday" {% if is_sunday %}disabled{% endif %}>
+                      <i class="fas fa-calendar-day me-1"></i> Sunday
+                    </button>
+                    <button type="button" class="btn btn-sm attendance-btn btn-outline-info {% if student.attendance_status == 'Holiday' %}active btn-info text-white{% endif %}" data-value="Holiday" {% if holiday %}disabled{% endif %}>
+                      <i class="fas fa-calendar-minus me-1"></i> Holiday
+                    </button>
+                    <button type="button" class="btn btn-sm attendance-btn btn-outline-primary" data-value="Override" id="override-btn-{{ student.id }}">
+                      <i class="fas fa-edit me-1"></i> Override
+                    </button>
+                  </div>
+                  <div class="btn-group attendance-buttons w-100 mt-1 d-none" id="override-options-{{ student.id }}" data-student="{{ student.id }}">
+                    <button type="button" class="btn btn-sm attendance-btn btn-outline-success {% if student.attendance_status == 'Present' %}active btn-success text-white{% endif %}" data-value="Present">
+                      <i class="fas fa-check-circle me-1"></i> Present
+                    </button>
+                    <button type="button" class="btn btn-sm attendance-btn btn-outline-warning {% if student.attendance_status == 'Leave' %}active btn-warning text-dark{% endif %}" data-value="Leave">
+                      <i class="fas fa-exclamation-circle me-1"></i> Leave
+                    </button>
+                    <button type="button" class="btn btn-sm attendance-btn btn-outline-danger {% if student.attendance_status == 'Absent' %}active btn-danger text-white{% endif %}" data-value="Absent">
+                      <i class="fas fa-times-circle me-1"></i> Absent
+                    </button>
+                  </div>
+                {% else %}
+                  <div class="btn-group attendance-buttons w-100" data-student="{{ student.id }}">
+                    <button type="button" class="btn btn-sm attendance-btn btn-outline-success {% if student.attendance_status == 'Present' %}active btn-success text-white{% endif %}" data-value="Present">
+                      <i class="fas fa-check-circle me-1"></i> Present
+                    </button>
+                    <button type="button" class="btn btn-sm attendance-btn btn-outline-warning {% if student.attendance_status == 'Leave' %}active btn-warning text-dark{% endif %}" data-value="Leave">
+                      <i class="fas fa-exclamation-circle me-1"></i> Leave
+                    </button>
+                    <button type="button" class="btn btn-sm attendance-btn btn-outline-danger {% if student.attendance_status == 'Absent' %}active btn-danger text-white{% endif %}" data-value="Absent">
+                      <i class="fas fa-times-circle me-1"></i> Absent
+                    </button>
+                  </div>
+                {% endif %}
+                <input type="hidden" name="attendance_{{ student.id }}" id="attendance_{{ student.id }}" value="{{ student.attendance_status|default:'Absent' }}">
+                </td>
+                <td>
+                  <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-light"><i class="fas fa-comment text-primary"></i></span>
+                    <input type="text" class="form-control border-start-0" name="comment_{{ student.id }}" placeholder="Add comment here..." value="{{ student.attendance_comment|default:'' }}">
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="7" class="text-center py-5">
+                  <div class="py-5">
+                    <i class="fas fa-user-graduate fa-3x text-muted mb-3"></i>
+                    <h5>No Students Found</h5>
+                    <p class="text-muted">No students found for the selected class and section.</p>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="card-footer bg-white border-top d-flex justify-content-end py-3">
+        <button type="submit" id="submit-attendance" class="btn btn-primary px-4">
+          <i class="fas fa-save me-2"></i> Submit Attendance
+        </button>
+      </div>
+    </div>
+  </form>
+  {% else %}
+  <!-- No Class Selected Message -->
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-body text-center py-5">
+      <div class="py-5">
+        <div class="mb-4">
+          <div class="d-inline-block p-3 bg-light rounded-circle mb-3">
+            <i class="fas fa-chalkboard-teacher fa-3x text-primary"></i>
+          </div>
+          <h3 class="text-primary">Select a Class to Begin</h3>
+          <p class="text-muted mb-4">Please select a class and section to view and record attendance</p>
+        </div>
+
+        <div class="row justify-content-center">
+          <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+              <div class="card-body">
+                <h5 class="card-title mb-3"><i class="fas fa-graduation-cap me-2"></i>Quick Start</h5>
+                <form method="GET" action="" class="row g-3" id="quick-filter-form">
+                  <div class="col-md-6">
+                    <label for="quick-class-filter" class="form-label">Select Class</label>
+                    <select id="quick-class-filter" name="class_id" class="form-select">
+                      <option value="">Choose a Class</option>
+                      <!-- DEBUG: Quick Classes count: {{ classes|length }} -->
+                      {% for class in classes %}
+                      <option value="{{ class.id }}">{{ class.name }}</option>
+                      {% empty %}
+                      <option disabled>No classes found</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="quick-section-filter" class="form-label">Select Section</label>
+                    <select id="quick-section-filter" name="section" class="form-select" disabled>
+                      <option value="">Choose a Section</option>
+                    </select>
+                  </div>
+                  <div class="col-12 mt-4">
+                    <button type="submit" class="btn btn-primary w-100">
+                      <i class="fas fa-clipboard-check me-2"></i> View Attendance
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-5">
+          <div class="row justify-content-center">
+            <div class="col-md-8">
+              <div class="d-flex justify-content-around">
+                <div class="text-center px-3">
+                  <div class="rounded-circle bg-primary bg-opacity-10 p-3 d-inline-block mb-2">
+                    <i class="fas fa-filter text-primary"></i>
+                  </div>
+                  <h6>1. Select Class & Section</h6>
+                  <small class="text-muted">Choose the class and section</small>
+                </div>
+                <div class="text-center px-3">
+                  <div class="rounded-circle bg-success bg-opacity-10 p-3 d-inline-block mb-2">
+                    <i class="fas fa-calendar-day text-success"></i>
+                  </div>
+                  <h6>2. Choose Date</h6>
+                  <small class="text-muted">Select today or past week</small>
+                </div>
+                <div class="text-center px-3">
+                  <div class="rounded-circle bg-info bg-opacity-10 p-3 d-inline-block mb-2">
+                    <i class="fas fa-user-check text-info"></i>
+                  </div>
+                  <h6>3. Mark Attendance</h6>
+                  <small class="text-muted">Record student attendance</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Loading Overlay -->
+  <div id="loading-overlay" class="position-fixed top-0 start-0 w-100 h-100 d-none" style="background: rgba(0,0,0,0.7); z-index: 9999;">
+    <div class="d-flex justify-content-center align-items-center h-100">
+      <div class="bg-white p-4 rounded-3 shadow-lg text-center" style="width: 200px;">
+        <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <h5 class="mb-1">Processing</h5>
+        <p class="text-muted small mb-0">Please wait...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript for Attendance Selection and Form Submission -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function () {
+
+    // Set current date in the header if not already set by Django
+    const today = new Date();
+    // Format date for display with more professional formatting
+    const formattedDate = today.toLocaleDateString('en-GB', {
+      weekday: 'long', day: '2-digit', month: 'long', year: 'numeric'
+    });
+
+    // Update the date in the header if needed
+    if (!$('#header-current-date').text()) {
+      $('#header-current-date').text(formattedDate);
+    }
+
+    // Add hover effect to date container
+    $('.date-container').hover(function() {
+      $(this).css({
+        'transform': 'translateY(-3px)',
+        'box-shadow': '0 8px 15px rgba(30, 60, 114, 0.2)'
+      });
+    }, function() {
+      $(this).css({
+        'transform': '',
+        'box-shadow': ''
+      });
+    });
+
+    // Format date to YYYY-MM-DD
+    function formatDate(date) {
+      return date.toISOString().split('T')[0];
+    }
+
+    // Calculate date range for attendance (today and past week)
+    const todayStr = formatDate(today);
+
+    // Calculate one week ago
+    const oneWeekAgo = new Date(today);
+    oneWeekAgo.setDate(today.getDate() - 7);
+    const oneWeekAgoStr = formatDate(oneWeekAgo);
+
+    // Set default date in date picker if not already set
+    if ($('#attendance-date').length && !$('#attendance-date').val()) {
+      $('#attendance-date').val(todayStr);
+    }
+
+    // Set min and max date for the date picker
+    $('#attendance-date').attr('min', oneWeekAgoStr);
+    $('#attendance-date').attr('max', todayStr);
+
+    // Today button functionality
+    $('#today-btn').on('click', function() {
+      $('#attendance-date').val(todayStr);
+      $('#filter-form').submit();
+    });
+
+    // Validate date selection
+    $('#attendance-date').on('change', function() {
+      const selectedDate = new Date($(this).val());
+
+      if (selectedDate > today) {
+        alert('You cannot take attendance for future dates!');
+        $(this).val(todayStr);
+        return;
+      }
+
+      if (selectedDate < oneWeekAgo) {
+        alert('You can only update attendance for the past week!');
+        $(this).val(oneWeekAgoStr);
+        return;
+      }
+
+      $('#filter-form').submit();
+    });
+
+    // Class-section filter functionality is handled by the global class-section-filter.js script
+
+    // Handle attendance button clicks
+    $(".attendance-btn").click(function () {
+      const studentId = $(this).closest(".attendance-buttons").data("student");
+      const selectedValue = $(this).data("value");
+
+      // Handle override button click
+      if (selectedValue === "Override") {
+        $("#override-options-" + studentId).toggleClass("d-none");
+        return;
+      }
+
+      // Remove active class from all buttons in this group
+      $(this).siblings().removeClass("active btn-success btn-warning btn-danger btn-secondary btn-info text-white text-dark");
+
+      // Add appropriate classes based on selection
+      if (selectedValue === "Present") {
+        $(this).addClass("active btn-success text-white");
+      } else if (selectedValue === "Leave") {
+        $(this).addClass("active btn-warning text-dark");
+      } else if (selectedValue === "Absent") {
+        $(this).addClass("active btn-danger text-white");
+      } else if (selectedValue === "Sunday") {
+        $(this).addClass("active btn-secondary text-white");
+      } else if (selectedValue === "Holiday") {
+        $(this).addClass("active btn-info text-white");
+      }
+
+      // Update the hidden input field with the selected value
+      $("#attendance_" + studentId).val(selectedValue);
+    });
+
+    // Quick action buttons
+    $("#mark-all-present").click(function() {
+      $(".attendance-buttons:not(.d-none)").each(function() {
+        const studentId = $(this).data("student");
+        const presentBtn = $(this).find('[data-value="Present"]');
+
+        // Skip if this is a Sunday/Holiday button group and override options are hidden
+        if (presentBtn.length === 0 && $("#override-options-" + studentId).hasClass("d-none")) {
+          // Show override options
+          $("#override-options-" + studentId).removeClass("d-none");
+        }
+
+        if (presentBtn.length > 0) {
+          // Simulate click on the Present button
+          presentBtn.siblings().removeClass("active btn-success btn-warning btn-danger btn-secondary btn-info text-white text-dark");
+          presentBtn.addClass("active btn-success text-white");
+
+          // Update the hidden input
+          $("#attendance_" + studentId).val("Present");
+        }
+      });
+    });
+
+    $("#mark-all-absent").click(function() {
+      $(".attendance-buttons:not(.d-none)").each(function() {
+        const studentId = $(this).data("student");
+        const absentBtn = $(this).find('[data-value="Absent"]');
+
+        // Skip if this is a Sunday/Holiday button group and override options are hidden
+        if (absentBtn.length === 0 && $("#override-options-" + studentId).hasClass("d-none")) {
+          // Show override options
+          $("#override-options-" + studentId).removeClass("d-none");
+        }
+
+        if (absentBtn.length > 0) {
+          // Simulate click on the Absent button
+          absentBtn.siblings().removeClass("active btn-success btn-warning btn-danger btn-secondary btn-info text-white text-dark");
+          absentBtn.addClass("active btn-danger text-white");
+
+          // Update the hidden input
+          $("#attendance_" + studentId).val("Absent");
+        }
+      });
+    });
+
+    $("#clear-all").click(function() {
+      $(".attendance-buttons").each(function() {
+        const studentId = $(this).data("student");
+        const isSundayHolidayGroup = $(this).find('[data-value="Sunday"]').length > 0 || $(this).find('[data-value="Holiday"]').length > 0;
+
+        // Hide override options if visible
+        $("#override-options-" + studentId).addClass("d-none");
+
+        // Remove active class from all buttons
+        $(this).find('button').removeClass("active btn-success btn-warning btn-danger btn-secondary btn-info text-white text-dark");
+
+        // Reset button styles
+        $(this).find('[data-value="Absent"]').addClass("btn-outline-danger");
+        $(this).find('[data-value="Present"]').addClass("btn-outline-success");
+        $(this).find('[data-value="Leave"]').addClass("btn-outline-warning");
+        $(this).find('[data-value="Sunday"]').addClass("btn-outline-secondary");
+        $(this).find('[data-value="Holiday"]').addClass("btn-outline-info");
+
+        // Reset the hidden input to appropriate default
+        if (isSundayHolidayGroup) {
+          const isSunday = $(this).find('[data-value="Sunday"]').prop('disabled');
+          const isHoliday = $(this).find('[data-value="Holiday"]').prop('disabled');
+
+          if (isSunday) {
+            $("#attendance_" + studentId).val("Sunday");
+            $(this).find('[data-value="Sunday"]').addClass("active btn-secondary text-white");
+          } else if (isHoliday) {
+            $("#attendance_" + studentId).val("Holiday");
+            $(this).find('[data-value="Holiday"]').addClass("active btn-info text-white");
+          } else {
+            $("#attendance_" + studentId).val("Absent");
+          }
+        } else {
+          $("#attendance_" + studentId).val("Absent");
+          $(this).find('[data-value="Absent"]').addClass("active btn-danger text-white");
+        }
+      });
+
+      // Clear all comments
+      $("input[name^='comment_']").val('');
+    });
+
+    // Form submission with AJAX
+    $("#attendance-form").on("submit", function(e) {
+      e.preventDefault();
+
+      // Show loading overlay
+      $("#loading-overlay").removeClass("d-none");
+
+      // Hide any existing messages
+      $("#success-message, #error-message").addClass("d-none");
+
+      // Submit the form via AJAX
+      $.ajax({
+        url: $(this).attr("action"),
+        type: "POST",
+        data: $(this).serialize(),
+        success: function(response) {
+          // Hide loading overlay
+          $("#loading-overlay").addClass("d-none");
+
+          // Update and show success message
+          $("#success-text").text(response.message || "Attendance has been saved successfully.");
+          $("#success-message").removeClass("d-none").addClass("show");
+
+          // Auto hide after 5 seconds
+          setTimeout(function() {
+            $("#success-message").removeClass("show");
+          }, 5000);
+        },
+        error: function(xhr, status, error) {
+          // Hide loading overlay
+          $("#loading-overlay").addClass("d-none");
+
+          // Show error message with details if available
+          $("#error-text").text(xhr.responseJSON?.message || "There was a problem saving attendance.");
+          $("#error-message").removeClass("d-none").addClass("show");
+
+          // Auto hide after 5 seconds
+          setTimeout(function() {
+            $("#error-message").removeClass("show");
+          }, 5000);
+        }
+      });
+    });
+  });
+</script>
+
+{% endblock content %}
+
+{% block morejs %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Initialize DataTable with search functionality disabled (we'll use our own)
+  $('#studenttable').DataTable({
+    "searching": false,
+    "paging": false,
+    "info": false
+  });
+
+  // Student search functionality
+  $('#student-search').on('keyup', function() {
+    const searchText = $(this).val().toLowerCase();
+    $('.student-row').each(function() {
+      const studentName = $(this).find('td:nth-child(2)').text().toLowerCase();
+      const regNumber = $(this).find('td:nth-child(3)').text().toLowerCase();
+      const fatherName = $(this).find('td:nth-child(4)').text().toLowerCase();
+
+      if (studentName.includes(searchText) || regNumber.includes(searchText) || fatherName.includes(searchText)) {
+        $(this).show();
+      } else {
+        $(this).hide();
+      }
+    });
+  });
+
+  // Class-section filter functionality is handled by the global class-section-filter.js script
+  // Additional functionality for the quick-start form
+  $('#quick-class-filter').on('change', function() {
+    const classId = $(this).val();
+    const sectionSelect = $('#quick-section-filter');
+
+    // Disable/enable section dropdown based on class selection
+    sectionSelect.prop('disabled', !classId);
+  });
+
+  // Take attendance button functionality
+  $('#take-attendance-btn').on('click', function() {
+    // Set date to today and redirect to the form
+    const today = new Date().toISOString().split('T')[0];
+    window.location.href = `?class_id=${$('#quick-class-filter').val()}&section=${$('#quick-section-filter').val()}&attendance_date=${today}`;
+  });
+
+  // Initialize the attendance chart
+  document.addEventListener('DOMContentLoaded', function() {
+    const chartCanvas = document.getElementById('attendanceChart');
+    if (chartCanvas) {
+      // Prepare data arrays
+      const labels = [];
+      const presentData = [];
+      const leaveData = [];
+      const absentData = [];
+
+      // Get data directly from Django template
+      {% if weekly_attendance %}
+        {% for day in weekly_attendance %}
+          labels.push('{{ day.date|date:"D" }}');
+          presentData.push({{ day.present|default:0 }});
+          leaveData.push({{ day.leave|default:0 }});
+          absentData.push({{ day.absent|default:0 }});
+          console.log('Added data for {{ day.date|date:"D" }}: Present={{ day.present|default:0 }}, Leave={{ day.leave|default:0 }}, Absent={{ day.absent|default:0 }}{% if day.is_sunday %}, Sunday{% endif %}{% if day.is_holiday %}, Holiday{% endif %}');
+        {% endfor %}
+      {% endif %}
+
+      // Reverse arrays to show oldest date first
+      labels.reverse();
+      presentData.reverse();
+      leaveData.reverse();
+      absentData.reverse();
+
+      // Create arrays for Sunday and Holiday indicators
+      const sundayData = [];
+      const holidayData = [];
+
+      {% if weekly_attendance %}
+        {% for day in weekly_attendance %}
+          {% if day.is_sunday %}
+            sundayData.push({{ day.total|default:0 }});
+          {% else %}
+            sundayData.push(0);
+          {% endif %}
+
+          {% if day.is_holiday and not day.is_sunday %}
+            holidayData.push({{ day.total|default:0 }});
+          {% else %}
+            holidayData.push(0);
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+
+      // Reverse the Sunday and Holiday arrays
+      sundayData.reverse();
+      holidayData.reverse();
+
+      // Create the chart
+      const ctx = chartCanvas.getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Present',
+              data: presentData,
+              backgroundColor: 'rgba(40, 167, 69, 0.7)',
+              borderColor: 'rgb(40, 167, 69)',
+              borderWidth: 1
+            },
+            {
+              label: 'Leave',
+              data: leaveData,
+              backgroundColor: 'rgba(255, 193, 7, 0.7)',
+              borderColor: 'rgb(255, 193, 7)',
+              borderWidth: 1
+            },
+            {
+              label: 'Absent',
+              data: absentData,
+              backgroundColor: 'rgba(220, 53, 69, 0.7)',
+              borderColor: 'rgb(220, 53, 69)',
+              borderWidth: 1
+            },
+            {
+              label: 'Sunday',
+              data: sundayData,
+              backgroundColor: 'rgba(108, 117, 125, 0.7)',
+              borderColor: 'rgb(108, 117, 125)',
+              borderWidth: 1
+            },
+            {
+              label: 'Holiday',
+              data: holidayData,
+              backgroundColor: 'rgba(23, 162, 184, 0.7)',
+              borderColor: 'rgb(23, 162, 184)',
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            tooltip: {
+              callbacks: {
+                title: function(tooltipItems) {
+                  return tooltipItems[0].label;
+                },
+                label: function(context) {
+                  const label = context.dataset.label || '';
+                  const value = context.parsed.y || 0;
+                  return `${label}: ${value} students`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              stacked: true,
+              title: {
+                display: true,
+                text: 'Date'
+              }
+            },
+            y: {
+              stacked: true,
+              beginAtZero: true,
+              ticks: {
+                precision: 0
+              },
+              title: {
+                display: true,
+                text: 'Number of Students'
+              }
+            }
+          }
+        }
+      });
+    }
+  });
+</script>
+{% endblock morejs %}

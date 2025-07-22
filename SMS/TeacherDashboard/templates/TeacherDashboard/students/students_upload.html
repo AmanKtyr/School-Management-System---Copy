@@ -1,0 +1,391 @@
+{% extends 'TeacherDashboard/base.html' %}
+{% load static %}
+
+{% block title %}Bulk Student Upload - Teacher Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .upload-card {
+        border-left: 4px solid #28a745;
+        transition: all 0.3s ease;
+    }
+    .upload-card:hover {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .upload-zone {
+        border: 2px dashed #28a745;
+        border-radius: 10px;
+        padding: 40px;
+        text-align: center;
+        background: #f8f9fa;
+        transition: all 0.3s ease;
+    }
+    .upload-zone:hover {
+        background: #e9ecef;
+        border-color: #20c997;
+    }
+    .upload-zone.dragover {
+        background: #d4edda;
+        border-color: #155724;
+    }
+    .step-card {
+        border-left: 4px solid #007bff;
+        margin-bottom: 20px;
+    }
+    .step-number {
+        background: #007bff;
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content-center;
+        font-weight: bold;
+    }
+    .file-info {
+        background: #e3f2fd;
+        border: 1px solid #bbdefb;
+        border-radius: 5px;
+        padding: 10px;
+        margin-top: 10px;
+    }
+    .sample-table {
+        font-size: 0.9em;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-0">
+                        <i class="fas fa-upload text-success"></i>
+                        Bulk Student Upload
+                    </h2>
+                    <p class="text-muted mb-0">Upload multiple students using CSV file</p>
+                </div>
+                <div>
+                    <a href="{% url 'teacher_download_csv' %}" class="btn btn-info">
+                        <i class="fas fa-download"></i> Download Template
+                    </a>
+                    <a href="{% url 'teacher_students_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Students
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Upload Form -->
+        <div class="col-lg-8">
+            <div class="card upload-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-cloud-upload-alt text-success"></i>
+                        Upload CSV File
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" id="uploadForm">
+                        {% csrf_token %}
+                        
+                        <div class="upload-zone" id="uploadZone">
+                            <i class="fas fa-cloud-upload-alt fa-4x text-success mb-3"></i>
+                            <h4>Drag & Drop CSV File Here</h4>
+                            <p class="text-muted mb-3">or click to browse files</p>
+                            
+                            <div class="mb-3">
+                                {{ form.csv_file }}
+                                {% if form.csv_file.errors %}
+                                    <div class="text-danger mt-2">{{ form.csv_file.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div id="fileInfo" class="file-info" style="display: none;">
+                                <i class="fas fa-file-csv text-success"></i>
+                                <span id="fileName"></span>
+                                <span id="fileSize" class="text-muted"></span>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 text-center">
+                            <button type="submit" class="btn btn-success btn-lg" id="uploadBtn" disabled>
+                                <i class="fas fa-upload"></i> Upload Students
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Upload Instructions -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle text-info"></i>
+                        Upload Instructions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="step-card card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="step-number me-3">1</div>
+                                        <h6 class="mb-0">Download Template</h6>
+                                    </div>
+                                    <p class="text-muted mb-0">
+                                        Download the CSV template file with the correct column headers.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="step-card card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="step-number me-3">2</div>
+                                        <h6 class="mb-0">Fill Student Data</h6>
+                                    </div>
+                                    <p class="text-muted mb-0">
+                                        Add student information in the template following the format.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="step-card card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="step-number me-3">3</div>
+                                        <h6 class="mb-0">Save as CSV</h6>
+                                    </div>
+                                    <p class="text-muted mb-0">
+                                        Save the file as CSV format (comma-separated values).
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="step-card card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="step-number me-3">4</div>
+                                        <h6 class="mb-0">Upload File</h6>
+                                    </div>
+                                    <p class="text-muted mb-0">
+                                        Upload the CSV file using the form above.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sample Data & Guidelines -->
+        <div class="col-lg-4">
+            <!-- Sample Data -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-table text-primary"></i>
+                        Sample CSV Format
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm sample-table">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>registration_number</th>
+                                    <th>fullname</th>
+                                    <th>gender</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>2024001</td>
+                                    <td>John Doe</td>
+                                    <td>male</td>
+                                </tr>
+                                <tr>
+                                    <td>2024002</td>
+                                    <td>Jane Smith</td>
+                                    <td>female</td>
+                                </tr>
+                                <tr>
+                                    <td>2024003</td>
+                                    <td>Mike Johnson</td>
+                                    <td>male</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <small class="text-muted">
+                        <strong>Note:</strong> This shows only first 3 columns. 
+                        Download template for all columns.
+                    </small>
+                </div>
+            </div>
+
+            <!-- Guidelines -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-exclamation-triangle text-warning"></i>
+                        Important Guidelines
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success"></i>
+                            Use only CSV format files
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success"></i>
+                            Keep column headers exactly as in template
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success"></i>
+                            Use 'male' or 'female' for gender
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success"></i>
+                            Registration numbers should be unique
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success"></i>
+                            Mobile numbers should be 10-15 digits
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-times text-danger"></i>
+                            Don't leave required fields empty
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-times text-danger"></i>
+                            Don't modify column headers
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- File Requirements -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-file-alt text-info"></i>
+                        File Requirements
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li><strong>Format:</strong> CSV (.csv)</li>
+                        <li><strong>Max Size:</strong> 10 MB</li>
+                        <li><strong>Max Records:</strong> 1000 students</li>
+                        <li><strong>Encoding:</strong> UTF-8</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadZone = document.getElementById('uploadZone');
+    const fileInput = document.getElementById('id_csv_file');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const uploadBtn = document.getElementById('uploadBtn');
+
+    // Handle file input change
+    fileInput.addEventListener('change', function(e) {
+        handleFile(e.target.files[0]);
+    });
+
+    // Handle drag and drop
+    uploadZone.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        uploadZone.classList.add('dragover');
+    });
+
+    uploadZone.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        uploadZone.classList.remove('dragover');
+    });
+
+    uploadZone.addEventListener('drop', function(e) {
+        e.preventDefault();
+        uploadZone.classList.remove('dragover');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            handleFile(files[0]);
+        }
+    });
+
+    // Handle file selection
+    function handleFile(file) {
+        if (file) {
+            // Validate file type
+            if (!file.name.toLowerCase().endsWith('.csv')) {
+                alert('Please select a CSV file.');
+                fileInput.value = '';
+                return;
+            }
+
+            // Validate file size (10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                alert('File size should not exceed 10MB.');
+                fileInput.value = '';
+                return;
+            }
+
+            // Show file info
+            fileName.textContent = file.name;
+            fileSize.textContent = `(${formatFileSize(file.size)})`;
+            fileInfo.style.display = 'block';
+            uploadBtn.disabled = false;
+        } else {
+            fileInfo.style.display = 'none';
+            uploadBtn.disabled = true;
+        }
+    }
+
+    // Format file size
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Form submission
+    document.getElementById('uploadForm').addEventListener('submit', function(e) {
+        if (!fileInput.files[0]) {
+            e.preventDefault();
+            alert('Please select a CSV file to upload.');
+            return;
+        }
+
+        // Show loading state
+        uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+        uploadBtn.disabled = true;
+    });
+});
+</script>
+{% endblock %}

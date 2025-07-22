@@ -1,0 +1,280 @@
+{% extends 'TeacherDashboard/base.html' %}
+{% load static %}
+
+{% block title %}Delete Student - {{ object.fullname }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .delete-warning {
+        border-left: 4px solid #dc3545;
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+    }
+    .related-data-card {
+        border-left: 4px solid #ffc107;
+    }
+    .student-info-card {
+        border-left: 4px solid #007bff;
+    }
+    .danger-zone {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        color: white;
+        border-radius: 10px;
+    }
+    .related-item {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+    .related-item i {
+        color: #856404;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-0 text-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Delete Student
+                    </h2>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{% url 'teacher_dashboard' %}">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="{% url 'teacher_students_list' %}">Students</a></li>
+                            <li class="breadcrumb-item"><a href="{% url 'teacher_student_detail' object.pk %}">{{ object.fullname }}</a></li>
+                            <li class="breadcrumb-item active">Delete</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div>
+                    <a href="{% url 'teacher_student_detail' object.pk %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Student
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Warning Alert -->
+    <div class="alert alert-danger delete-warning" role="alert">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+            <div>
+                <h5 class="alert-heading mb-1">⚠️ Permanent Deletion Warning</h5>
+                <p class="mb-0">
+                    You are about to permanently delete this student and all associated records. 
+                    This action <strong>cannot be undone</strong>.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Student Information -->
+        <div class="col-lg-6">
+            <div class="card student-info-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user text-primary"></i>
+                        Student Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        {% if object.passport %}
+                            <img src="{{ object.passport.url }}" alt="{{ object.fullname }}" 
+                                 class="rounded-circle border" width="100" height="100">
+                        {% else %}
+                            <div class="bg-light rounded-circle mx-auto d-flex align-items-center justify-content-center" 
+                                 style="width: 100px; height: 100px;">
+                                <i class="fas fa-user fa-3x text-muted"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <table class="table table-borderless">
+                        <tr>
+                            <td><strong>Full Name:</strong></td>
+                            <td>{{ object.fullname }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Registration No:</strong></td>
+                            <td>{{ object.registration_number|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Class:</strong></td>
+                            <td>{{ object.current_class|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Section:</strong></td>
+                            <td>{{ object.section|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Gender:</strong></td>
+                            <td>{{ object.get_gender_display }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Status:</strong></td>
+                            <td>
+                                <span class="badge bg-{% if object.current_status == 'active' %}success{% else %}danger{% endif %}">
+                                    {{ object.get_current_status_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Date of Birth:</strong></td>
+                            <td>{{ object.date_of_birth|date:"d M, Y" }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Father's Name:</strong></td>
+                            <td>{{ object.Father_name|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mobile Number:</strong></td>
+                            <td>{{ object.mobile_number|default:"-" }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Related Data Information -->
+        <div class="col-lg-6">
+            <div class="card related-data-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-database text-warning"></i>
+                        Related Records to be Deleted
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">
+                        The following related records will also be permanently deleted:
+                    </p>
+
+                    <div class="related-item">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <strong>Fee Payments:</strong> {{ related_data.fee_payments }} records
+                    </div>
+
+                    <div class="related-item">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <strong>Pending Fees:</strong> {{ related_data.pending_fees }} records
+                    </div>
+
+                    <div class="related-item">
+                        <i class="fas fa-calendar-check"></i>
+                        <strong>Attendance Records:</strong> {{ related_data.attendance }} records
+                    </div>
+
+                    <div class="related-item">
+                        <i class="fas fa-graduation-cap"></i>
+                        <strong>Exam Marks:</strong> {{ related_data.marks }} records
+                    </div>
+
+                    <div class="related-item">
+                        <i class="fas fa-id-card"></i>
+                        <strong>Admit Cards:</strong> {{ related_data.admit_cards }} records
+                    </div>
+
+                    <div class="related-item">
+                        <i class="fas fa-clipboard-check"></i>
+                        <strong>Exam Attendance:</strong> {{ related_data.exam_attendance }} records
+                    </div>
+
+                    <div class="related-item">
+                        <i class="fas fa-file-alt"></i>
+                        <strong>Documents:</strong> {{ related_data.documents }} records
+                    </div>
+
+                    {% if related_data.fee_payments > 0 or related_data.pending_fees > 0 or related_data.marks > 0 %}
+                    <div class="alert alert-warning mt-3">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Important:</strong> This student has academic and financial records. 
+                        Consider marking the student as "inactive" instead of deleting.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Danger Zone -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card danger-zone">
+                <div class="card-body text-center py-4">
+                    <i class="fas fa-skull-crossbones fa-3x mb-3"></i>
+                    <h4 class="mb-3">Danger Zone</h4>
+                    <p class="mb-4">
+                        Once you delete this student, there is no going back. Please be certain.
+                    </p>
+                    
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{% url 'teacher_student_detail' object.pk %}" class="btn btn-light btn-lg">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        
+                        <form method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-lg" 
+                                    onclick="return confirmDelete()">
+                                <i class="fas fa-trash"></i> Yes, Delete Student
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <small class="text-light">
+                            Alternative: <a href="{% url 'teacher_student_update' object.pk %}" class="text-warning">
+                                <u>Mark student as inactive</u>
+                            </a> instead of deleting
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function confirmDelete() {
+    const studentName = "{{ object.fullname|escapejs }}";
+    const confirmText = `Are you absolutely sure you want to delete ${studentName}?\n\nThis will permanently delete:\n- Student record\n- All attendance records\n- All fee records\n- All exam records\n- All documents\n\nThis action CANNOT be undone!\n\nType "DELETE" to confirm:`;
+    
+    const userInput = prompt(confirmText);
+    
+    if (userInput === "DELETE") {
+        return confirm(`Last chance! Are you sure you want to permanently delete ${studentName}?`);
+    } else {
+        alert("Deletion cancelled. Student was not deleted.");
+        return false;
+    }
+}
+
+// Add warning when user tries to leave the page
+window.addEventListener('beforeunload', function(e) {
+    // Only show warning if user hasn't clicked cancel or delete
+    const message = 'Are you sure you want to leave? The student deletion process is not complete.';
+    e.returnValue = message;
+    return message;
+});
+
+// Remove warning when user clicks cancel or delete buttons
+document.querySelectorAll('a, button[type="submit"]').forEach(element => {
+    element.addEventListener('click', function() {
+        window.removeEventListener('beforeunload', function() {});
+    });
+});
+</script>
+{% endblock %}

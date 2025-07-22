@@ -1,0 +1,468 @@
+{% extends 'website/base.html' %}
+{% load static %}
+
+{% block title %}SipherEdu - School & College Management System{% endblock %}
+
+{% block content %}
+
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .carousel-item {
+      background: linear-gradient(to right, #374c73ff, #879ecaff);
+      padding: 10px 10px
+      min-height: 500px;
+      position: relative;
+
+    }
+
+    .carousel-item h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+    }
+
+    .carousel-item p {
+      font-size: 1.1rem;
+      margin-bottom: 25px;
+    }
+
+    .floating-label {
+      position: absolute;
+      background: #fff;
+      border-radius: 12px;
+      padding: 10px 15px;
+      font-size: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      z-index: 10;
+    }
+
+    .label-content { top: 20%; left: 65%; }
+    .label-assessments { top: 45%; left: 75%; }
+    .label-tracking { top: 70%; left: 65%; }
+
+    .award-badge {
+      display: inline-block;
+      background: #fff;
+      padding: 10px 15px;
+      margin: 5px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      font-size: 0.9rem;
+    }
+    .carousel-indicators{
+           bottom: -67px;
+    }
+
+    .btn-primary {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: 2px solid var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+    color: var(--white);
+}
+  </style>
+
+    <!-- Hero Section -->
+    <section class="hero-section" id="home">
+        {% comment %} <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="hero-content">
+                        <h1>Transform Your Educational Institution with SipherEdu</h1>
+                        <p>A comprehensive SaaS solution for schools and colleges in India. Streamline administration, enhance teaching, and improve student outcomes with our all-in-one management system.</p>
+                        <div class="hero-btns">
+                            <a href="{% url 'login' %}" class="btn btn-primary">Get Started</a>
+                            <a href="#features" class="btn btn-outline">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="hero-image">
+                        <img src="https://smartstudent.app/media/2022/09/managment-software.png" alt="SipherEdu Dashboard" class="img-fluid" style="height: 500px;">
+                    </div>
+                </div>
+            </div>
+        </div> {% endcomment %}
+
+        <div id="lmsCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="7000">
+  <div class="carousel-inner">
+
+    <!-- Slide 1 -->
+    <div class="carousel-item active">
+      <div class="container">
+        <div class="row align-items-center">
+          <!-- Text Content -->
+          <div class="col-md-6">
+            <h2 class="text-white">Empower Learning with <span class="text-warning">SipherEdu LMS</span></h2>
+            <p class="text-white">Bridge the gap between teachers and students with our feature-rich <span class="fw-bold">Learning Management System</span>.</p>
+            <div class="mb-4">
+              <a class="btn btn-warning me-3" href="#">Get Started</a>
+              <a class="btn btn-outline-primary bg-primary text-white"  href="#">▶ Watch Video</a>
+            </div>
+
+            <!-- Awards -->
+            <div class="d-flex flex-wrap">
+              <div class="award-badge">🏅 Atma Nirbhar Bharat Award</div>
+              <div class="award-badge">🏅 Best Digital Transformation</div>
+              <div class="award-badge">🏅 Education Excellence Award</div>
+              <div class="award-badge">🏅 Most Innovative ERP</div>
+            </div>
+          </div>
+
+          <!-- Image & Floating Labels -->
+          <div class="col-md-6 position-relative text-center  hero-image">
+            {% comment %} <img src="https://smartstudent.app/media/2022/09/managment-software.png" class="img-fluid" alt="Student"> {% endcomment %}
+
+             <img src="static/img/banner_image_5.f79542b0.png" alt="SipherEdu Dashboard" class="img-fluid" style="height: 500px;">
+            {% comment %} <div class="floating-label label-content">📚 Interactive Content Delivery</div>
+            <div class="floating-label label-assessments">📝 Seamless Assignments</div>
+            <div class="floating-label label-tracking">📈 Progress Tracking</div> {% endcomment %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 2 -->
+    <div class="carousel-item ">
+      <div class="container">
+        <div class="row align-items-center">
+          <!-- Text Content -->
+          <div class="col-md-6">
+            <h2 class="text-white">Empower Learning with <span class="text-warning">SipherEdu LMS</span></h2>
+            <p class="text-white">Bridge the gap between teachers and students with our feature-rich <span class="fw-bold">Learning Management System</span>.</p>
+            <div class="mb-4">
+              <a class="btn btn-warning me-3" href="#">Get Started</a>
+              <a class="btn btn-outline-dark  bg-primary text-white" href="#">▶ Watch Video</a>
+            </div>
+
+            <!-- Awards -->
+            <div class="d-flex flex-wrap">
+              <div class="award-badge">🏅 Atma Nirbhar Bharat Award</div>
+              <div class="award-badge">🏅 Best Digital Transformation</div>
+              <div class="award-badge">🏅 Education Excellence Award</div>
+              <div class="award-badge">🏅 Most Innovative ERP</div>
+            </div>
+          </div>
+
+          <!-- Image & Floating Labels -->
+          <div class="col-md-6 position-relative text-center hero-image">
+            {% comment %} <img src="https://smartstudent.app/media/2022/09/managment-software.png" class="img-fluid" alt="Student"> {% endcomment %}
+             <img src="static/img/banner_image_7.e46c6c96.png" alt="SipherEdu Dashboard" class="img-fluid" style="height: 500px;">
+            {% comment %} <div class="floating-label label-content">📚 Interactive Content Delivery</div>
+            <div class="floating-label label-assessments">📝 Seamless Assignments</div>
+            <div class="floating-label label-tracking">📈 Progress Tracking</div> {% endcomment %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Slide 2 -->
+    {% comment %} <div class="carousel-item">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <h2>Next-Gen Education Tools</h2>
+            <p>Enable virtual classrooms, real-time assessment, and personalized learning using our modern tools.</p>
+            <a class="btn btn-primary" href="#">Explore Features</a>
+          </div>
+          <div class="col-md-6 text-center hero-image">
+            {% comment %} <img src="{% static 'img/about/education-management-system.jpg' %}" class="img-fluid" alt="Tools"> {% endcomment %}
+
+             {% comment %} <img src="https://smartstudent.app/media/2022/09/managment-software.png" alt="SipherEdu Dashboard" class="img-fluid" style="height: 500px;">
+          </div>
+        </div>
+      </div>
+    </div> {% endcomment %} 
+
+     <div class="carousel-item ">
+      <div class="container">
+        <div class="row align-items-center">
+          <!-- Text Content -->
+          <div class="col-md-6">
+            <h2 class="text-white">Empower Learning with <span class="text-warning">SipherEdu LMS</span></h2>
+            <p class="text-white">Bridge the gap between teachers and students with our feature-rich <span class="fw-bold">Learning Management System</span>.</p>
+            <div class="mb-4">
+              <a class="btn btn-warning me-3" href="#">Get Started</a>
+              <a class="btn btn-outline-dark bg-primary text-white" href="#">▶ Watch Video</a>
+            </div>
+
+            <!-- Awards -->
+            <div class="d-flex flex-wrap">
+              <div class="award-badge">🏅 Student Management</div>
+              <div class="award-badge">🏅 Staff Management</div>
+              <div class="award-badge">🏅 Fee Management</div>
+              <div class="award-badge">🏅 Examination System</div>
+            </div>
+          </div>
+
+          <!-- Image & Floating Labels -->
+          <div class="col-md-6 position-relative text-center hero-image">
+            {% comment %} <img src="https://smartstudent.app/media/2022/09/managment-software.png" class="img-fluid" alt="Student"> {% endcomment %}
+             <img src="https://smartstudent.app/media/2022/09/managment-software.png" alt="SipherEdu Dashboard" class="img-fluid" style="height: 500px;">
+            {% comment %} <div class="floating-label label-content">📚 Interactive Content Delivery</div>
+            <div class="floating-label label-assessments">📝 Seamless Assignments</div>
+            <div class="floating-label label-tracking">📈 Progress Tracking</div> {% endcomment %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+
+  <!-- Carousel Controls -->
+  {% comment %} <button class="carousel-control-prev" type="button" data-bs-target="#lmsCarousel" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon"></span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#lmsCarousel" data-bs-slide="next">
+    <span class="carousel-control-next-icon"></span>
+  </button> {% endcomment %}
+
+  <!-- Indicators -->
+  <div class="carousel-indicators">
+    <button type="button" data-bs-target="#lmsCarousel" data-bs-slide-to="0" class="active"></button>
+    <button type="button" data-bs-target="#lmsCarousel" data-bs-slide-to="1"></button>
+    <button type="button" data-bs-target="#lmsCarousel" data-bs-slide-to="2"></button>
+    {% comment %} <button type="button" data-bs-target="#lmsCarousel" data-bs-slide-to="3"></button> {% endcomment %}
+
+  </div>
+</div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section" id="features">
+        <div class="container">
+            <div class="section-header text-center">
+                <h2>Powerful Features for Modern Education</h2>
+                <p>Everything you need to manage your educational institution efficiently</p>
+            </div>
+            <div class="row">
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <h3>Student Management</h3>
+                        <p>Comprehensive student profiles, attendance tracking, and performance analytics.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <h3>Staff Management</h3>
+                        <p>Efficiently manage teaching and non-teaching staff records, attendance, and performance.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <h3>Fee Management</h3>
+                        <p>Streamline fee collection, generate invoices, and track payments with ease.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h3>Examination System</h3>
+                        <p>Create and manage exams, record marks, and generate comprehensive result reports.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <h3>Attendance Tracking</h3>
+                        <p>Track student and staff attendance with detailed reports and analytics.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-folder-open"></i>
+                        </div>
+                        <h3>Document Management</h3>
+                        <p>Securely store and manage important documents and certificates.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about-section" id="about">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="about-image">
+                        <img src="{% static 'img/school-management-system-service.jpg' %}" alt="About SipherEdu" class="img-fluid">
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="about-content">
+                        <h2>About SipherEdu</h2>
+                        <p>SipherEdu is a comprehensive School and College Management System designed specifically for Indian educational institutions. Our platform bridges the gap between traditional education and modern technology.</p>
+                        <p>With a focus on simplicity, security, and efficiency, SipherEdu helps educational institutions streamline their administrative processes, enhance teaching methodologies, and improve overall student outcomes.</p>
+                        <div class="about-stats">
+                            <div class="stat-item">
+                                <h3>500+</h3>
+                                <p>Schools & Colleges</p>
+                            </div>
+                            <div class="stat-item">
+                                <h3>100,000+</h3>
+                                <p>Students Managed</p>
+                            </div>
+                            <div class="stat-item">
+                                <h3>99.9%</h3>
+                                <p>Uptime</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials-section" id="testimonials">
+        <div class="container">
+            <div class="section-header text-center">
+                <h2>What Our Clients Say</h2>
+                <p>Trusted by educational institutions across India</p>
+            </div>
+            <div class="row">
+                <div class="col-lg-4 col-md-6">
+                    <div class="testimonial-card">
+                        <div class="testimonial-content">
+                            <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
+                            <p>"SipherEdu has transformed how we manage our school. The administrative burden has been reduced significantly, allowing us to focus more on education."</p>
+                        </div>
+                        <div class="testimonial-author">
+                            <div class="author-icon">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                            <div class="author-info">
+                                <h4>Rajesh Kumar</h4>
+                                <p>Principal, Delhi Public School</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="testimonial-card">
+                        <div class="testimonial-content">
+                            <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
+                            <p>"The fee management system is exceptional. We've reduced payment delays by 75% and our accounting team loves the automated reports and reconciliation."</p>
+                        </div>
+                        <div class="testimonial-author">
+                            <div class="author-icon">
+                                <i class="fas fa-user-cog"></i>
+                            </div>
+                            <div class="author-info">
+                                <h4>Priya Sharma</h4>
+                                <p>Administrator, St. Mary's College</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="testimonial-card">
+                        <div class="testimonial-content">
+                            <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
+                            <p>"As a teacher, I appreciate how easy it is to track attendance, manage grades, and communicate with students and parents through one platform."</p>
+                        </div>
+                        <div class="testimonial-author">
+                            <div class="author-icon">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                            </div>
+                            <div class="author-info">
+                                <h4>Amit Patel</h4>
+                                <p>Teacher, Modern Academy</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section" id="contact">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="contact-info">
+                        <h2>Get In Touch</h2>
+                        <p>Have questions about SipherEdu? Our team is here to help you.</p>
+                        <div class="info-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <div>
+                                <h4>Address</h4>
+                                <p>Jankipuram, Lucknow - 226021, India</p>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-phone-alt"></i>
+                            <div>
+                                <h4>Phone</h4>
+                                <p>+91 +91 9125525608</p>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-envelope"></i>
+                            <div>
+                                <h4>Email</h4>
+                                <p>info@SipherEdu.com</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="contact-form">
+                        <h3>Send Us a Message</h3>
+                        <form>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" placeholder="Your Name">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <input type="email" class="form-control" placeholder="Your Email">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Subject">
+                            </div>
+                            <div class="form-group">
+                                <textarea class="form-control" rows="5" placeholder="Your Message"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+
+{% endblock %}

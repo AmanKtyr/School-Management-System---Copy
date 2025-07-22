@@ -67,7 +67,7 @@ class Student(models.Model):
 
 
     def generate_registration_number(self):
-        """Generate sequential registration number based on class and section"""
+        """Generate unique sequential registration number based on class and section"""
         if not self.registration_number:
             # Get year suffix (last 2 digits of admission year)
             year_suffix = str(self.date_of_admission.year)[-2:]
@@ -78,42 +78,87 @@ class Student(models.Model):
             # Get section (default to 'A' if empty)
             section = self.section if self.section else "A"
 
-            # Find the highest number for this class and section
-            class_section_students = Student.objects.filter(
-                current_class=self.current_class,
-                section=section
-            )
+            # Create base prefix for the registration number
+            prefix = f"{year_suffix}{current_class}{section}"
 
-            # Extract the sequence number from existing registration numbers
-            max_number = 0
-            for student in class_section_students:
-                if student.registration_number and len(student.registration_number) >= 3:
+            # Find the highest number for this prefix pattern
+            existing_numbers = Student.objects.filter(
+                registration_number__startswith=prefix
+            ).exclude(pk=self.pk if self.pk else None).values_list('registration_number', flat=True)
+
+            # Extract sequence numbers from existing registration numbers
+            used_numbers = set()
+            for reg_num in existing_numbers:
+                if reg_num and len(reg_num) >= len(prefix) + 3:
                     try:
-                        # Try to extract the sequence number from the end of the registration number
-                        seq_number = int(student.registration_number[-3:])
-                        if seq_number > max_number:
-                            max_number = seq_number
+                        # Extract the sequence number from the end
+                        seq_number = int(reg_num[-3:])
+                        used_numbers.add(seq_number)
                     except (ValueError, IndexError):
                         pass
 
-            # Generate the next sequence number (1-200 range)
-            next_number = max_number + 1
-            if next_number > 200:
-                next_number = 1  # Reset if exceeds 200
+            # Find the next available number (1-999 range)
+            next_number = 1
+            while next_number in used_numbers and next_number <= 999:
+                next_number += 1
+
+            # If we've exhausted all numbers, use timestamp-based fallback
+            if next_number > 999:
+                import time
+                timestamp_suffix = str(int(time.time()))[-3:]
+                next_number = int(timestamp_suffix)
+
+                # Ensure it's still unique
+                while next_number in used_numbers:
+                    next_number = (next_number + 1) % 1000
 
             # Format the sequence number to be 3 digits (e.g., 001, 012, 123)
             formatted_number = f"{next_number:03d}"
 
             # Create the registration number in format: YYClassSection###
             # Example: 25 + 11 + A + 001 = 2511A001
-            self.registration_number = f"{year_suffix}{current_class}{section}{formatted_number}"
+            proposed_reg_number = f"{prefix}{formatted_number}"
+
+            # Final uniqueness check with retry mechanism
+            retry_count = 0
+            while Student.objects.filter(registration_number=proposed_reg_number).exclude(pk=self.pk if self.pk else None).exists():
+                retry_count += 1
+                next_number = (next_number + retry_count) % 1000
+                formatted_number = f"{next_number:03d}"
+                proposed_reg_number = f"{prefix}{formatted_number}"
+
+                # Prevent infinite loop
+                if retry_count > 100:
+                    import uuid
+                    # Use UUID as last resort
+                    unique_suffix = str(uuid.uuid4().hex)[:3].upper()
+                    proposed_reg_number = f"{prefix}{unique_suffix}"
+                    break
+
+            self.registration_number = proposed_reg_number
 
         return self.registration_number
 
     def save(self, *args, **kwargs):
+        from django.db import IntegrityError
+
         if not self.registration_number:
             self.registration_number = self.generate_registration_number()
-        super().save(*args, **kwargs)
+
+        # Handle potential IntegrityError with retry mechanism
+        max_retries = 5
+        for attempt in range(max_retries):
+            try:
+                super().save(*args, **kwargs)
+                break  # Success, exit the loop
+            except IntegrityError as e:
+                if 'registration_number' in str(e) and attempt < max_retries - 1:
+                    # Registration number conflict, regenerate and try again
+                    self.registration_number = None  # Reset to force regeneration
+                    self.registration_number = self.generate_registration_number()
+                else:
+                    # Re-raise the error if it's not registration_number related or max retries reached
+                    raise e
 
     def get_total_fee(self):
         """Calculate total fee for the student"""
