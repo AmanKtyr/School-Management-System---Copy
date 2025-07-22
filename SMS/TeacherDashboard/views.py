@@ -305,19 +305,7 @@ def teacher_attendance_mark(request):
         return render(request, 'TeacherDashboard/attendance/attendance_mark.html', {})
 
 
-@login_required
-def teacher_profile(request):
-    """Teacher profile view"""
-    try:
-        staff = Staff.objects.get(user=request.user)
 
-        context = {
-            'staff': staff,
-        }
-        return render(request, 'TeacherDashboard/profile/profile.html', context)
-    except Staff.DoesNotExist:
-        messages.error(request, 'Staff profile not found.')
-        return render(request, 'TeacherDashboard/profile/profile.html', {})
 
 
 @login_required
@@ -379,8 +367,18 @@ def teacher_profile(request):
     try:
         staff = Staff.objects.get(user=request.user)
 
+        # Get additional statistics for the teacher
+        total_students = Student.objects.filter(current_status='active').count()
+        total_classes = StudentClass.objects.count()
+
+        # Get recent activities (you can customize this based on your needs)
+        recent_students = Student.objects.filter(current_status='active').order_by('-date_of_admission')[:5]
+
         context = {
             'staff': staff,
+            'total_students': total_students,
+            'total_classes': total_classes,
+            'recent_students': recent_students,
         }
         return render(request, 'TeacherDashboard/profile.html', context)
     except Staff.DoesNotExist:
