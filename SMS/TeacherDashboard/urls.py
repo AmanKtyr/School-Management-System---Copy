@@ -36,6 +36,9 @@ urlpatterns = [
     # Main Dashboard
     path('dashboard/', teacher_dashboard, name='teacher_dashboard'),
 
+    # Test URL to verify teacher dashboard is working
+    path('test/', lambda request: HttpResponse("TEACHER DASHBOARD IS WORKING!"), name='teacher_test'),
+
     # ============ COMPREHENSIVE STUDENT MANAGEMENT ============
     # Enhanced Student Management (Class-based views)
     path('students/list/', TeacherStudentListView.as_view(), name='teacher_students_list'),
@@ -57,12 +60,8 @@ urlpatterns = [
 
     # ============ COMPREHENSIVE ATTENDANCE MANAGEMENT ============
     # Enhanced Attendance Management
-    path('attendance/management/', teacher_attendance_management, name='teacher_attendance_management'),
-    path('attendance/get-students/<int:class_id>/', teacher_get_students_for_attendance, name='teacher_get_students_for_attendance'),
-    path('attendance/submit/', teacher_submit_attendance, name='teacher_submit_attendance'),
-    path('attendance/reports/', teacher_attendance_reports, name='teacher_attendance_reports'),
-
-
+    path('attendance/list/', teacher_attendance_list, name='attendance_list'),
+    path('attendance/get-students/<int:class_id>/', teacher_get_students_for_attendance, name='attendance_get_students'),
 
     # ============ ORIGINAL VIEWS (Backward Compatibility) ============
     # Original Students Management (Function-based views - kept for backward compatibility)

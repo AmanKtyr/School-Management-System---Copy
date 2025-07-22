@@ -18,6 +18,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 from django.conf.urls.i18n import i18n_patterns
+from apps.corecode.views import get_sections_by_class
 
 urlpatterns = [
     path('admin/', admin.site.urls),  # <-- Add this line for admin
@@ -34,6 +35,8 @@ urlpatterns = [
     path('student-dashboard/', include('StudentDashboard.urls')),
     path('teacher-dashboard/', include('TeacherDashboard.urls')),
     path('account-dashboard/', include('AccountDashboard.urls')),
+    # API endpoints (direct access for JavaScript)
+    path('api/get-sections/<int:class_id>/', get_sections_by_class, name='api_get_sections'),
 ]
 
 urlpatterns += [

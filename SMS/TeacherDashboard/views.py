@@ -82,20 +82,210 @@ def teacher_student_detail(request, pk):
 
 @login_required
 def teacher_attendance_list(request):
-    """Teacher-specific attendance management"""
+    """Teacher-specific attendance management with class/section filtering"""
+    print(f"DEBUG: teacher_attendance_list called by user: {request.user}")
+    print(f"DEBUG: User is authenticated: {request.user.is_authenticated}")
+    print("TEACHER ATTENDANCE VIEW CALLED!!!")
+
+    if not request.user.is_authenticated:
+        print("DEBUG: User not authenticated, redirecting to login")
+        from django.contrib.auth.views import redirect_to_login
+        return redirect_to_login(request.get_full_path())
+
+    # Get all classes for the dropdown (regardless of staff status)
+    classes = StudentClass.objects.all().order_by('name')
+    print(f"DEBUG: Found {classes.count()} classes: {[(c.id, c.name) for c in classes]}")
+    selected_class_id = request.GET.get('class_id')
+    selected_section = request.GET.get('section', '')
+    print(f"DEBUG: selected_class_id={selected_class_id}, selected_section={selected_section}")
+
+    # Try to get staff, but continue even if not found
     try:
         staff = Staff.objects.get(user=request.user)
-        # Get attendance records for teacher's classes
-        attendance_records = Attendance.objects.all()[:20]  # Adjust query as needed
+        print(f"DEBUG: Found staff: {staff}")
+    except Staff.DoesNotExist:
+        print(f"DEBUG: No staff found for user: {request.user}")
+        staff = None
+
+        # Get attendance date from request or use today's date
+        attendance_date_str = request.GET.get('attendance_date')
+        today = timezone.now().date()
+
+        # Calculate one week ago for date restriction
+        one_week_ago = today - datetime.timedelta(days=7)
+
+        if attendance_date_str:
+            try:
+                attendance_date = datetime.datetime.strptime(attendance_date_str, '%Y-%m-%d').date()
+                # Ensure date is not in the future and not more than a week in the past
+                if attendance_date > today:
+                    attendance_date = today
+                elif attendance_date < one_week_ago:
+                    attendance_date = one_week_ago
+            except ValueError:
+                attendance_date = today
+        else:
+            attendance_date = today
+
+        students = []
+        selected_class_name = None
+        sections = []
+        weekly_attendance = []
+
+        # Check if the selected date is a Sunday
+        is_sunday = attendance_date.weekday() == 6  # 6 represents Sunday
+
+        # Check if the selected date is a holiday
+        holiday = None
+        try:
+            holiday = Holiday.objects.filter(date=attendance_date).first()
+        except Exception:
+            pass
+
+        if selected_class_id:
+            # Get the selected class name for display
+            try:
+                selected_class = StudentClass.objects.get(id=selected_class_id)
+                selected_class_name = selected_class.name
+
+                # Get all sections for this class
+                sections = Student.objects.filter(
+                    current_class_id=selected_class_id,
+                    current_status='active'
+                ).values_list('section', flat=True).distinct()
+
+                # Filter students by class and section if provided
+                student_query = Student.objects.filter(current_class_id=selected_class_id)
+                if selected_section:
+                    student_query = student_query.filter(section=selected_section)
+
+                students = student_query.filter(current_status='active')
+
+                # Get existing attendance records for these students on the selected date
+                attendance_records = Attendance.objects.filter(
+                    student__in=students,
+                    date=attendance_date
+                ).select_related('student')
+
+                # Create a dictionary of student_id -> attendance record
+                attendance_dict = {record.student.id: record for record in attendance_records}
+
+                # Attach attendance status and comment to each student
+                for student in students:
+                    if student.id in attendance_dict:
+                        record = attendance_dict[student.id]
+                        student.attendance_status = record.status
+                        student.attendance_comment = record.comment
+                        student.is_holiday = record.is_holiday
+                        student.holiday_name = record.holiday_name
+                    else:
+                        # Set default status based on whether it's a Sunday or holiday
+                        if is_sunday:
+                            student.attendance_status = 'Sunday'
+                            student.attendance_comment = 'Weekend'
+                            student.is_holiday = True
+                            student.holiday_name = 'Sunday'
+                        elif holiday:
+                            student.attendance_status = 'Holiday'
+                            student.attendance_comment = holiday.name
+                            student.is_holiday = True
+                            student.holiday_name = holiday.name
+                        else:
+                            student.attendance_status = 'Present'
+                            student.attendance_comment = ''
+                            student.is_holiday = False
+                            student.holiday_name = ''
+
+                # Generate weekly attendance data for the chart
+                for i in range(7):
+                    day_date = attendance_date - datetime.timedelta(days=i)
+                    day_is_sunday = day_date.weekday() == 6
+                    day_holiday = None
+
+                    try:
+                        day_holiday = Holiday.objects.filter(date=day_date).first()
+                    except Exception:
+                        pass
+
+                    if day_is_sunday or day_holiday:
+                        status = "Holiday"
+                        present_count = 0
+                        leave_count = 0
+                        absent_count = 0
+                        holiday_count = len(students)
+                        total_students = len(students)
+                    else:
+                        day_attendance = Attendance.objects.filter(
+                            student__in=students,
+                            date=day_date
+                        )
+
+                        present_count = day_attendance.filter(status="Present").count()
+                        leave_count = day_attendance.filter(status="Leave").count()
+                        absent_count = day_attendance.filter(status="Absent").count()
+                        holiday_count = day_attendance.filter(status__in=["Holiday", "Sunday"]).count()
+                        total_students = len(students)
+                        status = "Regular"
+
+                    weekly_attendance.append({
+                        'date': day_date,
+                        'present': present_count,
+                        'leave': leave_count,
+                        'absent': absent_count,
+                        'holiday': holiday_count,
+                        'total': total_students,
+                        'is_sunday': day_is_sunday,
+                        'is_holiday': True if day_holiday else False,
+                        'holiday_name': day_holiday.name if day_holiday else ("Sunday" if day_is_sunday else ""),
+                        'status': status
+                    })
+            except StudentClass.DoesNotExist:
+                pass
+
+        # Get attendance statistics for the selected date, class, and section
+        attendance_query = Attendance.objects.filter(date=attendance_date)
+
+        if selected_class_id:
+            attendance_query = attendance_query.filter(student__current_class_id=selected_class_id)
+
+            if selected_section:
+                attendance_query = attendance_query.filter(student__section=selected_section)
+
+        present_leave = attendance_query.filter(status__in=["Present", "Leave"]).count()
+        absent = attendance_query.filter(status="Absent").count()
+        holiday_count = attendance_query.filter(status__in=["Holiday", "Sunday"]).count()
+
+        # Get class teacher (placeholder - you can implement this based on your data model)
+        class_teacher = None
+        if selected_class_id:
+            # This is a placeholder - replace with your actual logic to get class teacher
+            class_teacher = "Class Teacher"  # Replace with actual teacher name if available
 
         context = {
-            'attendance_records': attendance_records,
+            "classes": classes,
+            "sections": sections,
+            "students": students,
+            "selected_class_id": selected_class_id,
+            "selected_class_name": selected_class_name,
+            "selected_section": selected_section,
+            "attendance_date": attendance_date,
+            "present_leave": present_leave,
+            "absent": absent,
+            "holiday_count": holiday_count,
+            "class_teacher": class_teacher,
+            "weekly_attendance": weekly_attendance,
+            "today": today,
+            "one_week_ago": one_week_ago,
+            "is_sunday": is_sunday,
+            "holiday": holiday,
             'staff': staff,
         }
-        return render(request, 'TeacherDashboard/attendance/attendance_list.html', context)
-    except Staff.DoesNotExist:
-        messages.error(request, 'Staff profile not found.')
-        return render(request, 'TeacherDashboard/attendance/attendance_list.html', {})
+    print(f"DEBUG: Context classes count: {len(classes)}")
+    print(f"DEBUG: Context classes: {[(c.id, c.name) for c in classes]}")
+    return render(request, 'TeacherDashboard/attendance/attendance_list.html', context)
+
+
+
 
 
 @login_required
@@ -103,16 +293,31 @@ def teacher_attendance_mark(request):
     """Teacher attendance marking interface"""
     try:
         staff = Staff.objects.get(user=request.user)
-        students = Student.objects.filter(current_status='active')
+        classes = StudentClass.objects.all()
 
         context = {
-            'students': students,
+            'classes': classes,
             'staff': staff,
         }
         return render(request, 'TeacherDashboard/attendance/attendance_mark.html', context)
     except Staff.DoesNotExist:
         messages.error(request, 'Staff profile not found.')
         return render(request, 'TeacherDashboard/attendance/attendance_mark.html', {})
+
+
+@login_required
+def teacher_profile(request):
+    """Teacher profile view"""
+    try:
+        staff = Staff.objects.get(user=request.user)
+
+        context = {
+            'staff': staff,
+        }
+        return render(request, 'TeacherDashboard/profile/profile.html', context)
+    except Staff.DoesNotExist:
+        messages.error(request, 'Staff profile not found.')
+        return render(request, 'TeacherDashboard/profile/profile.html', {})
 
 
 @login_required
