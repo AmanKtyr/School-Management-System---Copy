@@ -1,6 +1,109 @@
 {% extends 'TeacherDashboard/base.html' %}
 {% load humanize %}
 
+{% block extra_css %}
+<style>
+  .bg-primary-dark {
+    background-color: #0056b3 !important;
+  }
+  .bg-success-dark {
+    background-color: #155724 !important;
+  }
+  .bg-warning-dark {
+    background-color: #856404 !important;
+  }
+  .bg-info-dark {
+    background-color: #0c5460 !important;
+  }
+  .border-left-primary {
+    border-left: 4px solid #007bff !important;
+  }
+  .card-body .btn-block {
+    text-align: center;
+    padding: 1rem;
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .card-body .btn-block i {
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  .statistics-card {
+    transition: transform 0.2s;
+  }
+  .statistics-card:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Fix for statistics cards text visibility */
+  .statistics-card .card-body h4,
+  .statistics-card .card-body p {
+    color: white !important;
+    font-weight: bold !important;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .statistics-card .card-footer a,
+  .statistics-card .card-footer small,
+  .statistics-card .card-footer div {
+    color: white !important;
+    text-decoration: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .statistics-card .card-footer a:hover {
+    color: #f8f9fa !important;
+    opacity: 0.9 !important;
+  }
+
+  /* Ensure proper spacing and visibility */
+  .statistics-card .card-body {
+    padding: 1.5rem !important;
+    background: inherit !important;
+  }
+
+  .statistics-card .card-footer {
+    padding: 0.75rem 1.5rem !important;
+    border-top: 1px solid rgba(255,255,255,0.2) !important;
+    background: inherit !important;
+  }
+
+  /* Force text to be visible */
+  .text-white {
+    color: #ffffff !important;
+  }
+
+  .text-white-50 {
+    color: rgba(255,255,255,0.75) !important;
+  }
+
+  .fw-bold {
+    font-weight: 700 !important;
+  }
+
+  /* Additional fixes for Bootstrap conflicts */
+  .statistics-card * {
+    color: inherit;
+  }
+
+  .statistics-card .card-body h4 {
+    font-size: 2rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .statistics-card .card-body p {
+    font-size: 0.9rem !important;
+    line-height: 1.4 !important;
+  }
+</style>
+{% endblock extra_css %}
+
 {% block breadcrumb-left %}
 <div class="breadcrumb-container">
   <nav aria-label="breadcrumb">
@@ -31,86 +134,300 @@
 {% endblock page-actions %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container-fluid mt-4">
+  <!-- Statistics Cards Row -->
   <div class="row mb-4">
-    <div class="col-md-8">
-      <div class="card shadow-sm">
-        <div class="card-header bg-success text-white">
-          <h5 class="mb-0"><i class="fas fa-chalkboard-teacher me-2"></i> Your Classes</h5>
-        </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="card bg-primary text-white shadow-sm statistics-card">
         <div class="card-body">
-          <ul class="list-group">
-            {% for class in teacher_classes %}
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                {{ class.name }}
-                <span class="badge bg-primary">{{ class.student_count }} Students</span>
-              </li>
-            {% empty %}
-              <li class="list-group-item">No classes assigned.</li>
-            {% endfor %}
-          </ul>
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="flex-grow-1">
+              <h4 class="mb-1 fw-bold" style="color: #ffffff !important; font-size: 2rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">{{ total_students|default:0 }}</h4>
+              <p class="mb-0" style="color: rgba(255,255,255,0.85) !important; font-size: 0.9rem;">Total Students</p>
+            </div>
+            <div class="ms-3">
+              <i class="fas fa-user-graduate fa-2x" style="color: rgba(255,255,255,0.7) !important;"></i>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer bg-primary-dark border-0">
+          <a href="{% url 'teacher_students_list' %}" class="text-decoration-none d-flex justify-content-between align-items-center" style="color: #ffffff !important;">
+            <small style="color: #ffffff !important;">View All Students</small>
+            <i class="fas fa-arrow-right" style="color: #ffffff !important;"></i>
+          </a>
         </div>
       </div>
     </div>
-    <div class="col-md-4">
-      <div class="card shadow-sm">
-        <div class="card-header bg-info text-white">
-          <h5 class="mb-0"><i class="fas fa-tasks me-2"></i> Recent Assignments</h5>
-        </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="card bg-success text-white shadow-sm statistics-card">
         <div class="card-body">
-          <ul class="list-group">
-            {% for assignment in teacher_assignments %}
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                {{ assignment.title }}
-                <span class="badge bg-secondary">Due: {{ assignment.due_date }}</span>
-              </li>
-            {% empty %}
-              <li class="list-group-item">No assignments found.</li>
-            {% endfor %}
-          </ul>
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="flex-grow-1">
+              <h4 class="mb-1 fw-bold" style="color: #ffffff !important; font-size: 2rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">{{ new_admissions_this_month|default:0 }}</h4>
+              <p class="mb-0" style="color: rgba(255,255,255,0.85) !important; font-size: 0.9rem;">New Admissions</p>
+            </div>
+            <div class="ms-3">
+              <i class="fas fa-user-plus fa-2x" style="color: rgba(255,255,255,0.7) !important;"></i>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer bg-success-dark border-0">
+          <a href="{% url 'teacher_student_create' %}" class="text-decoration-none d-flex justify-content-between align-items-center" style="color: #ffffff !important;">
+            <small style="color: #ffffff !important;">Add New Student</small>
+            <i class="fas fa-arrow-right" style="color: #ffffff !important;"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="card bg-warning text-white shadow-sm statistics-card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="flex-grow-1">
+              <h4 class="mb-1 fw-bold" style="color: #ffffff !important; font-size: 2rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">{{ pending_fees_count|default:0 }}</h4>
+              <p class="mb-0" style="color: rgba(255,255,255,0.85) !important; font-size: 0.9rem;">Pending Fees</p>
+            </div>
+            <div class="ms-3">
+              <i class="fas fa-money-bill-wave fa-2x" style="color: rgba(255,255,255,0.7) !important;"></i>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer bg-warning-dark border-0">
+          <div>
+            <small style="color: #ffffff !important;">Fee Management</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="card bg-info text-white shadow-sm statistics-card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="flex-grow-1">
+              <h4 class="mb-1 fw-bold" style="color: #ffffff !important; font-size: 2rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">{{ today_attendance|default:0 }}</h4>
+              <p class="mb-0" style="color: rgba(255,255,255,0.85) !important; font-size: 0.9rem;">Today's Attendance</p>
+            </div>
+            <div class="ms-3">
+              <i class="fas fa-calendar-check fa-2x" style="color: rgba(255,255,255,0.7) !important;"></i>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer bg-info-dark border-0">
+          <a href="{% url 'teacher_attendance_list' %}" class="text-decoration-none d-flex justify-content-between align-items-center" style="color: #ffffff !important;">
+            <small style="color: #ffffff !important;">View Attendance</small>
+            <i class="fas fa-arrow-right" style="color: #ffffff !important;"></i>
+          </a>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Main Content Row -->
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="fas fa-chalkboard-teacher me-2"></i> Your Classes</h5>
+        </div>
+        <div class="card-body">
+          {% if teacher_classes %}
+            <div class="row">
+              {% for class in teacher_classes %}
+                <div class="col-md-6 mb-3">
+                  <div class="card border-left-primary">
+                    <div class="card-body">
+                      <h6 class="card-title">{{ class.name }}</h6>
+                      <p class="card-text text-muted">Class {{ class.name }}</p>
+                      <div class="d-flex justify-content-between">
+                        <span class="badge bg-primary">Active</span>
+                        <small class="text-muted">{{ class.name }}</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="text-center py-4">
+              <i class="fas fa-chalkboard-teacher fa-3x text-muted mb-3"></i>
+              <p class="text-muted">No classes assigned yet.</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0"><i class="fas fa-users me-2"></i> Recent Students</h5>
+        </div>
+        <div class="card-body">
+          {% if recent_students %}
+            <div class="list-group list-group-flush">
+              {% for student in recent_students %}
+                <div class="list-group-item border-0 px-0">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <h6 class="mb-1">{{ student.fullname }}</h6>
+                      <small class="text-muted">{{ student.current_class }} - {{ student.section }}</small>
+                    </div>
+                    <span class="badge bg-success">{{ student.get_current_status_display }}</span>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+            <div class="text-center mt-3">
+              <a href="{% url 'teacher_students_list' %}" class="btn btn-sm btn-outline-success">View All Students</a>
+            </div>
+          {% else %}
+            <div class="text-center py-3">
+              <i class="fas fa-user-graduate fa-2x text-muted mb-2"></i>
+              <p class="text-muted mb-0">No students found.</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Exams and Documents Row -->
   <div class="row mb-4">
     <div class="col-md-6">
       <div class="card shadow-sm">
         <div class="card-header bg-warning text-dark">
-          <h5 class="mb-0"><i class="fas fa-calendar-check me-2"></i> Upcoming Events</h5>
+          <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i> Upcoming Exams</h5>
         </div>
         <div class="card-body">
-          <ul class="list-group">
-            {% for event in teacher_events %}
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                {{ event.title }}
-                <span class="badge bg-info">{{ event.date }}</span>
-              </li>
-            {% empty %}
-              <li class="list-group-item">No upcoming events.</li>
-            {% endfor %}
-          </ul>
+          {% if upcoming_exams %}
+            <div class="list-group list-group-flush">
+              {% for exam in upcoming_exams %}
+                <div class="list-group-item border-0 px-0">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <h6 class="mb-1">{{ exam.name }}</h6>
+                      <small class="text-muted">{{ exam.start_date|date:"M d, Y" }} - {{ exam.end_date|date:"M d, Y" }}</small>
+                    </div>
+                    <span class="badge bg-warning">{{ exam.get_status_display }}</span>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+            <div class="text-center mt-3">
+              <a href="{% url 'teacher_exams_list' %}" class="btn btn-sm btn-outline-warning">View All Exams</a>
+            </div>
+          {% else %}
+            <div class="text-center py-3">
+              <i class="fas fa-calendar-alt fa-2x text-muted mb-2"></i>
+              <p class="text-muted mb-0">No upcoming exams.</p>
+            </div>
+          {% endif %}
         </div>
       </div>
     </div>
+
     <div class="col-md-6">
       <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-          <h5 class="mb-0"><i class="fas fa-clipboard-list me-2"></i> Gradebook</h5>
+        <div class="card-header bg-info text-white">
+          <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i> Recent Exams</h5>
         </div>
         <div class="card-body">
-          <ul class="list-group">
-            {% for gradebook in teacher_gradebooks %}
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                {{ gradebook.class_name }}
-                <span class="badge bg-success">{{ gradebook.entries_count }} Entries</span>
-              </li>
-            {% empty %}
-              <li class="list-group-item">No gradebook entries.</li>
-            {% endfor %}
-          </ul>
+          {% if recent_exams %}
+            <div class="list-group list-group-flush">
+              {% for exam in recent_exams %}
+                <div class="list-group-item border-0 px-0">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <h6 class="mb-1">{{ exam.name }}</h6>
+                      <small class="text-muted">Completed: {{ exam.end_date|date:"M d, Y" }}</small>
+                    </div>
+                    <span class="badge bg-success">{{ exam.get_status_display }}</span>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+            <div class="text-center mt-3">
+              <a href="{% url 'teacher_marks_entry' %}" class="btn btn-sm btn-outline-info">Enter Marks</a>
+            </div>
+          {% else %}
+            <div class="text-center py-3">
+              <i class="fas fa-file-alt fa-2x text-muted mb-2"></i>
+              <p class="text-muted mb-0">No recent exams.</p>
+            </div>
+          {% endif %}
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Quick Actions Row -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+          <h5 class="mb-0"><i class="fas fa-bolt me-2"></i> Quick Actions</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3 mb-3">
+              <a href="{% url 'teacher_student_create' %}" class="btn btn-outline-primary btn-block w-100">
+                <i class="fas fa-user-plus fa-2x mb-2"></i><br>
+                <span>Add Student</span>
+              </a>
+            </div>
+            <div class="col-md-3 mb-3">
+              <a href="{% url 'teacher_student_create_udise' %}" class="btn btn-outline-success btn-block w-100">
+                <i class="fas fa-id-card fa-2x mb-2"></i><br>
+                <span>UDISE+ Form</span>
+              </a>
+            </div>
+            <div class="col-md-3 mb-3">
+              <a href="{% url 'teacher_attendance_mark' %}" class="btn btn-outline-info btn-block w-100">
+                <i class="fas fa-calendar-check fa-2x mb-2"></i><br>
+                <span>Mark Attendance</span>
+              </a>
+            </div>
+            <div class="col-md-3 mb-3">
+              <a href="{% url 'teacher_documents_list' %}" class="btn btn-outline-warning btn-block w-100">
+                <i class="fas fa-file-alt fa-2x mb-2"></i><br>
+                <span>Documents</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Session Information -->
+  {% if current_session or current_term %}
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-secondary text-white">
+          <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i> Academic Information</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            {% if current_session %}
+            <div class="col-md-6">
+              <h6><i class="fas fa-calendar-alt text-primary"></i> Current Session</h6>
+              <p class="mb-0">{{ current_session.name }}</p>
+            </div>
+            {% endif %}
+            {% if current_term %}
+            <div class="col-md-6">
+              <h6><i class="fas fa-clock text-success"></i> Current Term</h6>
+              <p class="mb-0">{{ current_term.name }}</p>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
 </div>
 {% endblock content %}

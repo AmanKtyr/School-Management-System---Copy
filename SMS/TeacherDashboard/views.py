@@ -11,34 +11,101 @@ from django.urls import reverse_lazy
 from django.views.decorators.http import require_POST
 from django.db import IntegrityError, transaction
 from django.utils import timezone
+from django.db.models import Count, Q, Sum
 import datetime
 
 from apps.students.models import Student, StudentBulkUpload, StudentDocument, StudentUDISEInfo
 from apps.students.forms import StudentForm
 from apps.staffs.models import Staff
 from apps.attendance.models import Attendance, Holiday
-from apps.exams.models import Exam, Mark
+from apps.exams.models import Exam, Mark, ExamSchedule
 from apps.documents.models import Document
-from apps.corecode.models import StudentClass, Section
+from apps.corecode.models import StudentClass, Section, AcademicSession, AcademicTerm
 from apps.corecode.filters import ClassSectionFilterForm
+from apps.fees.models import FeePayment, PendingFee
 
 
 @login_required
 def teacher_dashboard(request):
-    """Main teacher dashboard"""
+    """Enhanced teacher dashboard with comprehensive statistics"""
     try:
         # Get the staff object for the logged-in user
         staff = Staff.objects.get(user=request.user)
 
-        # Get teacher's assigned classes/students (you may need to adjust this based on your model structure)
-        teacher_students = Student.objects.filter(current_status='active')[:10]  # Limit for dashboard
-        recent_exams = Exam.objects.all()[:5]
+        # Get current academic session and term
+        try:
+            current_session = AcademicSession.objects.filter(current=True).first()
+            current_term = AcademicTerm.objects.filter(current=True).first()
+        except:
+            current_session = None
+            current_term = None
+
+        # Get teacher's assigned classes (you may need to adjust this based on your model structure)
+        teacher_classes = StudentClass.objects.all()[:5]  # Adjust based on teacher assignment logic
+
+        # Get students statistics
+        total_students = Student.objects.filter(current_status='active').count()
+        new_admissions_this_month = Student.objects.filter(
+            date_of_admission__month=timezone.now().month,
+            date_of_admission__year=timezone.now().year
+        ).count()
+
+        # Get recent students for dashboard display
+        recent_students = Student.objects.filter(current_status='active').order_by('-date_of_admission')[:5]
+
+        # Get exam statistics
+        upcoming_exams = Exam.objects.filter(
+            start_date__gte=timezone.now().date(),
+            status__in=['pending', 'ongoing']
+        ).order_by('start_date')[:5]
+
+        recent_exams = Exam.objects.filter(
+            status='completed'
+        ).order_by('-end_date')[:3]
+
+        # Get attendance statistics for today
+        today = timezone.now().date()
+        today_attendance = Attendance.objects.filter(date=today).count()
+
+        # Get documents count
+        total_documents = Document.objects.count()
+
+        # Get fee statistics
+        pending_fees_count = PendingFee.objects.count()
+        total_fee_collected = FeePayment.objects.filter(status='Paid').aggregate(
+            total=Sum('amount')
+        )['total'] or 0
 
         context = {
             'staff': staff,
-            'teacher_students': teacher_students,
+            'current_session': current_session,
+            'current_term': current_term,
+
+            # Student statistics
+            'total_students': total_students,
+            'new_admissions_this_month': new_admissions_this_month,
+            'recent_students': recent_students,
+
+            # Class information
+            'teacher_classes': teacher_classes,
+
+            # Exam information
+            'upcoming_exams': upcoming_exams,
             'recent_exams': recent_exams,
-            'total_students': teacher_students.count(),
+
+            # Attendance
+            'today_attendance': today_attendance,
+
+            # Documents and fees
+            'total_documents': total_documents,
+            'pending_fees_count': pending_fees_count,
+            'total_fee_collected': total_fee_collected,
+
+            # For template compatibility
+            'teacher_students': recent_students,
+            'teacher_assignments': [],  # Placeholder for assignments if you have an assignment model
+            'teacher_events': [],  # Placeholder for events if you have an event model
+            'teacher_gradebooks': [],  # Placeholder for gradebook if you have a gradebook model
         }
         return render(request, 'TeacherDashboard/dashboard.html', context)
     except Staff.DoesNotExist:
