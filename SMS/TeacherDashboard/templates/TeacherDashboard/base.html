@@ -157,7 +157,7 @@
               <span class="user-status-indicator online" title="Online"></span>
             </div>
             <div class="user-info d-none d-md-inline-block">
-              <span class="user-name">{{ request.user.username }}</span>
+              <span class="user-name">{{ staff.fullname }}</span>
               <span class="user-role">{% if request.user.is_superuser %}Administrator{% else %}Staff{% endif %}</span>
             </div>
             <i class="fas fa-chevron-down user-dropdown-icon d-none d-md-inline-block"></i>
@@ -171,7 +171,7 @@
                   <span class="user-status-indicator-lg online" title="Online"></span>
                 </div>
                 <div class="user-details">
-                  <h6 class="user-name-lg">{{ request.user.username }}</h6>
+                  <h6 class="user-name-lg">{{ staff.fullname }}</h6>
                   <p class="user-role-lg">{% if request.user.is_superuser %}Administrator{% else %}Staff{% endif %}</p>
                 </div>
               </div>

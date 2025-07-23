@@ -17,28 +17,47 @@
   <link rel="stylesheet" href="{% static 'dist/css/login-page.css' %}">
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
+    html {
+      height: 100%;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
     body {
       background: url("{% static 'dist/img/bg.jpg' %}") no-repeat center center fixed;
       background-size: cover;
       font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      animation: fadeIn 1s ease-in;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .page-wrapper {
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      animation: fadeIn 1s ease-in;
-      color: #333;
+      min-height: 100vh;
+      width: 100%;
     }
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
     }
     .container {
-      width: 1200px;
+      width: 100%;
+      max-width: 1200px;
       display: flex;
       background: rgba(255, 255, 255, 0.9);
       box-shadow: 0px 15px 40px rgba(0, 0, 0, 0.3);
       border-radius: 20px;
       overflow: hidden;
+      min-height: 600px;
+      margin: auto;
     }
     .left-section {
       width: 50%;
@@ -70,7 +89,9 @@
       to { transform: translateX(0); opacity: 1; }
     }
     .logo img {
-      width: 300px;
+      width: 100%;
+      max-width: 300px;
+      height: auto;
       animation: bounceIn 1s ease-in-out;
     }
     @keyframes bounceIn {
@@ -78,7 +99,7 @@
       50% { transform: scale(1.1); opacity: 1; }
       100% { transform: scale(1); }
     }
-    input {
+    input, select {
       width: 100%;
       padding: 15px;
       margin: 16px 0;
@@ -86,8 +107,9 @@
       border: 1px solid #ccc;
       transition: 0.3s;
       font-size: 16px;
+      box-sizing: border-box;
     }
-    input:focus {
+    input:focus, select:focus {
       border-color: #3282B8;
       outline: none;
       box-shadow: 0px 0px 10px rgba(50, 130, 184, 0.5);
@@ -136,11 +158,172 @@
       font-size: 14px;
       margin-bottom: 10px;
     }
+
+    /* Responsive Media Queries */
+    @media (max-width: 1024px) {
+      .container {
+        max-width: 900px;
+      }
+      .left-section, .right-section {
+        padding: 50px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      html, body {
+        height: auto !important;
+        overflow-y: scroll !important;
+        -webkit-overflow-scrolling: touch;
+      }
+      body {
+        padding: 10px;
+        background-attachment: scroll;
+      }
+      .page-wrapper {
+        align-items: flex-start;
+        min-height: auto;
+        padding: 20px 0;
+      }
+      .container {
+        flex-direction: column;
+        max-width: 500px;
+        min-height: auto;
+        margin: 0 auto;
+      }
+      .left-section {
+        width: 100%;
+        padding: 30px 20px;
+        order: 1;
+        min-height: auto;
+      }
+      .right-section {
+        width: 100%;
+        padding: 30px 20px;
+        order: 2;
+        min-height: auto;
+      }
+      .logo img {
+        max-width: 200px;
+      }
+      h1 {
+        font-size: 24px;
+        margin-bottom: 10px;
+      }
+      h3 {
+        font-size: 18px;
+        margin-bottom: 15px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 5px;
+        background-attachment: scroll;
+      }
+      .page-wrapper {
+        padding: 10px 0;
+        min-height: auto;
+      }
+      .container {
+        border-radius: 15px;
+        max-width: 100%;
+        margin: 0;
+        min-height: auto;
+      }
+      .left-section, .right-section {
+        padding: 20px 15px;
+        min-height: auto;
+      }
+      .logo img {
+        max-width: 150px;
+      }
+      h1 {
+        font-size: 20px;
+        margin-bottom: 8px;
+      }
+      h3 {
+        font-size: 16px;
+        margin-bottom: 12px;
+      }
+      p {
+        font-size: 14px;
+        margin-bottom: 10px;
+      }
+      input, select {
+        padding: 12px;
+        font-size: 14px;
+        margin: 12px 0;
+      }
+      .login-btn {
+        padding: 12px;
+        font-size: 16px;
+        margin-top: 15px;
+      }
+    }
+
+    @media (max-width: 320px) {
+      body {
+        padding: 2px;
+      }
+      .page-wrapper {
+        padding: 5px 0;
+      }
+      .container {
+        margin: 0;
+        border-radius: 10px;
+      }
+      .left-section, .right-section {
+        padding: 15px 10px;
+      }
+      .logo img {
+        max-width: 120px;
+      }
+      h1 {
+        font-size: 18px;
+        margin-bottom: 6px;
+      }
+      h3 {
+        font-size: 14px;
+        margin-bottom: 8px;
+      }
+      p {
+        font-size: 12px;
+        margin-bottom: 8px;
+      }
+      input, select {
+        padding: 10px;
+        font-size: 13px;
+        margin: 10px 0;
+      }
+      .login-btn {
+        padding: 10px;
+        font-size: 14px;
+      }
+    }
+
+    /* Force scrolling on all mobile devices */
+    @media screen and (max-width: 768px) {
+      html {
+        overflow-y: scroll !important;
+        -webkit-overflow-scrolling: touch !important;
+      }
+      body {
+        overflow-y: scroll !important;
+        -webkit-overflow-scrolling: touch !important;
+        position: static !important;
+        height: auto !important;
+      }
+      .page-wrapper, .container {
+        position: static !important;
+        height: auto !important;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <div class="container">
+  <div class="page-wrapper">
+    <div class="container">
     <div class="left-section">
       <div class="logo">
         {% if profile.college_logo.url %}
@@ -164,7 +347,7 @@
       {% endif %}
       <form method="post" action="{% url 'login' %}">
         {% csrf_token %}
-        <select id="user_type" name="user_type" required style="width:100%;padding:15px;margin:16px 0;border-radius:12px;border:1px solid #ccc;font-size:16px;">
+        <select id="user_type" name="user_type" required>
           <option value="">-- Select User Type --</option>
           <option value="student">Student</option>
           <option value="teacher">Teacher</option>
@@ -188,7 +371,8 @@
       <a class="forgot-link" href="#">Forgot Username / Password?</a>
     </div>
   </div>
-  
+  </div>
+
   <!-- Scripts -->
   <script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
   <script src="{% static 'plugins/toastr/toastr.min.js' %}"></script>
