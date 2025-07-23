@@ -6,8 +6,11 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
   <title>{{ profile.college_name | default:"MySchool" }}</title>
 
@@ -163,8 +166,14 @@
       <!-- Left navbar links -->
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i
-              class="fas fa-bars"></i></a>
+          <a class="nav-link" data-widget="pushmenu" href="#" role="button" aria-label="Toggle navigation menu" title="Toggle Menu">
+            <i class="fas fa-bars"></i>
+          </a>
+        </li>
+        <li class="nav-item d-none d-md-inline-block">
+          <a class="nav-link" href="#" id="sidebar-settings-trigger" role="button" aria-label="Sidebar settings" title="Sidebar Settings">
+            <i class="fas fa-cog"></i>
+          </a>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
           <a href="{% url 'home' %} " class="nav-link"><i class="fa fa-home"></i></a>
@@ -873,6 +882,61 @@
   {% endblock morejs %}
 
   <!-- All JavaScript moved to custom.js -->
+
+  <!-- Mobile Touch Enhancement Script -->
+  <script>
+    // Mobile touch and responsive enhancements
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add touch support for mobile devices
+      if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+        document.body.classList.add('touch-device');
+
+        // Improve touch responsiveness for sidebar links
+        const sidebarLinks = document.querySelectorAll('.nav-sidebar .nav-link');
+        sidebarLinks.forEach(function(link) {
+          link.addEventListener('touchstart', function() {
+            this.classList.add('touch-active');
+          });
+
+          link.addEventListener('touchend', function() {
+            setTimeout(() => {
+              this.classList.remove('touch-active');
+            }, 150);
+          });
+        });
+
+        // Improve hamburger menu touch response
+        const hamburgerBtn = document.querySelector('[data-widget="pushmenu"]');
+        if (hamburgerBtn) {
+          hamburgerBtn.addEventListener('touchstart', function() {
+            this.style.transform = 'scale(0.95)';
+          });
+
+          hamburgerBtn.addEventListener('touchend', function() {
+            this.style.transform = '';
+          });
+        }
+      }
+
+      // Handle orientation changes
+      window.addEventListener('orientationchange', function() {
+        setTimeout(function() {
+          // Trigger resize event to recalculate sidebar
+          window.dispatchEvent(new Event('resize'));
+        }, 100);
+      });
+
+      // Prevent zoom on double tap for iOS
+      let lastTouchEnd = 0;
+      document.addEventListener('touchend', function(event) {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+          event.preventDefault();
+        }
+        lastTouchEnd = now;
+      }, false);
+    });
+  </script>
 
   <!-- Force CSS reload -->
   <script>
