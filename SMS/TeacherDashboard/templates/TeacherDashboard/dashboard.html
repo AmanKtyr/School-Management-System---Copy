@@ -41,9 +41,9 @@
   /* Fix for statistics cards text visibility */
   .statistics-card .card-body h4,
   .statistics-card .card-body p {
-    color: white !important;
+    color: black !important;
     font-weight: bold !important;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.5) !important;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.5) !important;
     opacity: 1 !important;
     visibility: visible !important;
   }
@@ -51,14 +51,14 @@
   .statistics-card .card-footer a,
   .statistics-card .card-footer small,
   .statistics-card .card-footer div {
-    color: white !important;
+    color: black !important;
     text-decoration: none !important;
     opacity: 1 !important;
     visibility: visible !important;
   }
 
   .statistics-card .card-footer a:hover {
-    color: #f8f9fa !important;
+    color: #333333 !important;
     opacity: 0.9 !important;
   }
 
@@ -75,12 +75,12 @@
   }
 
   /* Force text to be visible */
-  .text-white {
-    color: #ffffff !important;
+  .statistics-card .text-white {
+    color: #000000 !important;
   }
 
-  .text-white-50 {
-    color: rgba(255,255,255,0.75) !important;
+  .statistics-card .text-white-50 {
+    color: rgba(0,0,0,0.75) !important;
   }
 
   .fw-bold {
@@ -142,18 +142,18 @@
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center">
             <div class="flex-grow-1">
-              <h4 class="mb-1 fw-bold" style="color: #ffffff !important; font-size: 2rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">{{ total_students|default:0 }}</h4>
-              <p class="mb-0" style="color: rgba(255,255,255,0.85) !important; font-size: 0.9rem;">Total Students</p>
+              <h4 class="mb-1 fw-bold" style="color: #000000 !important; font-size: 2rem; text-shadow: 1px 1px 2px rgba(255,255,255,0.5);">{{ total_students|default:0 }}</h4>
+              <p class="mb-0" style="color: rgba(0,0,0,0.85) !important; font-size: 0.9rem;">Total Students</p>
             </div>
             <div class="ms-3">
-              <i class="fas fa-user-graduate fa-2x" style="color: rgba(255,255,255,0.7) !important;"></i>
+              <i class="fas fa-user-graduate fa-2x" style="color: rgba(0,0,0,0.7) !important;"></i>
             </div>
           </div>
         </div>
         <div class="card-footer bg-primary-dark border-0">
-          <a href="{% url 'teacher_students_list' %}" class="text-decoration-none d-flex justify-content-between align-items-center" style="color: #ffffff !important;">
-            <small style="color: #ffffff !important;">View All Students</small>
-            <i class="fas fa-arrow-right" style="color: #ffffff !important;"></i>
+          <a href="{% url 'teacher_students_list' %}" class="text-decoration-none d-flex justify-content-between align-items-center" style="color: #000000 !important;">
+            <small style="color: #000000 !important;">View All Students</small>
+            <i class="fas fa-arrow-right" style="color: #000000 !important;"></i>
           </a>
         </div>
       </div>
@@ -164,18 +164,18 @@
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center">
             <div class="flex-grow-1">
-              <h4 class="mb-1 fw-bold" style="color: #ffffff !important; font-size: 2rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">{{ new_admissions_this_month|default:0 }}</h4>
-              <p class="mb-0" style="color: rgba(255,255,255,0.85) !important; font-size: 0.9rem;">New Admissions</p>
+              <h4 class="mb-1 fw-bold" style="color: #000000 !important; font-size: 2rem; text-shadow: 1px 1px 2px rgba(255,255,255,0.5);">{{ new_admissions_this_month|default:0 }}</h4>
+              <p class="mb-0" style="color: rgba(0,0,0,0.85) !important; font-size: 0.9rem;">New Admissions</p>
             </div>
             <div class="ms-3">
-              <i class="fas fa-user-plus fa-2x" style="color: rgba(255,255,255,0.7) !important;"></i>
+              <i class="fas fa-user-plus fa-2x" style="color: rgba(0,0,0,0.7) !important;"></i>
             </div>
           </div>
         </div>
         <div class="card-footer bg-success-dark border-0">
-          <a href="{% url 'teacher_student_create' %}" class="text-decoration-none d-flex justify-content-between align-items-center" style="color: #ffffff !important;">
-            <small style="color: #ffffff !important;">Add New Student</small>
-            <i class="fas fa-arrow-right" style="color: #ffffff !important;"></i>
+          <a href="{% url 'teacher_student_create' %}" class="text-decoration-none d-flex justify-content-between align-items-center" style="color: #000000 !important;">
+            <small style="color: #000000 !important;">Add New Student</small>
+            <i class="fas fa-arrow-right" style="color: #000000 !important;"></i>
           </a>
         </div>
       </div>
@@ -186,17 +186,17 @@
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center">
             <div class="flex-grow-1">
-              <h4 class="mb-1 fw-bold" style="color: #ffffff !important; font-size: 2rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">{{ pending_fees_count|default:0 }}</h4>
-              <p class="mb-0" style="color: rgba(255,255,255,0.85) !important; font-size: 0.9rem;">Pending Fees</p>
+              <h4 class="mb-1 fw-bold" style="color: #000000 !important; font-size: 2rem; text-shadow: 1px 1px 2px rgba(255,255,255,0.5);">{{ pending_fees_count|default:0 }}</h4>
+              <p class="mb-0" style="color: rgba(0,0,0,0.85) !important; font-size: 0.9rem;">Pending Fees</p>
             </div>
             <div class="ms-3">
-              <i class="fas fa-money-bill-wave fa-2x" style="color: rgba(255,255,255,0.7) !important;"></i>
+              <i class="fas fa-money-bill-wave fa-2x" style="color: rgba(0,0,0,0.7) !important;"></i>
             </div>
           </div>
         </div>
         <div class="card-footer bg-warning-dark border-0">
           <div>
-            <small style="color: #ffffff !important;">Fee Management</small>
+            <small style="color: #000000 !important;">Fee Management</small>
           </div>
         </div>
       </div>
@@ -207,18 +207,18 @@
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center">
             <div class="flex-grow-1">
-              <h4 class="mb-1 fw-bold" style="color: #ffffff !important; font-size: 2rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">{{ today_attendance|default:0 }}</h4>
-              <p class="mb-0" style="color: rgba(255,255,255,0.85) !important; font-size: 0.9rem;">Today's Attendance</p>
+              <h4 class="mb-1 fw-bold" style="color: #000000 !important; font-size: 2rem; text-shadow: 1px 1px 2px rgba(255,255,255,0.5);">{{ today_attendance|default:0 }}</h4>
+              <p class="mb-0" style="color: rgba(0,0,0,0.85) !important; font-size: 0.9rem;">Today's Attendance</p>
             </div>
             <div class="ms-3">
-              <i class="fas fa-calendar-check fa-2x" style="color: rgba(255,255,255,0.7) !important;"></i>
+              <i class="fas fa-calendar-check fa-2x" style="color: rgba(0,0,0,0.7) !important;"></i>
             </div>
           </div>
         </div>
         <div class="card-footer bg-info-dark border-0">
-          <a href="{% url 'teacher_attendance_list' %}" class="text-decoration-none d-flex justify-content-between align-items-center" style="color: #ffffff !important;">
-            <small style="color: #ffffff !important;">View Attendance</small>
-            <i class="fas fa-arrow-right" style="color: #ffffff !important;"></i>
+          <a href="{% url 'teacher_attendance_list' %}" class="text-decoration-none d-flex justify-content-between align-items-center" style="color: #000000 !important;">
+            <small style="color: #000000 !important;">View Attendance</small>
+            <i class="fas fa-arrow-right" style="color: #000000 !important;"></i>
           </a>
         </div>
       </div>
