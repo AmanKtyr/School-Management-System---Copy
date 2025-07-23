@@ -36,9 +36,6 @@ urlpatterns = [
     # Main Dashboard
     path('dashboard/', teacher_dashboard, name='teacher_dashboard'),
 
-    # Test URL to verify teacher dashboard is working
-    path('test/', lambda request: HttpResponse("TEACHER DASHBOARD IS WORKING!"), name='teacher_test'),
-
     # ============ COMPREHENSIVE STUDENT MANAGEMENT ============
     # Enhanced Student Management (Class-based views)
     path('students/list/', TeacherStudentListView.as_view(), name='teacher_students_list'),
