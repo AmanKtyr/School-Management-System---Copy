@@ -1102,7 +1102,7 @@
                 <option value="4">4-Speech and Language disability</option>
                 <option value="5">5-Locomotor disability</option>
                 <option value="6">6-Mental illness</option>
-                <option value="7">7-Specific learning disabilities</option>
+                <option value="7">7-Specific Management disabilities</option>
                 <option value="8">8-Cerebral palsy</option>
                 <option value="9">9-Autism spectrum disorder</option>
                 <option value="10">10-Multiple disabilities</option>
@@ -1661,7 +1661,7 @@
           <div class="col-md-12 mb-4">
             <div class="udise-field-group">
               <label class="udise-field-label">
-                <span class="udise-field-number">1</span> Whether Student has been screened for Specific Learning Disability (SLD)?
+                <span class="udise-field-number">1</span> Whether Student has been screened for Specific Management Disability (SLD)?
               </label>
               <div class="udise-field-sublabel">
                 <span class="udise-rule-reference"></span>
@@ -2295,7 +2295,7 @@
               </tr>
               <tr>
                 <td style="width: 30px;" class="text-center">5</td>
-                <td>Whether Student has been screened for Specific Learning Disability (SLD)</td>
+                <td>Whether Student has been screened for Specific Management Disability (SLD)</td>
                 <td id="preview-sld-screened">No</td>
                 <td style="width: 30px;" class="text-center">6</td>
                 <td>Whether student is capable of handling digital devices including the internet?</td>
@@ -2647,7 +2647,7 @@
           </tr>
           <tr>
             <td style="width: 30px; text-align: center;">5</td>
-            <td>Whether Student has been screened for Specific Learning Disability (SLD)</td>
+            <td>Whether Student has been screened for Specific Management Disability (SLD)</td>
             <td>${document.getElementById('preview-sld-screened').textContent}</td>
             <td style="width: 30px; text-align: center;">6</td>
             <td>Whether student is capable of handling digital devices including the internet?</td>
@@ -3022,7 +3022,7 @@
       if (document.getElementById('cwsn_yes').checked) {
         specialNeeds = 'CWSN';
       } else if (document.getElementById('sld_yes').checked) {
-        specialNeeds = 'Specific Learning Disability';
+        specialNeeds = 'Specific Management Disability';
       } else if (document.getElementById('asd_yes').checked) {
         specialNeeds = 'Autism Spectrum Disorder';
       } else if (document.getElementById('adhd_yes').checked) {
@@ -3493,7 +3493,7 @@
         content: `
           <p>This section collects information about student's special needs and facilities:</p>
           <ul>
-            <li><strong>Special Learning Needs:</strong> Information about SLD, ASD, ADHD</li>
+            <li><strong>Special Management Needs:</strong> Information about SLD, ASD, ADHD</li>
             <li><strong>Physical Attributes:</strong> Height, weight, etc.</li>
             <li><strong>Distance to School:</strong> How far the student travels</li>
             <li><strong>Digital Capability:</strong> Student's ability to use digital devices</li>
