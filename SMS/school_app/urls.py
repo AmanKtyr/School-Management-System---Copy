@@ -32,6 +32,7 @@ urlpatterns = [
     path('exams/', include('apps.exams.urls', namespace='exams')),
     path('documents/', include('apps.documents.urls', namespace='documents')),
     path('transport/', include('apps.transport.urls')),
+    path('notices/', include('apps.notice.urls', namespace='notice')),
     path('student-dashboard/', include('StudentDashboard.urls')),
     path('teacher-dashboard/', include('TeacherDashboard.urls')),
     path('account-dashboard/', include('AccountDashboard.urls')),

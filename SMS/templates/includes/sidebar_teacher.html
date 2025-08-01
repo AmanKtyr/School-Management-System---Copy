@@ -9,6 +9,41 @@
     <li class="nav-item">
       <a href="#" class="nav-link"><i class="nav-icon fas fa-tasks"></i> <p>Assignments</p></a>
     </li>
+
+    <!-- Notice Section -->
+    <li class="nav-item has-treeview">
+      <a href="#" class="nav-link">
+        <i class="nav-icon fas fa-bullhorn"></i>
+        <p>Notices <i class="fas fa-angle-left right"></i></p>
+      </a>
+      <ul class="nav nav-treeview">
+        <li class="nav-item">
+          <a href="{% url 'notice:list' %}" class="nav-link">
+            <i class="fas fa-list nav-icon"></i>
+            <p>All Notices</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'notice:my_notices' %}" class="nav-link">
+            <i class="fas fa-user-circle nav-icon"></i>
+            <p>My Notices</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'notice:create' %}" class="nav-link">
+            <i class="fas fa-plus nav-icon"></i>
+            <p>Create Notice</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'notice:quick_create' %}" class="nav-link">
+            <i class="fas fa-bolt nav-icon"></i>
+            <p>Quick Notice</p>
+          </a>
+        </li>
+      </ul>
+    </li>
+
     <!-- Add more teacher links as needed -->
   </ul>
-</nav> 
+</nav>

@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if object %}Edit Category{% else %}Create Category{% endif %}{% endblock %}
+{% block title-icon %}fas fa-{% if object %}edit{% else %}plus{% endif %}{% endblock %}
+{% block subtitle %}{% if object %}Update category details{% else %}Create a new notice category{% endif %}{% endblock %}
+
+{% block page-actions %}
+<a href="{% url 'notice:category_list' %}" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left me-1"></i>Back to Categories
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-tag me-2"></i>Category Details
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">
+                                <strong>Category Name <span class="text-danger">*</span></strong>
+                            </label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                                <div class="text-danger small">{{ form.name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label for="{{ form.color.id_for_label }}" class="form-label">
+                                <strong>Color <span class="text-danger">*</span></strong>
+                            </label>
+                            {{ form.color }}
+                            {% if form.color.errors %}
+                                <div class="text-danger small">{{ form.color.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.description.id_for_label }}" class="form-label">
+                            <strong>Description</strong>
+                        </label>
+                        {{ form.description }}
+                        <small class="form-text text-muted">Optional description for this category</small>
+                        {% if form.description.errors %}
+                            <div class="text-danger small">{{ form.description.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="form-check">
+                            {{ form.is_active }}
+                            <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                <strong>Active Category</strong>
+                            </label>
+                            <small class="form-text text-muted d-block">Inactive categories won't be available for new notices</small>
+                        </div>
+                    </div>
+
+                    <!-- Preview Section -->
+                    <div class="mb-4">
+                        <h6>Preview:</h6>
+                        <div class="card" style="max-width: 300px;">
+                            <div class="card-header text-white" id="preview-header" style="background-color: {{ form.color.value|default:'#007bff' }};">
+                                <span id="preview-name">{{ form.name.value|default:'Category Name' }}</span>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text" id="preview-description">{{ form.description.value|default:'Category description will appear here...' }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Errors -->
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'notice:category_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>{% if object %}Update{% else %}Create{% endif %} Category
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Sidebar -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-question-circle me-2"></i>Help & Tips</h6>
+            </div>
+            <div class="card-body">
+                <h6>Category Guidelines:</h6>
+                <ul class="small">
+                    <li><strong>Name:</strong> Keep it short and descriptive (e.g., "Academic", "Events")</li>
+                    <li><strong>Color:</strong> Choose distinct colors for easy identification</li>
+                    <li><strong>Description:</strong> Briefly explain what notices belong in this category</li>
+                </ul>
+                
+                <h6 class="mt-3">Suggested Categories:</h6>
+                <ul class="small">
+                    <li><span class="badge bg-primary">Academic</span> - Academic announcements</li>
+                    <li><span class="badge bg-success">Events</span> - School events and activities</li>
+                    <li><span class="badge bg-warning">Holidays</span> - Holiday announcements</li>
+                    <li><span class="badge bg-danger">Urgent</span> - Urgent notices</li>
+                    <li><span class="badge bg-info">General</span> - General information</li>
+                </ul>
+                
+                <div class="alert alert-info mt-3">
+                    <small><i class="fas fa-lightbulb me-1"></i> <strong>Tip:</strong> Use consistent color schemes to help users quickly identify notice types.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block morejs %}
+<script>
+$(document).ready(function() {
+    // Live preview updates
+    function updatePreview() {
+        var name = $('#id_name').val() || 'Category Name';
+        var description = $('#id_description').val() || 'Category description will appear here...';
+        var color = $('#id_color').val() || '#007bff';
+        
+        $('#preview-name').text(name);
+        $('#preview-description').text(description);
+        $('#preview-header').css('background-color', color);
+    }
+    
+    // Update preview on input changes
+    $('#id_name, #id_description, #id_color').on('input change', updatePreview);
+    
+    // Initial preview update
+    updatePreview();
+});
+</script>
+{% endblock %}

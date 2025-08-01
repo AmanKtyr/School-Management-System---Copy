@@ -1,0 +1,292 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if object %}Edit Notice{% else %}Create Notice{% endif %}{% endblock %}
+{% block title-icon %}fas fa-{% if object %}edit{% else %}plus{% endif %}{% endblock %}
+{% block subtitle %}{% if object %}Update notice details{% else %}Create a new notice for your recipients{% endif %}{% endblock %}
+
+{% block page-actions %}
+<a href="{% url 'notice:list' %}" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left me-1"></i>Back to Notices
+</a>
+{% endblock %}
+
+{% block content %}
+<!-- Form -->
+<div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Notice Details</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" id="noticeForm">
+                        {% csrf_token %}
+                        
+                        <!-- Basic Information -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <label for="{{ form.title.id_for_label }}" class="form-label">
+                                    <strong>Title <span class="text-danger">*</span></strong>
+                                </label>
+                                {{ form.title }}
+                                {% if form.title.errors %}
+                                    <div class="text-danger small">{{ form.title.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <label for="{{ form.content.id_for_label }}" class="form-label">
+                                    <strong>Content <span class="text-danger">*</span></strong>
+                                </label>
+                                {{ form.content }}
+                                {% if form.content.errors %}
+                                    <div class="text-danger small">{{ form.content.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Settings Row -->
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="{{ form.category.id_for_label }}" class="form-label">Category</label>
+                                {{ form.category }}
+                                {% if form.category.errors %}
+                                    <div class="text-danger small">{{ form.category.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="{{ form.priority.id_for_label }}" class="form-label">
+                                    <strong>Priority <span class="text-danger">*</span></strong>
+                                </label>
+                                {{ form.priority }}
+                                {% if form.priority.errors %}
+                                    <div class="text-danger small">{{ form.priority.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="{{ form.status.id_for_label }}" class="form-label">
+                                    <strong>Status <span class="text-danger">*</span></strong>
+                                </label>
+                                {{ form.status }}
+                                {% if form.status.errors %}
+                                    <div class="text-danger small">{{ form.status.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Recipients Section -->
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h6 class="mb-0"><i class="fas fa-users me-2"></i>Recipients</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="{{ form.recipient_type.id_for_label }}" class="form-label">
+                                            <strong>Recipient Type <span class="text-danger">*</span></strong>
+                                        </label>
+                                        {{ form.recipient_type }}
+                                        {% if form.recipient_type.errors %}
+                                            <div class="text-danger small">{{ form.recipient_type.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6" id="target-class-section" style="display: none;">
+                                        <label for="{{ form.target_class.id_for_label }}" class="form-label">
+                                            <strong>Target Class <span class="text-danger">*</span></strong>
+                                        </label>
+                                        {{ form.target_class }}
+                                        {% if form.target_class.errors %}
+                                            <div class="text-danger small">{{ form.target_class.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Individual Recipients Section -->
+                                <div id="individual-recipients-section" style="display: none;">
+                                    <label class="form-label">
+                                        <strong>Select Individual Recipients <span class="text-danger">*</span></strong>
+                                    </label>
+                                    <div class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                                        {{ form.individual_recipients }}
+                                    </div>
+                                    {% if form.individual_recipients.errors %}
+                                        <div class="text-danger small">{{ form.individual_recipients.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Validity Period -->
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h6 class="mb-0"><i class="fas fa-calendar me-2"></i>Validity Period</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="{{ form.valid_from.id_for_label }}" class="form-label">Valid From</label>
+                                        {{ form.valid_from }}
+                                        {% if form.valid_from.errors %}
+                                            <div class="text-danger small">{{ form.valid_from.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="{{ form.valid_until.id_for_label }}" class="form-label">Valid Until</label>
+                                        {{ form.valid_until }}
+                                        <small class="form-text text-muted">Leave blank for no expiry</small>
+                                        {% if form.valid_until.errors %}
+                                            <div class="text-danger small">{{ form.valid_until.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Additional Options -->
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h6 class="mb-0"><i class="fas fa-cog me-2"></i>Additional Options</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            {{ form.is_important }}
+                                            <label class="form-check-label" for="{{ form.is_important.id_for_label }}">
+                                                Mark as Important
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            {{ form.send_email }}
+                                            <label class="form-check-label" for="{{ form.send_email.id_for_label }}">
+                                                Send Email Notification
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            {{ form.send_sms }}
+                                            <label class="form-check-label" for="{{ form.send_sms.id_for_label }}">
+                                                Send SMS Notification
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Attachment -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <label for="{{ form.attachment.id_for_label }}" class="form-label">Attachment</label>
+                                {{ form.attachment }}
+                                <small class="form-text text-muted">Optional: Upload a file to attach to this notice</small>
+                                {% if form.attachment.errors %}
+                                    <div class="text-danger small">{{ form.attachment.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Form Errors -->
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                        {% endif %}
+
+                        <!-- Submit Buttons -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'notice:list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i>Cancel
+                            </a>
+                            <div>
+                                <button type="submit" name="action" value="draft" class="btn btn-outline-primary me-2">
+                                    <i class="fas fa-save me-1"></i>Save as Draft
+                                </button>
+                                <button type="submit" name="action" value="publish" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane me-1"></i>{% if object %}Update{% else %}Create{% endif %} & Publish
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Sidebar -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-question-circle me-2"></i>Help & Tips</h6>
+                </div>
+                <div class="card-body">
+                    <h6>Recipient Types:</h6>
+                    <ul class="small">
+                        <li><strong>All Users:</strong> Send to everyone in the system</li>
+                        <li><strong>All Students:</strong> Send to all students</li>
+                        <li><strong>All Teachers:</strong> Send to all teaching staff</li>
+                        <li><strong>All Staff:</strong> Send to all staff members</li>
+                        <li><strong>Specific Class:</strong> Send to students in a particular class</li>
+                        <li><strong>Individual Users:</strong> Select specific recipients</li>
+                    </ul>
+                    
+                    <h6 class="mt-3">Priority Levels:</h6>
+                    <ul class="small">
+                        <li><strong>Urgent:</strong> Critical announcements</li>
+                        <li><strong>High:</strong> Important notices</li>
+                        <li><strong>Medium:</strong> Regular announcements</li>
+                        <li><strong>Low:</strong> General information</li>
+                    </ul>
+                    
+                    <h6 class="mt-3">Status Options:</h6>
+                    <ul class="small">
+                        <li><strong>Draft:</strong> Save without publishing</li>
+                        <li><strong>Published:</strong> Make visible to recipients</li>
+                        <li><strong>Archived:</strong> Hide from active notices</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block morejs %}
+<script>
+$(document).ready(function() {
+    // Show/hide recipient-specific fields
+    function toggleRecipientFields() {
+        var recipientType = $('#id_recipient_type').val();
+        
+        if (recipientType === 'class') {
+            $('#target-class-section').show();
+            $('#individual-recipients-section').hide();
+        } else if (recipientType === 'individual') {
+            $('#target-class-section').hide();
+            $('#individual-recipients-section').show();
+        } else {
+            $('#target-class-section').hide();
+            $('#individual-recipients-section').hide();
+        }
+    }
+    
+    // Initial call and event binding
+    toggleRecipientFields();
+    $('#id_recipient_type').change(toggleRecipientFields);
+    
+    // Handle form submission with different actions
+    $('button[name="action"]').click(function() {
+        var action = $(this).val();
+        if (action === 'draft') {
+            $('#id_status').val('draft');
+        } else if (action === 'publish') {
+            $('#id_status').val('published');
+        }
+    });
+});
+</script>
+{% endblock %}

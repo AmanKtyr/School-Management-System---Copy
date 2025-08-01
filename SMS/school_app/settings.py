@@ -48,16 +48,16 @@ INSTALLED_APPS = [
     "apps.corecode.apps.CorecodeConfig",
     "apps.students",
     "apps.staffs",
-    # "apps.result", # Removed
     "apps.NonTeachingStaffs",
     "apps.attendance",
     'apps.fees',
     'apps.exams',
+    'apps.notice',
     'apps.documents',
     'django_filters',
     'apps.transport',
     "TeacherDashboard",
-    "website",  # Ensure this is present for website templates
+    "website",  
 ]
 
 MIDDLEWARE = [

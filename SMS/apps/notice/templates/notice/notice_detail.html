@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ notice.title }}{% endblock %}
+{% block title-icon %}fas fa-bullhorn{% endblock %}
+{% block subtitle %}Notice Details{% endblock %}
+
+{% block page-actions %}
+<a href="{% url 'notice:list' %}" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left me-1"></i>Back to Notices
+</a>
+{% endblock %}
+
+{% block content %}
+<!-- Notice Detail -->
+<div class="row">
+        <div class="col-lg-8">
+            <div class="card notice-card priority-{{ notice.priority }} {% if notice.is_important %}important-notice{% endif %}">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h3 class="mb-1">
+                                {{ notice.title }}
+                                {% if notice.is_important %}
+                                    <i class="fas fa-star text-warning ms-2"></i>
+                                {% endif %}
+                            </h3>
+                            <div class="notice-meta">
+                                <span class="me-3">
+                                    <i class="fas fa-user me-1"></i>{{ notice.created_by.get_full_name|default:notice.created_by.username }}
+                                </span>
+                                <span class="me-3">
+                                    <i class="fas fa-calendar me-1"></i>{{ notice.created_at|date:"F d, Y" }}
+                                </span>
+                                <span class="me-3">
+                                    <i class="fas fa-clock me-1"></i>{{ notice.created_at|time:"H:i" }}
+                                </span>
+                                {% if notice.updated_at != notice.created_at %}
+                                <span class="me-3">
+                                    <i class="fas fa-edit me-1"></i>Updated: {{ notice.updated_at|date:"M d, Y H:i" }}
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <span class="notice-status status-{{ notice.status }}">
+                                {{ notice.get_status_display }}
+                            </span>
+                            <div class="mt-1">
+                                <small class="badge bg-secondary">{{ notice.get_priority_display }}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <!-- Category -->
+                    {% if notice.category %}
+                    <div class="mb-3">
+                        <span class="category-badge" style="background-color: {{ notice.category.color }}">
+                            <i class="fas fa-tag me-1"></i>{{ notice.category.name }}
+                        </span>
+                    </div>
+                    {% endif %}
+
+                    <!-- Content -->
+                    <div class="notice-content-full mb-4">
+                        {{ notice.content|linebreaks }}
+                    </div>
+
+                    <!-- Attachment -->
+                    {% if notice.attachment %}
+                    <div class="mb-4">
+                        <h6><i class="fas fa-paperclip me-2"></i>Attachment</h6>
+                        <div class="border rounded p-3">
+                            <a href="{{ notice.attachment.url }}" target="_blank" class="text-decoration-none">
+                                <i class="fas fa-download me-2"></i>{{ notice.attachment.name|slice:"9:" }}
+                            </a>
+                            <small class="text-muted ms-2">(Click to download)</small>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Validity Period -->
+                    {% if notice.valid_until %}
+                    <div class="mb-3">
+                        <h6><i class="fas fa-calendar-check me-2"></i>Validity Period</h6>
+                        <p class="text-muted mb-0">
+                            Valid from {{ notice.valid_from|date:"F d, Y H:i" }} 
+                            to {{ notice.valid_until|date:"F d, Y H:i" }}
+                        </p>
+                        {% if not notice.is_active %}
+                        <div class="alert alert-warning mt-2">
+                            <i class="fas fa-exclamation-triangle me-2"></i>This notice has expired.
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Actions -->
+                    {% if user_role == 'admin' or notice.created_by == user %}
+                    <div class="mt-4 pt-3 border-top">
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'notice:update' notice.pk %}" class="btn btn-primary">
+                                <i class="fas fa-edit me-1"></i>Edit Notice
+                            </a>
+                            <a href="{% url 'notice:delete' notice.pk %}" class="btn btn-danger" 
+                               onclick="return confirm('Are you sure you want to delete this notice?')">
+                                <i class="fas fa-trash me-1"></i>Delete Notice
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Notice Info -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Notice Information</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-2">
+                        <div class="col-5"><strong>Priority:</strong></div>
+                        <div class="col-7">
+                            <span class="badge bg-{{ notice.priority == 'urgent' and 'danger' or notice.priority == 'high' and 'warning' or notice.priority == 'medium' and 'info' or 'success' }}">
+                                {{ notice.get_priority_display }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5"><strong>Status:</strong></div>
+                        <div class="col-7">
+                            <span class="badge bg-{{ notice.status == 'published' and 'success' or notice.status == 'draft' and 'secondary' or 'danger' }}">
+                                {{ notice.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5"><strong>Recipients:</strong></div>
+                        <div class="col-7">{{ notice.get_recipient_type_display }}</div>
+                    </div>
+                    {% if notice.target_class %}
+                    <div class="row mb-2">
+                        <div class="col-5"><strong>Target Class:</strong></div>
+                        <div class="col-7">{{ notice.target_class.name }}</div>
+                    </div>
+                    {% endif %}
+                    <div class="row mb-2">
+                        <div class="col-5"><strong>Total Recipients:</strong></div>
+                        <div class="col-7">{{ notice.total_recipients }}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5"><strong>Read Count:</strong></div>
+                        <div class="col-7">{{ notice.read_count }}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5"><strong>Unread Count:</strong></div>
+                        <div class="col-7">{{ notice.unread_count }}</div>
+                    </div>
+                    {% if notice.send_email %}
+                    <div class="row mb-2">
+                        <div class="col-12">
+                            <i class="fas fa-envelope text-primary me-2"></i>Email notifications enabled
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if notice.send_sms %}
+                    <div class="row mb-2">
+                        <div class="col-12">
+                            <i class="fas fa-sms text-success me-2"></i>SMS notifications enabled
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Read Status (for current user) -->
+            {% if recipient_info %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-eye me-2"></i>Your Status</h6>
+                </div>
+                <div class="card-body">
+                    {% if recipient_info.is_read %}
+                    <div class="text-success">
+                        <i class="fas fa-check-circle me-2"></i>Read on {{ recipient_info.read_at|date:"F d, Y H:i" }}
+                    </div>
+                    {% else %}
+                    <div class="text-warning">
+                        <i class="fas fa-clock me-2"></i>Not read yet
+                    </div>
+                    {% endif %}
+                    
+                    {% if recipient_info.email_sent %}
+                    <div class="text-info mt-2">
+                        <i class="fas fa-envelope me-2"></i>Email sent on {{ recipient_info.email_sent_at|date:"M d, Y H:i" }}
+                    </div>
+                    {% endif %}
+                    
+                    {% if recipient_info.sms_sent %}
+                    <div class="text-success mt-2">
+                        <i class="fas fa-sms me-2"></i>SMS sent on {{ recipient_info.sms_sent_at|date:"M d, Y H:i" }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Recent Notices -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-list me-2"></i>Recent Notices</h6>
+                </div>
+                <div class="card-body">
+                    <!-- This would be populated with recent notices -->
+                    <p class="text-muted">Recent notices will be displayed here.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% csrf_token %}
+{% endblock %}
+
+{% block morejs %}
+<script>
+    // Mark notice as read when page loads
+    $(document).ready(function() {
+        $.post('{% url "notice:mark_read" notice.id %}', {
+            'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val()
+        });
+    });
+</script>
+{% endblock %}

@@ -294,57 +294,57 @@
               </a>
               <ul class="nav nav-treeview">
                   <li class="nav-item">
-                      <a href="{% url 'exams:dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' and 'exams' in request.path %}active{% endif %}">
-                          <i class="fas fa-tachometer-alt nav-icon" style="color: #ff9900;"></i>
+                      {% comment %} <a href="{% url 'exams:dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' and 'exams' in request.path %}active{% endif %}">
+                          <i class="fas fa-tachometer-alt nav-icon" style="color: #ff9900;"></i> {% endcomment %}
                           <p>Dashboard</p>
                       </a>
                   </li>
                   <li class="nav-item">
-                      <a href="{% url 'exams:exam_list' %}" class="nav-link {% if request.resolver_match.url_name == 'exam_list' %}active{% endif %}">
-                          <i class="fas fa-list-alt nav-icon" style="color: #ff6600;"></i>
+                      {% comment %} <a href="{% url 'exams:exam_list' %}" class="nav-link {% if request.resolver_match.url_name == 'exam_list' %}active{% endif %}">
+                          <i class="fas fa-list-alt nav-icon" style="color: #ff6600;"></i> {% endcomment %}
                           <p>Manage Exams</p>
                       </a>
                   </li>
                   <li class="nav-item">
-                      <a href="{% url 'exams:exam_schedule_list' %}" class="nav-link {% if request.resolver_match.url_name == 'exam_schedule_list' %}active{% endif %}">
-                          <i class="fas fa-calendar-alt nav-icon" style="color: #ff6600;"></i>
+                      {% comment %} <a href="{% url 'exams:exam_schedule_list' %}" class="nav-link {% if request.resolver_match.url_name == 'exam_schedule_list' %}active{% endif %}">
+                          <i class="fas fa-calendar-alt nav-icon" style="color: #ff6600;"></i> {% endcomment %}
                           <p>Exam Schedule</p>
                       </a>
                   </li>
                   <li class="nav-item">
-                      <a href="{% url 'exams:admit_card_list' %}" class="nav-link {% if request.resolver_match.url_name == 'admit_card_list' %}active{% endif %}">
-                          <i class="fas fa-id-card nav-icon" style="color: #cc3300;"></i>
+                      {% comment %} <a href="{% url 'exams:admit_card_list' %}" class="nav-link {% if request.resolver_match.url_name == 'admit_card_list' %}active{% endif %}">
+                          <i class="fas fa-id-card nav-icon" style="color: #cc3300;"></i> {% endcomment %}
                           <p>Admit Cards</p>
                       </a>
                   </li>
                   <li class="nav-item">
-                      <a href="{% url 'exams:marks_entry' %}" class="nav-link {% if request.resolver_match.url_name == 'marks_entry' %}active{% endif %}">
-                          <i class="fas fa-clipboard-check nav-icon" style="color: #33cc33;"></i>
+                      {% comment %} <a href="{% url 'exams:marks_entry' %}" class="nav-link {% if request.resolver_match.url_name == 'marks_entry' %}active{% endif %}">
+                          <i class="fas fa-clipboard-check nav-icon" style="color: #33cc33;"></i> {% endcomment %}
                           <p>Marks Entry</p>
                       </a>
                   </li>
                   <li class="nav-item">
-                      <a href="{% url 'exams:results' %}" class="nav-link {% if request.resolver_match.url_name == 'results' %}active{% endif %}">
-                          <i class="fas fa-chart-bar nav-icon" style="color: #3399ff;"></i>
+                      {% comment %} <a href="{% url 'exams:results' %}" class="nav-link {% if request.resolver_match.url_name == 'results' %}active{% endif %}">
+                          <i class="fas fa-chart-bar nav-icon" style="color: #3399ff;"></i> {% endcomment %}
                           <p>Results & Reports</p>
                       </a>
                   </li>
                   <li class="nav-item">
-                      <a href="{% url 'teacher_exams_list' %}" class="nav-link {% if request.resolver_match.url_name == 'teacher_exams_list' %}active{% endif %}">
-                          <i class="fas fa-eye nav-icon" style="color: #6c757d;"></i>
+                      {% comment %} <a href="{% url 'teacher_exams_list' %}" class="nav-link {% if request.resolver_match.url_name == 'teacher_exams_list' %}active{% endif %}">
+                          <i class="fas fa-eye nav-icon" style="color: #6c757d;"></i> {% endcomment %}
                           <p>View Exams (Old)</p>
                       </a>
                   </li>
                   <li class="nav-item">
-                      <a href="{% url 'teacher_marks_entry' %}" class="nav-link {% if request.resolver_match.url_name == 'teacher_marks_entry' %}active{% endif %}">
-                          <i class="fas fa-edit nav-icon" style="color: #6c757d;"></i>
+                      {% comment %} <a href="{% url 'teacher_marks_entry' %}" class="nav-link {% if request.resolver_match.url_name == 'teacher_marks_entry' %}active{% endif %}">
+                          <i class="fas fa-edit nav-icon" style="color: #6c757d;"></i> {% endcomment %}
                           <p>Marks Entry (Old)</p>
                       </a>
                   </li>
               </ul>
           </li>
 
-          <li class="nav-header">Documents</li>
+          {% comment %} <li class="nav-header">Documents</li>
           <li class="nav-item has-treeview {% if 'documents' in request.path or request.resolver_match.url_name == 'teacher_documents_list' %}menu-open{% endif %}">
               <a href="{% url 'documents:dashboard' %}" class="nav-link {% if 'documents' in request.path %}active{% endif %}">
                   <i class="nav-icon fas fa-folder-open" style="color: #9933ff; text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);"></i>
@@ -382,7 +382,7 @@
                       </a>
                   </li>
               </ul>
-          </li>
+          </li> {% endcomment %}
 
 
 
