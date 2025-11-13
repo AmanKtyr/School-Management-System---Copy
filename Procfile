@@ -1,1 +1,1 @@
-web: gunicorn school_app.wsgi --bind 0.0.0.0:$PORT
+web: gunicorn school_app.wsgi --log-file -

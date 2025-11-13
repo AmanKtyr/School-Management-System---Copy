@@ -18,18 +18,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', "__$1ud47e&nyso5h5o3fwnqu4+hfqcply9h$k*h2s34)hn5@nc")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG", "True") == "True"
+DEBUG = True
 
-# Allow all hosts temporarily (Railway assigns random subdomain)
 ALLOWED_HOSTS = ['*']
 
-# CSRF trusted origins (important for forms/login)
-CSRF_TRUSTED_ORIGINS = [
-    'https://*.up.railway.app',
-    'https://*.railway.app',
-    'https://django-school-management-system.onrender.com',
-    'https://vidyabharti.in',
-]
+CSRF_TRUSTED_ORIGINS = ['https://*.up.railway.app']
 
 # Installed apps
 INSTALLED_APPS = [
@@ -119,10 +112,7 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [BASE_DIR / "static"]
-
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
 MEDIA_ROOT = BASE_DIR / "media"
 MEDIA_URL = "/media/"
 
