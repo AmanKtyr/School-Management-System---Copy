@@ -31,7 +31,8 @@ SECRET_KEY = os.environ.get('SECRET_KEY', "__$1ud47e&nyso5h5o3fwnqu4+hfqcply9h$k
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['.up.railway.app', 'localhost', '127.0.0.1']
+
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
