@@ -39,7 +39,7 @@ if RENDER_EXTERNAL_HOSTNAME:
 
 RAILWAY_PUBLIC_DOMAIN = os.environ.get('RAILWAY_PUBLIC_DOMAIN')
 if RAILWAY_PUBLIC_DOMAIN:
-    ALLOWED_HOSTS.append("web-production-cc888.up.railway.app")
+    ALLOWED_HOSTS.append(RAILWAY_PUBLIC_DOMAIN)
 
 
 # Application definition
