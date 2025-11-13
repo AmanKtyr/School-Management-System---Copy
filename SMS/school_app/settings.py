@@ -39,7 +39,7 @@ if RENDER_EXTERNAL_HOSTNAME:
 
 RAILWAY_PUBLIC_DOMAIN = os.environ.get('RAILWAY_PUBLIC_DOMAIN')
 if RAILWAY_PUBLIC_DOMAIN:
-    ALLOWED_HOSTS.append(RAILWAY_PUBLIC_DOMAIN)
+    ALLOWED_HOSTS.append("web-production-cc888.up.railway.app")
 
 
 # Application definition
@@ -108,7 +108,7 @@ WSGI_APPLICATION = "school_app.wsgi.application"
 
 # for CSRF protection on railway
 CSRF_TRUSTED_ORIGINS = [
-    "https://web-production-41f28.up.railway.app",
+    "https://web-production-cc888.up.railway.app",
     'https://django-school-management-system.onrender.com',
     'https://vidyabharti.in',
 ]
