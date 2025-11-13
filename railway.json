@@ -1,12 +1,16 @@
 {
   "$schema": "https://railway.com/railway.schema.json",
   "build": {
-    "builder": "RAILPACK"
+    "builder": "RAILPACK",
+    "commands": [
+      "python SMS/manage.py migrate",
+      "python SMS/manage.py collectstatic --noinput"
+    ]
   },
   "deploy": {
     "runtime": "V2",
     "numReplicas": 1,
-    "startCommand": "python SMS/manage.py migrate && python SMS/manage.py collectstatic --noinput && gunicorn --chdir SMS school_app.wsgi:application",
+    "startCommand": "gunicorn --chdir SMS school_app.wsgi",
     "sleepApplication": false,
     "useLegacyStacker": false,
     "multiRegionConfig": {
