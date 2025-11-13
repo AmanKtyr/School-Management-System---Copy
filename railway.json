@@ -6,7 +6,7 @@
   "deploy": {
     "runtime": "V2",
     "numReplicas": 1,
-    "startCommand": "cd SMS && python manage.py migrate && python manage.py collectstatic --noinput && gunicorn school_app.wsgi:application",
+    "startCommand": "python SMS/manage.py migrate && python SMS/manage.py collectstatic --noinput && gunicorn --chdir SMS school_app.wsgi:application",
     "sleepApplication": false,
     "useLegacyStacker": false,
     "multiRegionConfig": {
