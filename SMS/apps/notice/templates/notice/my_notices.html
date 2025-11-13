@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Notices{% endblock %}
+{% block title-icon %}fas fa-user-circle{% endblock %}
+{% block subtitle %}Notices specifically for you{% endblock %}
+
+{% block page-actions %}
+<a href="{% url 'notice:list' %}" class="btn btn-outline-primary">
+    <i class="fas fa-list me-1"></i>All Notices
+</a>
+{% endblock %}
+
+{% block content %}
+<!-- Statistics -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ page_obj.paginator.count }}</h4>
+                        <p class="mb-0">Total My Notices</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-user-circle fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ unread_count }}</h4>
+                        <p class="mb-0">Unread</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-envelope fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ read_status.values|length }}</h4>
+                        <p class="mb-0">Read</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-check-circle fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notices List -->
+<div class="row">
+    {% for notice in page_obj %}
+    <div class="col-12 mb-3">
+        <div class="card notice-card priority-{{ notice.priority }} {% if notice.is_important %}important-notice{% endif %} {% if not notice.is_read_by_user %}unread-notice{% endif %}"
+             data-notice-id="{{ notice.id }}">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div class="flex-grow-1">
+                        <h5 class="card-title mb-1">
+                            <a href="{% url 'notice:detail' notice.pk %}" class="text-decoration-none">
+                                {% if not notice.is_read_by_user %}
+                                    <span class="badge bg-primary me-2">NEW</span>
+                                {% endif %}
+                                {{ notice.title }}
+                                {% if notice.is_important %}
+                                    <i class="fas fa-star text-warning ms-1"></i>
+                                {% endif %}
+                                {% if notice.attachment %}
+                                    <i class="fas fa-paperclip attachment-icon ms-1"></i>
+                                {% endif %}
+                            </a>
+                        </h5>
+                        <div class="notice-meta mb-2">
+                            <span class="me-3">
+                                <i class="fas fa-user me-1"></i>{{ notice.created_by.get_full_name|default:notice.created_by.username }}
+                            </span>
+                            <span class="me-3">
+                                <i class="fas fa-calendar me-1"></i>{{ notice.created_at|date:"M d, Y" }}
+                            </span>
+                            <span class="me-3">
+                                <i class="fas fa-clock me-1"></i>{{ notice.created_at|time:"H:i" }}
+                            </span>
+                            {% if notice.category %}
+                            <span class="category-badge me-2" style="background-color: {{ notice.category.color }}">
+                                {{ notice.category.name }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <span class="notice-status status-{{ notice.status }}">
+                            {{ notice.get_status_display }}
+                        </span>
+                        <div class="mt-1">
+                            <small class="text-muted">{{ notice.get_priority_display }}</small>
+                        </div>
+                        {% if notice.is_read_by_user %}
+                        <div class="mt-1">
+                            <small class="text-success">
+                                <i class="fas fa-check me-1"></i>Read
+                            </small>
+                        </div>
+                        {% else %}
+                        <div class="mt-1">
+                            <small class="text-warning">
+                                <i class="fas fa-clock me-1"></i>Unread
+                            </small>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="notice-content">
+                    {{ notice.content|truncatewords:30|linebreaks }}
+                </div>
+                {% if notice.content|wordcount > 30 %}
+                <span class="read-more">Read more...</span>
+                {% endif %}
+                
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <div>
+                        <small class="text-muted">
+                            <i class="fas fa-users me-1"></i>{{ notice.get_recipient_type_display }}
+                            {% if notice.target_class %}
+                                - {{ notice.target_class.name }}
+                            {% endif %}
+                        </small>
+                    </div>
+                    <div>
+                        <a href="{% url 'notice:detail' notice.pk %}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-eye me-1"></i>View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="text-center py-5">
+            <i class="fas fa-user-circle fa-3x text-muted mb-3"></i>
+            <h4 class="text-muted">No Personal Notices</h4>
+            <p class="text-muted">You don't have any personal notices at the moment.</p>
+            <a href="{% url 'notice:list' %}" class="btn btn-primary">
+                <i class="fas fa-list me-1"></i>View All Notices
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if page_obj.has_other_pages %}
+<div class="row">
+    <div class="col-12">
+        <nav aria-label="My notices pagination">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1">
+                        <i class="fas fa-angle-double-left"></i> First
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                        <i class="fas fa-angle-left"></i> Prev
+                    </a>
+                </li>
+                {% endif %}
+
+                <!-- Show page numbers with active state -->
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <li class="page-item active" aria-current="page">
+                            <span class="page-link bg-primary border-primary text-white fw-bold shadow-sm">
+                                {{ num }}
+                                <span class="visually-hidden">(current page)</span>
+                            </span>
+                        </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                    {% elif num == 1 %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                        {% if page_obj.number > 4 %}
+                            <li class="page-item disabled">
+                                <span class="page-link text-muted">...</span>
+                            </li>
+                        {% endif %}
+                    {% elif num == page_obj.paginator.num_pages %}
+                        {% if page_obj.number < page_obj.paginator.num_pages|add:'-3' %}
+                            <li class="page-item disabled">
+                                <span class="page-link text-muted">...</span>
+                            </li>
+                        {% endif %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                        Next <i class="fas fa-angle-right"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">
+                        Last <i class="fas fa-angle-double-right"></i>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+
+        <!-- Pagination Info with Active Page Highlight -->
+        <div class="text-center mt-2">
+            <small class="text-muted">
+                <i class="fas fa-info-circle me-1"></i>
+                Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} personal notices
+                | <span class="text-primary fw-bold">Page {{ page_obj.number }}</span> of {{ page_obj.paginator.num_pages }}
+            </small>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block morejs %}
+<script>
+$(document).ready(function() {
+    // Read more functionality
+    $('.read-more').click(function() {
+        var content = $(this).siblings('.notice-content');
+        if (content.hasClass('expanded')) {
+            content.removeClass('expanded');
+            $(this).text('Read more...');
+        } else {
+            content.addClass('expanded');
+            $(this).text('Read less');
+        }
+    });
+    
+    // Mark notice as read when clicked
+    $('.notice-card').click(function() {
+        var noticeId = $(this).data('notice-id');
+        if (noticeId) {
+            $.post('{% url "notice:mark_read" 0 %}'.replace('0', noticeId), {
+                'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val()
+            });
+        }
+    });
+});
+</script>
+
+{% csrf_token %}
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Quick Notice{% endblock %}
+{% block title-icon %}fas fa-bolt{% endblock %}
+{% block subtitle %}Create and publish a notice instantly{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt me-2"></i>Quick Notice
+                    </h5>
+                    <small>Create and publish a notice instantly</small>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="quickNoticeForm">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.title.id_for_label }}" class="form-label">
+                                <strong>Title <span class="text-danger">*</span></strong>
+                            </label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                                <div class="text-danger small">{{ form.title.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.content.id_for_label }}" class="form-label">
+                                <strong>Content <span class="text-danger">*</span></strong>
+                            </label>
+                            {{ form.content }}
+                            {% if form.content.errors %}
+                                <div class="text-danger small">{{ form.content.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.recipient_type.id_for_label }}" class="form-label">
+                                    <strong>Send To <span class="text-danger">*</span></strong>
+                                </label>
+                                {{ form.recipient_type }}
+                                {% if form.recipient_type.errors %}
+                                    <div class="text-danger small">{{ form.recipient_type.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.priority.id_for_label }}" class="form-label">
+                                    <strong>Priority <span class="text-danger">*</span></strong>
+                                </label>
+                                {{ form.priority }}
+                                {% if form.priority.errors %}
+                                    <div class="text-danger small">{{ form.priority.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check">
+                                {{ form.is_important }}
+                                <label class="form-check-label" for="{{ form.is_important.id_for_label }}">
+                                    Mark as Important Notice
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Quick Notice:</strong> This notice will be published immediately and sent to the selected recipients. 
+                            For more advanced options like attachments, validity periods, or individual recipient selection, 
+                            use the <a href="{% url 'notice:create' %}" class="alert-link">full notice creation form</a>.
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'notice:list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-bolt me-1"></i>Create & Publish Quick Notice
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block morejs %}
+<script>
+$(document).ready(function() {
+    // Add confirmation for quick notice submission
+    $('#quickNoticeForm').submit(function(e) {
+        var recipientType = $('#id_recipient_type option:selected').text();
+        var title = $('#id_title').val();
+        
+        if (!confirm('Are you sure you want to create and publish "' + title + '" to ' + recipientType + '?')) {
+            e.preventDefault();
+        }
+    });
+});
+</script>
+{% endblock %}

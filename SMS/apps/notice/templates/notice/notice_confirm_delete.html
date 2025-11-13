@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Delete Notice{% endblock %}
+{% block title-icon %}fas fa-trash{% endblock %}
+{% block subtitle %}Confirm notice deletion{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Confirm Delete Notice
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-warning me-2"></i>
+                        <strong>Warning:</strong> This action cannot be undone. All recipient data and statistics will be permanently deleted.
+                    </div>
+                    
+                    <h6>You are about to delete the following notice:</h6>
+                    
+                    <div class="card mt-3 mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ object.title }}</h5>
+                            <p class="card-text">{{ object.content|truncatewords:50 }}</p>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <small class="text-muted">
+                                        <strong>Created by:</strong> {{ object.created_by.get_full_name|default:object.created_by.username }}<br>
+                                        <strong>Created on:</strong> {{ object.created_at|date:"F d, Y H:i" }}<br>
+                                        <strong>Priority:</strong> {{ object.get_priority_display }}<br>
+                                        <strong>Status:</strong> {{ object.get_status_display }}
+                                    </small>
+                                </div>
+                                <div class="col-md-6">
+                                    <small class="text-muted">
+                                        <strong>Recipients:</strong> {{ object.get_recipient_type_display }}<br>
+                                        <strong>Total Recipients:</strong> {{ object.total_recipients }}<br>
+                                        <strong>Read Count:</strong> {{ object.read_count }}<br>
+                                        <strong>Unread Count:</strong> {{ object.unread_count }}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'notice:detail' object.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-1"></i>Yes, Delete Notice
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

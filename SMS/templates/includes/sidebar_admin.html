@@ -9,6 +9,41 @@
     <li class="nav-item">
       <a href="{% url 'student-list' %}" class="nav-link"><i class="nav-icon fas fa-user-graduate"></i> <p>Student Management</p></a>
     </li>
+
+    <!-- Notice Management -->
+    <li class="nav-item has-treeview">
+      <a href="#" class="nav-link">
+        <i class="nav-icon fas fa-bullhorn"></i>
+        <p>Notice Management <i class="fas fa-angle-left right"></i></p>
+      </a>
+      <ul class="nav nav-treeview">
+        <li class="nav-item">
+          <a href="{% url 'notice:list' %}" class="nav-link">
+            <i class="fas fa-list nav-icon"></i>
+            <p>All Notices</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'notice:create' %}" class="nav-link">
+            <i class="fas fa-plus nav-icon"></i>
+            <p>Create Notice</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'notice:quick_create' %}" class="nav-link">
+            <i class="fas fa-bolt nav-icon"></i>
+            <p>Quick Notice</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'notice:category_list' %}" class="nav-link">
+            <i class="fas fa-tags nav-icon"></i>
+            <p>Categories</p>
+          </a>
+        </li>
+      </ul>
+    </li>
+
     <li class="nav-item">
       <a href="{% url 'system_settings_dashboard' %}" class="nav-link"><i class="nav-icon fas fa-cogs"></i> <p>System Settings</p></a>
     </li>
