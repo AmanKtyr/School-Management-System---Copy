@@ -1,1 +1,1 @@
-web: cd SMS && gunicorn school_app.wsgi:application
+web: python SMS/manage.py migrate && python SMS/manage.py collectstatic --noinput && gunicorn --chdir SMS school_app.wsgi:application
