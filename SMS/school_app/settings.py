@@ -19,8 +19,8 @@ SECRET_KEY = os.environ.get('SECRET_KEY', "__$1ud47e&nyso5h5o3fwnqu4+hfqcply9h$k
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = [
-    'school-management-system-copy-school.up.railway.app',
-    'localhost',
+    os.environ.get('RAILWAY_STATIC_URL', 'localhost').split('//')[-1],
+    '127.0.0.1',
 ]
 
 
