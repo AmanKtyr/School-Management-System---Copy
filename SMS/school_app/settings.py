@@ -18,11 +18,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', "__$1ud47e&nyso5h5o3fwnqu4+hfqcply9h$k*h2s34)hn5@nc")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = ['*']
 
-CSRF_TRUSTED_ORIGINS = ['https://*.up.railway.app']
+# for CSRF protection on railway
+RAILWAY_PUBLIC_DOMAIN = os.environ.get('RAILWAY_PUBLIC_DOMAIN')
+if RAILWAY_PUBLIC_DOMAIN:
+    CSRF_TRUSTED_ORIGINS = [f"https://{RAILWAY_PUBLIC_DOMAIN}"]
+else:
+    CSRF_TRUSTED_ORIGINS = ['https://*.up.railway.app']
+
 
 # Installed apps
 INSTALLED_APPS = [
@@ -87,7 +93,7 @@ WSGI_APPLICATION = "school_app.wsgi.application"
 # Database
 DATABASES = {
     'default': dj_database_url.config(
-        conn_max_age=600,
+        conn_max_age=None,
         default='sqlite:///db.sqlite3'
     )
 }
@@ -112,6 +118,9 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_ROOT = BASE_DIR / "media"
 MEDIA_URL = "/media/"
