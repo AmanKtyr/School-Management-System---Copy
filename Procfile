@@ -1,1 +1,1 @@
-web: gunicorn school_app.wsgi:application --bind 0.0.0.0:$PORT --workers 3
+web: gunicorn --chdir SMS school_app.wsgi:application
