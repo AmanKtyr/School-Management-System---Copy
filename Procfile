@@ -1,0 +1,1 @@
+web: gunicorn --chdir SMS school_app.wsgi:application

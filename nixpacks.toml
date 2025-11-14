@@ -1,0 +1,13 @@
+[phases.setup]
+aptPkgs = [
+    "..."]
+
+[phases.build]
+cmds = [
+    "pip install -r requirements.txt",
+    "python SMS/manage.py migrate",
+    "python SMS/manage.py collectstatic --no-input",
+]
+
+[start]
+command = "gunicorn --chdir SMS school_app.wsgi:application"
