@@ -1,2 +1,2 @@
-release: python manage.py migrate
-web: gunicorn school_app.wsgi --bind 0.0.0.0:$PORT
+release: python SMS/manage.py migrate
+web: gunicorn --chdir SMS school_app.wsgi
