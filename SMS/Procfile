@@ -1,2 +1,2 @@
-release: python SMS/manage.py migrate && python SMS/manage.py collectstatic --noinput
-web: gunicorn SMS.school_app.wsgi
+release: python manage.py migrate && python manage.py collectstatic --noinput
+web: gunicorn school_app.wsgi
