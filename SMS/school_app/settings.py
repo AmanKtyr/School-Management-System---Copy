@@ -109,6 +109,7 @@ WSGI_APPLICATION = "school_app.wsgi.application"
 
 # for CSRF protection on railway
 CSRF_TRUSTED_ORIGINS = [
+    f"https://{RAILWAY_PUBLIC_DOMAIN}",
     "https://web-production-cc888.up.railway.app",
     'https://django-school-management-system.onrender.com',
     'https://vidyabharti.in',
@@ -118,7 +119,9 @@ CSRF_TRUSTED_ORIGINS = [
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-DATABASES = {'default': dj_database_url.config(conn_max_age=600, default='sqlite:///db.sqlite3')}
+DATABASES = {
+    'default': dj_database_url.config(conn_max_age=None, default='sqlite:///db.sqlite3')
+}
 
 
 # Password validation
@@ -160,9 +163,9 @@ USE_TZ = True
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
 
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-STATICFILES_DIRS = (BASE_DIR / "static",)
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
