@@ -5,7 +5,7 @@
   },
   "deploy": {
     "startCommand": "gunicorn --chdir SMS school_app.wsgi:application",
-    "preDeployCommand": "python SMS/manage.py makemigrations && python SMS/manage.py migrate && python SMS/manage.py collectstatic --no-input",
+    "preDeployCommand": "python SMS/manage.py migrate && python SMS/manage.py collectstatic --no-input",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }
