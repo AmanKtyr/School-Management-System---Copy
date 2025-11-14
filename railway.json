@@ -1,9 +1,10 @@
 {
+  "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "NIXPACKS"
   },
   "deploy": {
     "startCommand": "gunicorn SMS.school_app.wsgi:application --bind 0.0.0.0:$PORT",
-    "preDeployCommand": "python SMS/manage.py migrate && python SMS/manage.py collectstatic --noinput"
+    "preDeployCommand": "bash deploy.sh"
   }
 }
