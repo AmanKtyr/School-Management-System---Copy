@@ -18,7 +18,11 @@ SECRET_KEY = os.environ.get('SECRET_KEY', "__$1ud47e&nyso5h5o3fwnqu4+hfqcply9h$k
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    'school-management-system-copy-school.up.railway.app',
+    'localhost',
+]
+
 
 # for CSRF protection on railway
 RAILWAY_PUBLIC_DOMAIN = os.environ.get('RAILWAY_PUBLIC_DOMAIN')
