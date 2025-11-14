@@ -4,7 +4,7 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "gunicorn SMS.school_app.wsgi --bind 0.0.0.0:$PORT",
+    "startCommand": "gunicorn SMS.school_app.wsgi:application --bind 0.0.0.0:$PORT",
     "preDeployCommand": "python SMS/manage.py migrate --noinput && python SMS/manage.py collectstatic --noinput",
     "healthcheckPath": "/",
     "healthcheckTimeout": 120
