@@ -149,7 +149,11 @@
   <div class="loader-wrapper">
     <div class="loader">
       <div class="school-logo">
-        <i class="fas fa-graduation-cap"></i>
+        {% if profile.college_logo %}
+          <img src="{{ profile.college_logo.url }}" alt="{{ profile.college_name }}" class="brand-image img-circle elevation-3" style="opacity: .8">
+        {% else %}
+          <i class="fas fa-graduation-cap"></i>
+        {% endif %}
       </div>
     </div>
     <div class="loading-text">LOADING</div>
